@@ -31,7 +31,7 @@ interface Tutorial {
 
 const tutorials: Tutorial[] = [
   {
-    id: 'introduction-to-kortix',
+    id: 'introduction-to-bapx',
     title: 'Introduction to Bapx Media Hub',
     description: 'Get a comprehensive overview of Bapx Media Hub and discover the different AI-powered content generation modes available to supercharge your workflow.',
     duration: '3 min',
@@ -322,7 +322,7 @@ export default function TutorialsPage() {
                     Support
                   </Link>
                   <a
-                    href="mailto:support@kortix.com"
+                    href="mailto:support@bapx.in"
                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
                   >
                     <ChevronRight className="w-4 h-4" />

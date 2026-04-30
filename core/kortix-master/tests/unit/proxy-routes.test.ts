@@ -177,7 +177,7 @@ describe('Proxy Routes (/proxy)', () => {
   // ─── Blocked port ────────────────────────────────────────────────────
 
   describe('blocked port', () => {
-    it('returns 403 for the Kortix Master port (default 8000)', async () => {
+    it('returns 403 for the Bapx Master port (default 8000)', async () => {
       const blockedPort = config.PORT // Should be 8000
 
       const res = await app.request(`/proxy/${blockedPort}/anything`)

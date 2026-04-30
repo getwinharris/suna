@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/trailbase/client';
 import { toast } from '@/lib/toast';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { BapxLoader } from '@/components/ui/bapx-loader';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 
@@ -37,7 +37,7 @@ interface GoogleSignInProps {
 
 export default function GoogleSignIn({ returnUrl, referralCode }: GoogleSignInProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = createClient();
+  const trailbase = createClient();
   const t = useTranslations('auth');
 
   const handleGoogleSignIn = async () => {
@@ -48,17 +48,11 @@ export default function GoogleSignIn({ returnUrl, referralCode }: GoogleSignInPr
         document.cookie = `pending-referral-code=${referralCode.trim().toUpperCase()}; path=/; max-age=600; SameSite=Lax`;
       }
       
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback${returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ''
-            }`,
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
+      // Trailbase handles OAuth via direct redirect
+      const url = new URL(`${trailbase.auth.getUrl()}/oauth/google`);
+      url.searchParams.set('redirect_to', `${window.location.origin}/auth/callback${returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ''}`);
+      
+      window.location.href = url.toString();
     } catch (error: any) {
       console.error('Google sign-in error:', error);
       toast.error(error.message || 'Failed to sign in with Google');
@@ -76,7 +70,7 @@ export default function GoogleSignIn({ returnUrl, referralCode }: GoogleSignInPr
       type="button"
     >
       {isLoading ? (
-        <KortixLoader size="small" />
+        <BapxLoader size="small" />
       ) : (
         <GoogleIcon className="w-4 h-4" />
       )}

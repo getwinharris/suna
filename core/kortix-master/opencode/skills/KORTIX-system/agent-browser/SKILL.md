@@ -423,13 +423,13 @@ agent-browser --session agent1 close   # Close specific session
 
 If a previous session was not closed properly, the daemon may still be running. Use `agent-browser close` to clean it up before starting new work.
 
-## Live Viewer URL (Required in Kortix)
+## Live Viewer URL (Required in Bapx)
 
-Kortix keeps a persistent primary browser session named `kortix` alive for the live viewer. Reuse that session instead of creating ad hoc sessions or overriding stream ports.
+Bapx keeps a persistent primary browser session named `bapx` alive for the live viewer. Reuse that session instead of creating ad hoc sessions or overriding stream ports.
 
-Mandatory launch policy in Kortix:
+Mandatory launch policy in Bapx:
 
-1. Reuse the existing `kortix` session unless the task explicitly requires isolation
+1. Reuse the existing `bapx` session unless the task explicitly requires isolation
 2. Do not set `AGENT_BROWSER_STREAM_PORT` manually
 3. Only use a different session name when parallel browser state is truly needed
 
@@ -442,12 +442,12 @@ agent-browser open <url>
 Optional explicit form when you need to be precise about the primary session:
 
 ```bash
-agent-browser --session kortix open <url>
+agent-browser --session bapx open <url>
 ```
 
 Required behavior:
 
-1. Determine the active session name (default to `kortix` in the Kortix sandbox)
+1. Determine the active session name (default to `bapx` in the Bapx sandbox)
 2. Construct the viewer URL with `?session=<name>`
 3. Return that URL to the human right away after session init or navigation when browser visibility matters
 
@@ -462,7 +462,7 @@ Example:
 ```bash
 agent-browser open https://app.example.com
 # Then share:
-# http://localhost:9224/?session=kortix
+# http://localhost:9224/?session=bapx
 ```
 
 Do not wait for the human to ask for the viewer link. Provide it automatically whenever the live browser view is relevant.

@@ -4,7 +4,7 @@
  * The completion contract is a single unique XML tag the worker emits
  * intentionally when it believes the task is 100% done and verified:
  *
- *   <kortix_autowork_complete>
+ *   <bapx_autowork_complete>
  *     <verification>
  *       [real command output + exit codes]
  *     </verification>
@@ -12,7 +12,7 @@
  *       - [x] "requirement 1" — evidence
  *       - [x] "requirement 2" — evidence
  *     </requirements_check>
- *   </kortix_autowork_complete>
+ *   </bapx_autowork_complete>
  *
  * The tag name is namespaced so it cannot appear in prose, logs, or code
  * output by accident. Malformed or incomplete tags are rejected by the
@@ -20,20 +20,20 @@
  */
 
 /** Unique XML tag the worker emits to declare completion. */
-export const COMPLETION_TAG = "kortix_autowork_complete"
+export const COMPLETION_TAG = "bapx_autowork_complete"
 
 /** Unique XML tag the worker emits to declare an approved execution plan. */
-export const PLAN_TAG = "kortix_autowork_plan"
+export const PLAN_TAG = "bapx_autowork_plan"
 
 /** Unique XML tag the worker emits to declare the final verifier pass succeeded. */
-export const VERIFIED_TAG = "kortix_autowork_verified"
+export const VERIFIED_TAG = "bapx_autowork_verified"
 
 /** Wrapper tag around every plugin-injected prompt — used by the filter
  * to detect internal messages so they never trigger re-evaluation. */
-export const SYSTEM_WRAPPER_TAG = "kortix_autowork_system"
+export const SYSTEM_WRAPPER_TAG = "bapx_autowork_system"
 
 /** Wrapper around the re-injected user-requirement block. */
-export const REQUEST_TAG = "kortix_autowork_request"
+export const REQUEST_TAG = "bapx_autowork_request"
 
 export interface AutoworkOptions {
 	maxIterations: number
@@ -164,7 +164,7 @@ const VERIFICATION_COMMAND_LINE = /^\s*(?:\$|bun\b|pnpm\b|npm\b|yarn\b|npx\b|nod
 /**
  * Parser for the completion tag.
  *
- * - Returns `null` if the outer `<kortix_autowork_complete>` tag is absent.
+ * - Returns `null` if the outer `<bapx_autowork_complete>` tag is absent.
  * - Returns a `ParsedCompletion` if the outer tag is present, even if the
  *   children are missing or empty — downstream `validateCompletion` turns that
  *   into a structured rejection so the worker learns exactly what's missing.

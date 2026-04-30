@@ -21,9 +21,9 @@ describe("opencode storage path helpers", () => {
 
 	test("persistent root maps to /opencode storage dir", async () => {
 		delete process.env.OPENCODE_STORAGE_BASE
-		process.env.KORTIX_PERSISTENT_ROOT = "/tmp/kortix-persistent"
+		process.env.KORTIX_PERSISTENT_ROOT = "/tmp/bapx-persistent"
 		const mod = await import(`./opencode-storage-paths.ts?persistent=${Date.now()}`)
-		expect(mod.getOpencodeStorageBase()).toBe("/tmp/kortix-persistent/opencode")
-		expect(mod.getOpencodeStoragePath("workspace", "abc")).toBe("/tmp/kortix-persistent/opencode/workspace/abc")
+		expect(mod.getOpencodeStorageBase()).toBe("/tmp/bapx-persistent/opencode")
+		expect(mod.getOpencodeStoragePath("workspace", "abc")).toBe("/tmp/bapx-persistent/opencode/workspace/abc")
 	})
 })

@@ -1,8 +1,8 @@
 # OpenCode skills dependency spec
 
 Audit scope:
-- every folder under `core/kortix-master/opencode/skills/GENERAL-KNOWLEDGE-WORKER/`
-- every folder under `core/kortix-master/opencode/skills/KORTIX-system/`
+- every folder under `core/bapx-master/opencode/skills/GENERAL-KNOWLEDGE-WORKER/`
+- every folder under `core/bapx-master/opencode/skills/KORTIX-system/`
 
 Method used:
 - walked the full skill tree (64 skills)

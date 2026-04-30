@@ -79,7 +79,7 @@ interface MarketplacePageProps {
   isRightDrawerOpen?: boolean;
 }
 
-const REGISTRY_URL = 'https://kortix-registry-6om.pages.dev';
+const REGISTRY_URL = 'https://bapx-registry-6om.pages.dev';
 
 const FILTERS: Array<{ key: FilterKey; label: string }> = [
   { key: 'all', label: 'All' },
@@ -266,7 +266,7 @@ async function runPtyCommand(sandboxUrl: string, command: string): Promise<strin
 async function installComponentWithOcx(sandboxUrl: string, componentName: string): Promise<void> {
   const output = await runPtyCommand(
     sandboxUrl,
-    `cd /workspace && ocx init -q 2>/dev/null && ocx registry add https://kortix-registry-6om.pages.dev --name kortix -q 2>/dev/null; ocx add kortix/${componentName} 2>&1`,
+    `cd /workspace && ocx init -q 2>/dev/null && ocx registry add https://bapx-registry-6om.pages.dev --name bapx -q 2>/dev/null; ocx add bapx/${componentName} 2>&1`,
   );
   const normalized = output.toLowerCase();
   const looksInstalled = normalized.includes('installed') || normalized.includes('done');

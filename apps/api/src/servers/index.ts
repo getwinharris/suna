@@ -13,11 +13,11 @@
 
 import { Hono } from 'hono';
 import { eq, and } from 'drizzle-orm';
-import { serverEntries } from '@kortix/db';
+import { serverEntries } from '@bapx/db';
 import type { AppEnv } from '../types';
 import { db } from '../shared/db';
 import { config } from '../config';
-import { supabaseAuth } from '../middleware/auth';
+import { trailbaseAuth } from '../middleware/auth';
 import { resolveAccountId } from '../shared/resolve-account';
 
 export const serversApp = new Hono<AppEnv>();
@@ -25,7 +25,7 @@ export const serversApp = new Hono<AppEnv>();
 // ─── Auth middleware ────────────────────────────────────────────────────────
 // In cloud mode: require Supabase JWT. In local mode: inject static userId.
 
-serversApp.use('/*', supabaseAuth);
+serversApp.use('/*', trailbaseAuth);
 
 // ─── Static routes MUST come before parameterized /:id routes ───────────────
 

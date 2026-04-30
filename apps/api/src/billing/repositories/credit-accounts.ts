@@ -1,5 +1,5 @@
 import { eq, and, or, isNull, lte, ne, sql } from 'drizzle-orm';
-import { creditAccounts } from '@kortix/db';
+import { creditAccounts } from '@bapx/db';
 import { db } from '../../shared/db';
 
 /**

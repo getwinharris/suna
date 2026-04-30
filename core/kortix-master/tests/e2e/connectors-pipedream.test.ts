@@ -3,17 +3,17 @@ import { Hono } from "hono"
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "fs"
 import { tmpdir } from "os"
 import { join } from "path"
-import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startKortixMaster, waitForHttp, type RuntimeFixture, type StartedServer } from "./helpers"
+import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startBapxMaster, waitForHttp, type RuntimeFixture, type StartedServer } from "./helpers"
 
-const scriptPath = "/Users/markokraemer/Projects/heyagi/computer/core/kortix-master/opencode/skills/KORTIX-system/connectors/integration.ts"
-const pluginPath = "/Users/markokraemer/Projects/heyagi/computer/core/kortix-master/opencode/plugin/connectors/connectors.ts"
+const scriptPath = "/Users/markokraemer/Projects/heyagi/computer/core/bapx-master/opencode/skills/KORTIX-system/connectors/integration.ts"
+const pluginPath = "/Users/markokraemer/Projects/heyagi/computer/core/bapx-master/opencode/plugin/connectors/connectors.ts"
 
 describe("connectors plugin + pipedream script e2e", () => {
   let dir = ""
 
   beforeEach(() => {
     if (dir) rmSync(dir, { recursive: true, force: true })
-    dir = mkdtempSync(join(tmpdir(), "kortix-connectors-"))
+    dir = mkdtempSync(join(tmpdir(), "bapx-connectors-"))
   })
 
   afterAll(() => {
@@ -50,7 +50,7 @@ describe("connectors plugin + pipedream script e2e", () => {
 
     const setup = await plugin.tool.connector_setup.execute({
       connectors: JSON.stringify([
-        { name: "github", description: "kortix-ai org", source: "cli", status: "pending" },
+        { name: "github", description: "bapx-ai org", source: "cli", status: "pending" },
         { name: "gmail-work", description: "work gmail", source: "pipedream", pipedream_slug: "gmail", status: "pending" },
       ]),
     }, ctx)
@@ -67,7 +67,7 @@ describe("connectors plugin + pipedream script e2e", () => {
   })
 })
 
-describe("integration.ts end-to-end through kortix-master", () => {
+describe("integration.ts end-to-end through bapx-master", () => {
   let api: ReturnType<typeof Bun.serve>
   let open: { stop: () => Promise<void> }
   let master: StartedServer
@@ -78,13 +78,13 @@ describe("integration.ts end-to-end through kortix-master", () => {
 
   beforeAll(async () => {
     // Legacy cleanup — old trigger system stored cron state here
-    rmSync("/tmp/kortix-agent-triggers/cron-state.json", { force: true })
+    rmSync("/tmp/bapx-agent-triggers/cron-state.json", { force: true })
 
     const app = new Hono()
 
     app.use("*", async (c, next) => {
       const auth = c.req.header("authorization")
-      if (auth && auth !== "Bearer test-kortix-token") {
+      if (auth && auth !== "Bearer test-bapx-token") {
         return c.text("bad auth", 401)
       }
       await next()
@@ -140,9 +140,9 @@ describe("integration.ts end-to-end through kortix-master", () => {
 
     fx = createRuntimeFixture("km-connectors-")
     open = await startDummyOpenCode(masterPort + 1000)
-    master = await startKortixMaster(masterPort, fx, {
+    master = await startBapxMaster(masterPort, fx, {
       INTERNAL_SERVICE_KEY: key,
-      KORTIX_TOKEN: "test-kortix-token",
+      KORTIX_TOKEN: "test-bapx-token",
       KORTIX_API_URL: `http://127.0.0.1:${apiPort}`,
       PIPEDREAM_CLIENT_ID: "pd-client",
       PIPEDREAM_CLIENT_SECRET: "pd-secret",

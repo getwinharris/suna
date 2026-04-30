@@ -13,12 +13,12 @@
 
 import { Hono } from 'hono';
 import { eq, and } from 'drizzle-orm';
-import { sandboxes, kortixApiKeys, type Database } from '@kortix/db';
+import { sandboxes, bapxApiKeys, type Database } from '@bapx/db';
 import { db as defaultDb } from '../../shared/db';
 import { hashSecretKey, generateApiKeyPair, generateSandboxKeyPair, isApiKeySecretConfigured } from '../../shared/crypto';
 import type { AuthVariables } from '../../types';
 import { resolveAccountId as defaultResolveAccountId } from '../../shared/resolve-account';
-import { supabaseAuth } from '../../middleware/auth';
+import { trailbaseAuth } from '../../middleware/auth';
 import { getProvider, type ProviderName } from '../providers';
 
 // ─── Dependency Injection ────────────────────────────────────────────────────
@@ -46,7 +46,7 @@ export function createApiKeysRouter(
   const router = new Hono<{ Variables: AuthVariables }>();
 
   if (deps.useAuth) {
-    router.use('/*', supabaseAuth);
+    router.use('/*', trailbaseAuth);
   }
 
   // ─── Helpers ────────────────────────────────────────────────────────────
@@ -73,7 +73,7 @@ export function createApiKeysRouter(
    *   1. If param looks like a UUID:
    *      a. Try as DB `sandboxId` (PK) — fast path when frontend sends instanceId
    *      b. Fallback: try as `externalId` — cloud providers (Daytona) use UUID external IDs
-   *   2. Otherwise: look up by `externalId` (e.g. 'kortix-sandbox' for local Docker)
+   *   2. Otherwise: look up by `externalId` (e.g. 'bapx-sandbox' for local Docker)
    *
    * Returns the resolved DB UUID, or null if not found / not owned by the account.
    */
@@ -95,7 +95,7 @@ export function createApiKeysRouter(
       return row?.sandboxId ?? null;
     }
 
-    // Not a UUID — must be an externalId string (e.g. 'kortix-sandbox')
+    // Not a UUID — must be an externalId string (e.g. 'bapx-sandbox')
     const [row] = await db
       .select({ sandboxId: sandboxes.sandboxId })
       .from(sandboxes)
@@ -148,7 +148,7 @@ export function createApiKeysRouter(
       const secretKeyHash = hashSecretKey(secretKey);
 
       const [row] = await db
-        .insert(kortixApiKeys)
+        .insert(bapxApiKeys)
         .values({
           sandboxId: resolvedSandboxId,
           accountId,
@@ -188,7 +188,7 @@ export function createApiKeysRouter(
 
   // ─── GET / ──────────────────────────────────────────────────────────────
   // List all API keys for a sandbox (no secrets).
-  // Accepts sandbox_id as either the UUID or external_id (e.g. 'kortix-sandbox').
+  // Accepts sandbox_id as either the UUID or external_id (e.g. 'bapx-sandbox').
 
   router.get('/', async (c) => {
     const userId = c.get('userId');
@@ -210,19 +210,19 @@ export function createApiKeysRouter(
     try {
       const keys = await db
         .select({
-          keyId: kortixApiKeys.keyId,
-          publicKey: kortixApiKeys.publicKey,
-          title: kortixApiKeys.title,
-          description: kortixApiKeys.description,
-          type: kortixApiKeys.type,
-          status: kortixApiKeys.status,
-          sandboxId: kortixApiKeys.sandboxId,
-          expiresAt: kortixApiKeys.expiresAt,
-          lastUsedAt: kortixApiKeys.lastUsedAt,
-          createdAt: kortixApiKeys.createdAt,
+          keyId: bapxApiKeys.keyId,
+          publicKey: bapxApiKeys.publicKey,
+          title: bapxApiKeys.title,
+          description: bapxApiKeys.description,
+          type: bapxApiKeys.type,
+          status: bapxApiKeys.status,
+          sandboxId: bapxApiKeys.sandboxId,
+          expiresAt: bapxApiKeys.expiresAt,
+          lastUsedAt: bapxApiKeys.lastUsedAt,
+          createdAt: bapxApiKeys.createdAt,
         })
-        .from(kortixApiKeys)
-        .where(eq(kortixApiKeys.sandboxId, resolvedSandboxId));
+        .from(bapxApiKeys)
+        .where(eq(bapxApiKeys.sandboxId, resolvedSandboxId));
 
       return c.json({
         success: true,
@@ -254,16 +254,16 @@ export function createApiKeysRouter(
 
     try {
       const result = await db
-        .update(kortixApiKeys)
+        .update(bapxApiKeys)
         .set({ status: 'revoked' })
         .where(
           and(
-            eq(kortixApiKeys.keyId, keyId),
-            eq(kortixApiKeys.accountId, accountId),
-            eq(kortixApiKeys.status, 'active'),
+            eq(bapxApiKeys.keyId, keyId),
+            eq(bapxApiKeys.accountId, accountId),
+            eq(bapxApiKeys.status, 'active'),
           ),
         )
-        .returning({ keyId: kortixApiKeys.keyId });
+        .returning({ keyId: bapxApiKeys.keyId });
 
       if (result.length === 0) {
         return c.json({ error: 'API key not found or already revoked' }, 404);
@@ -285,14 +285,14 @@ export function createApiKeysRouter(
 
     try {
       const result = await db
-        .delete(kortixApiKeys)
+        .delete(bapxApiKeys)
         .where(
           and(
-            eq(kortixApiKeys.keyId, keyId),
-            eq(kortixApiKeys.accountId, accountId),
+            eq(bapxApiKeys.keyId, keyId),
+            eq(bapxApiKeys.accountId, accountId),
           ),
         )
-        .returning({ keyId: kortixApiKeys.keyId });
+        .returning({ keyId: bapxApiKeys.keyId });
 
       if (result.length === 0) {
         return c.json({ error: 'API key not found' }, 404);
@@ -311,7 +311,7 @@ export function createApiKeysRouter(
   //
   // Flow:
   //   1. Revoke old key in DB
-  //   2. Create new kortix_sb_ key in DB
+  //   2. Create new bapx_sb_ key in DB
   //   3. Resolve sandbox endpoint via provider
   //   4. Read all secrets from sandbox (decrypted with old KORTIX_TOKEN)
   //   5. Update KORTIX_TOKEN in sandbox (changes encryption key derivation)
@@ -327,16 +327,16 @@ export function createApiKeysRouter(
       // Find the existing key and verify it's a sandbox key owned by this account
       const [existing] = await db
         .select({
-          keyId: kortixApiKeys.keyId,
-          sandboxId: kortixApiKeys.sandboxId,
-          type: kortixApiKeys.type,
-          status: kortixApiKeys.status,
+          keyId: bapxApiKeys.keyId,
+          sandboxId: bapxApiKeys.sandboxId,
+          type: bapxApiKeys.type,
+          status: bapxApiKeys.status,
         })
-        .from(kortixApiKeys)
+        .from(bapxApiKeys)
         .where(
           and(
-            eq(kortixApiKeys.keyId, keyId),
-            eq(kortixApiKeys.accountId, accountId),
+            eq(bapxApiKeys.keyId, keyId),
+            eq(bapxApiKeys.accountId, accountId),
           ),
         )
         .limit(1);
@@ -366,9 +366,9 @@ export function createApiKeysRouter(
       // Revoke the old key
       if (existing.status === 'active') {
         await db
-          .update(kortixApiKeys)
+          .update(bapxApiKeys)
           .set({ status: 'revoked' })
-          .where(eq(kortixApiKeys.keyId, keyId));
+          .where(eq(bapxApiKeys.keyId, keyId));
       }
 
       // Create a new sandbox key for the same sandbox
@@ -376,7 +376,7 @@ export function createApiKeysRouter(
       const secretKeyHash = hashSecretKey(secretKey);
 
       const [newRow] = await db
-        .insert(kortixApiKeys)
+        .insert(bapxApiKeys)
         .values({
           sandboxId: existing.sandboxId,
           accountId,

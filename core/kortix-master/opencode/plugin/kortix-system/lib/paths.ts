@@ -16,7 +16,7 @@ function findWorkspaceRoot(startDir: string): string | null {
 	}
 }
 
-export function resolveKortixWorkspaceRoot(anchorDir?: string): string {
+export function resolveBapxWorkspaceRoot(anchorDir?: string): string {
 	const explicitWorkspace = process.env.KORTIX_WORKSPACE?.trim()
 	if (explicitWorkspace) return normalizeAbsolutePath(explicitWorkspace)
 
@@ -39,16 +39,16 @@ export function resolveKortixWorkspaceRoot(anchorDir?: string): string {
 	return normalizeAbsolutePath(home)
 }
 
-export function resolveKortixDir(anchorDir?: string): string {
+export function resolveBapxDir(anchorDir?: string): string {
 	const explicitDir = process.env.KORTIX_DIR?.trim()
 	if (explicitDir) return normalizeAbsolutePath(explicitDir)
-	return join(resolveKortixWorkspaceRoot(anchorDir), ".kortix")
+	return join(resolveBapxWorkspaceRoot(anchorDir), ".bapx")
 }
 
-export function ensureKortixDir(anchorDir?: string): string {
-	const kortixDir = resolveKortixDir(anchorDir)
-	mkdirSync(kortixDir, { recursive: true })
-	return kortixDir
+export function ensureBapxDir(anchorDir?: string): string {
+	const bapxDir = resolveBapxDir(anchorDir)
+	mkdirSync(bapxDir, { recursive: true })
+	return bapxDir
 }
 
 function ensureFile(filePath: string, content: string): string {
@@ -57,15 +57,15 @@ function ensureFile(filePath: string, content: string): string {
 }
 
 /**
- * Ensure global USER.md + MEMORY.md exist at the workspace root .kortix/ directory.
- * Deeper notes can live in .kortix/memory/*.md and be referenced from MEMORY.md.
+ * Ensure global USER.md + MEMORY.md exist at the workspace root .bapx/ directory.
+ * Deeper notes can live in .bapx/memory/*.md and be referenced from MEMORY.md.
  */
 export function ensureGlobalMemoryFiles(anchorDir?: string): { userPath: string; memoryPath: string; memoryDir: string } {
-	const kortixDir = ensureKortixDir(anchorDir)
-	const memoryDir = join(kortixDir, "memory")
+	const bapxDir = ensureBapxDir(anchorDir)
+	const memoryDir = join(bapxDir, "memory")
 	mkdirSync(memoryDir, { recursive: true })
 	return {
-		userPath: ensureFile(join(kortixDir, "USER.md"), [
+		userPath: ensureFile(join(bapxDir, "USER.md"), [
 			"# User Profile",
 			"",
 			"## Preferences",
@@ -75,10 +75,10 @@ export function ensureGlobalMemoryFiles(anchorDir?: string): { userPath: string;
 			"## Workflow Habits",
 			"",
 		].join("\n")),
-		memoryPath: ensureFile(join(kortixDir, "MEMORY.md"), [
+		memoryPath: ensureFile(join(bapxDir, "MEMORY.md"), [
 			"# Global Memory",
 			"",
-			"Keep this file concise. Put deeper notes in `.kortix/memory/*.md` and reference them here.",
+			"Keep this file concise. Put deeper notes in `.bapx/memory/*.md` and reference them here.",
 			"",
 			"## Environment",
 			"",
@@ -157,7 +157,7 @@ export function renderMergedMemoryContext(anchorDir?: string): string {
 }
 
 export function renderProjectContext(projectPath: string): string {
-	const ctxPath = join(projectPath, ".kortix", "CONTEXT.md")
+	const ctxPath = join(projectPath, ".bapx", "CONTEXT.md")
 	const raw = readIfExists(ctxPath)
 	if (!raw) return ""
 	const lines = normalizeMemoryBody(raw)

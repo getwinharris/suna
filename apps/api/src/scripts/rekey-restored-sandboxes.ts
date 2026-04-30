@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import { kortixApiKeys, sandboxes } from '@kortix/db';
+import { bapxApiKeys, sandboxes } from '@bapx/db';
 import { db } from '../shared/db';
 import { createApiKey } from '../repositories/api-keys';
 import { config, SANDBOX_VERSION } from '../config';
@@ -103,12 +103,12 @@ for (const row of filtered) {
     }
 
     const existingKeys = await db
-      .select({ keyId: kortixApiKeys.keyId })
-      .from(kortixApiKeys)
-      .where(and(eq(kortixApiKeys.sandboxId, row.sandboxId), eq(kortixApiKeys.type, 'sandbox')));
+      .select({ keyId: bapxApiKeys.keyId })
+      .from(bapxApiKeys)
+      .where(and(eq(bapxApiKeys.sandboxId, row.sandboxId), eq(bapxApiKeys.type, 'sandbox')));
 
     for (const existing of existingKeys) {
-      await db.delete(kortixApiKeys).where(eq(kortixApiKeys.keyId, existing.keyId));
+      await db.delete(bapxApiKeys).where(eq(bapxApiKeys.keyId, existing.keyId));
     }
 
     const created = await createApiKey({
@@ -144,7 +144,7 @@ for (const row of filtered) {
       throw new Error(`Toolbox returned ${response.status}: ${await response.text()}`);
     }
 
-    const verify = await fetch(`https://8000--${slug}.${config.JUSTAVPS_PROXY_DOMAIN}/kortix/health`, {
+    const verify = await fetch(`https://8000--${slug}.${config.JUSTAVPS_PROXY_DOMAIN}/bapx/health`, {
       headers: {
         'X-Proxy-Token': freshMetadata.justavpsProxyToken as string,
         Authorization: `Bearer ${created.secretKey}`,

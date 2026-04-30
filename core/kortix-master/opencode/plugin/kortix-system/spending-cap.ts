@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs'
 import { createHmac } from 'node:crypto'
 import { join } from 'node:path'
 
-const HEADER_NAME = 'X-Kortix-Actor-Context'
+const HEADER_NAME = 'X-Bapx-Actor-Context'
 const TOKEN_TTL_SECONDS = 300
 
 function base64urlEncode(buf: Buffer): string {
@@ -26,18 +26,18 @@ function signActorToken(
   return `${payloadB64}.${base64urlEncode(mac)}`
 }
 
-function resolveKortixDbPath(): string {
+function resolveBapxDbPath(): string {
   const workspace =
     process.env.KORTIX_WORKSPACE?.trim() ||
     process.env.OPENCODE_CONFIG_DIR?.replace(/\/opencode\/?$/, '') ||
     '/workspace'
-  return join(workspace, '.kortix', 'kortix.db')
+  return join(workspace, '.bapx', 'bapx.db')
 }
 
-export const KortixSpendingCapPlugin: Plugin = async () => {
+export const BapxSpendingCapPlugin: Plugin = async () => {
   const sandboxId = process.env.SANDBOX_ID?.trim() || ''
   const secret = process.env.KORTIX_TOKEN?.trim() || ''
-  const dbPath = resolveKortixDbPath()
+  const dbPath = resolveBapxDbPath()
 
   // Open the sqlite database once per plugin lifetime and cache a prepared
   // statement — keeps the hot path (every LLM call) to microseconds.
@@ -87,4 +87,4 @@ export const KortixSpendingCapPlugin: Plugin = async () => {
   }
 }
 
-export default KortixSpendingCapPlugin
+export default BapxSpendingCapPlugin

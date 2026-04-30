@@ -115,7 +115,7 @@ async function send(opts: {
 }
 
 function frontendBase(): string {
-  return config.FRONTEND_URL || 'https://app.kortix.com';
+  return config.FRONTEND_URL || 'https://app.bapx.in';
 }
 
 // ─── Public: invite email ───────────────────────────────────────────────────

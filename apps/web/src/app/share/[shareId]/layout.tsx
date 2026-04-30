@@ -6,7 +6,7 @@ export async function generateMetadata({ params }: { params: Promise<{ shareId: 
 
   const title = 'Shared Conversation | Bapx Media Hub';
   const description = 'Replay this Worker conversation on Bapx Media Hub';
-  const url = getServerPublicEnv().APP_URL || 'https://www.kortix.com';
+  const url = getServerPublicEnv().APP_URL || 'https://www.bapx.in';
 
   return {
     title,

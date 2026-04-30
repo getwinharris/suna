@@ -117,7 +117,7 @@ export function ToolsScreen({ agentId, onUpdate }: ToolsScreenProps) {
     }
   }, [agent?.agentpress_tools]);
 
-  const isSunaAgent = agent?.metadata?.is_suna_default || false;
+  const isSunaAgent = agent?.metadata?.is_bapX_default || false;
   const restrictions = agent?.metadata?.restrictions || {};
   const areToolsEditable = restrictions.tools_editable !== false && !isSunaAgent;
 
@@ -244,13 +244,13 @@ export function ToolsScreen({ agentId, onUpdate }: ToolsScreenProps) {
   const handleSave = async () => {
     if (!hasChanges) return;
 
-    const isSunaAgent = agent?.metadata?.is_suna_default || false;
+    const isSunaAgent = agent?.metadata?.is_bapX_default || false;
     const restrictions = agent?.metadata?.restrictions || {};
     const areToolsEditable = restrictions.tools_editable !== false && !isSunaAgent;
 
     if (!areToolsEditable) {
       if (isSunaAgent) {
-        Alert.alert(t('workers.cannotEditTools'), t('workers.sunaToolsManagedAlert'));
+        Alert.alert(t('workers.cannotEditTools'), t('workers.bapXToolsManagedAlert'));
       }
       return;
     }
@@ -538,7 +538,7 @@ export function ToolsScreen({ agentId, onUpdate }: ToolsScreenProps) {
                   className="mt-0.5 text-yellow-600 dark:text-yellow-400"
                 />
                 <Text className="flex-1 font-roobert text-sm text-yellow-600 dark:text-yellow-400">
-                  {isSunaAgent ? t('workers.sunaToolsManaged') : t('workers.toolsNotEditable')}
+                  {isSunaAgent ? t('workers.bapXToolsManaged') : t('workers.toolsNotEditable')}
                 </Text>
               </View>
             )}

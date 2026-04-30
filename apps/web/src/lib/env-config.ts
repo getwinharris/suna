@@ -19,6 +19,7 @@ function readRawEnv(): Partial<RuntimeEnv> {
   }
 
   return {
+    TRAILBASE_URL: process.env.TRAILBASE_URL || process.env.NEXT_PUBLIC_TRAILBASE_URL,
     SUPABASE_URL: process.env.KORTIX_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_PUBLIC_URL || process.env.SUPABASE_URL,
     SUPABASE_ANON_KEY: process.env.KORTIX_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY,
     BACKEND_URL: process.env.KORTIX_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL,
@@ -33,11 +34,12 @@ function logRuntimeEnv(env: RuntimeEnv) {
   window.__ENV_LOGGED__ = true
   console.info('[runtime-env]', {
     source: window.__KORTIX_RUNTIME_CONFIG || window.__RUNTIME_ENV ? 'runtime-script' : 'fallback',
+    trailbaseUrl: env.TRAILBASE_URL,
     supabaseUrl: env.SUPABASE_URL,
     backendUrl: env.BACKEND_URL,
     envMode: env.ENV_MODE,
     appUrl: env.APP_URL,
-    anonKeyLength: env.SUPABASE_ANON_KEY.length,
+    anonKeyLength: env.SUPABASE_ANON_KEY?.length ?? 0,
   })
 }
 

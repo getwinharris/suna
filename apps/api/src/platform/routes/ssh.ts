@@ -19,23 +19,23 @@ import { readFileSync, unlinkSync, mkdirSync, rmdirSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import Docker from 'dockerode';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@bapx/db';
 import { config } from '../../config';
 import { execOnHost } from '../../update/exec';
 import type { AuthVariables } from '../../types';
-import { supabaseAuth } from '../../middleware/auth';
+import { trailbaseAuth } from '../../middleware/auth';
 import { db } from '../../shared/db';
 import { resolveAccountId } from '../../shared/resolve-account';
 import { buildSSHConnectionInfo, buildSSHSetupPayload, resolvePublicSSHHost, type SSHConnectionInfo } from '../services/ssh-access';
 import { findAccessibleSandboxForUser } from '../services/sandbox-access';
 
 const sshRouter = new Hono<{ Variables: AuthVariables }>();
-sshRouter.use('/*', supabaseAuth);
+sshRouter.use('/*', trailbaseAuth);
 
 // ─── Shared: keypair generation ──────────────────────────────────────────────
 
-function generateKeypair(comment = 'kortix-sandbox'): { privateKey: string; publicKey: string } {
-  const tmpPath = join(tmpdir(), `kortix-ssh-${Date.now()}`);
+function generateKeypair(comment = 'bapx-sandbox'): { privateKey: string; publicKey: string } {
+  const tmpPath = join(tmpdir(), `bapx-ssh-${Date.now()}`);
   mkdirSync(tmpPath, { recursive: true });
   const keyPath = join(tmpPath, 'key');
 
@@ -71,7 +71,7 @@ async function resolveSandboxRecord(userId: string, requestedSandboxId?: string)
 
 // ─── Shared: authorized_keys injection via remote host toolbox exec ──────────
 // JustAVPS resolveEndpoint() points at the VPS host toolbox endpoint, not the
-// sandbox's kortix-master API. To inject a key into the Dockerized sandbox we
+// sandbox's bapx-master API. To inject a key into the Dockerized sandbox we
 // must exec on the host, then docker exec into the workload container.
 
 async function injectPublicKeyViaHostExec(

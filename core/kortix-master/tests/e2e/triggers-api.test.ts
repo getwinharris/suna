@@ -25,8 +25,8 @@ function createTestApp(dir: string) {
   const { TriggerYaml } = require('../../triggers/src/trigger-yaml') as typeof import('../../triggers/src/trigger-yaml')
   const { isValidCronExpression, describeCron } = require('../../triggers/src/trigger-store') as typeof import('../../triggers/src/trigger-store')
 
-  mkdirSync(join(dir, '.kortix'), { recursive: true })
-  const store = new TriggerStore(join(dir, '.kortix', 'test.db'))
+  mkdirSync(join(dir, '.bapx'), { recursive: true })
+  const store = new TriggerStore(join(dir, '.bapx', 'test.db'))
   const yamlSync = new TriggerYaml(store, dir)
 
   const api = new Hono()
@@ -198,7 +198,7 @@ describe('Triggers API E2E', () => {
         name: 'Daily Report',
         description: 'Generates daily report',
         source: { type: 'cron', cron_expr: '0 0 9 * * *', timezone: 'UTC' },
-        action: { type: 'prompt', prompt: 'Generate the daily report', agent: 'kortix' },
+        action: { type: 'prompt', prompt: 'Generate the daily report', agent: 'bapx' },
       })
       expect(createStatus).toBe(201)
       expect(createJson.success).toBe(true)
@@ -423,7 +423,7 @@ describe('Triggers API E2E', () => {
         action: { type: 'prompt', prompt: 'test' },
       })
 
-      const yamlPath = join(tempDir, '.kortix', 'triggers.yaml')
+      const yamlPath = join(tempDir, '.bapx', 'triggers.yaml')
       expect(existsSync(yamlPath)).toBe(true)
 
       const content = readFileSync(yamlPath, 'utf8')
@@ -439,14 +439,14 @@ describe('Triggers API E2E', () => {
       })
 
       // Verify it's in YAML
-      let content = readFileSync(join(tempDir, '.kortix', 'triggers.yaml'), 'utf8')
+      let content = readFileSync(join(tempDir, '.bapx', 'triggers.yaml'), 'utf8')
       expect(content).toContain('To Delete')
 
       // Delete
       await req('DELETE', `/triggers/${json.data.id}`)
 
       // Verify removed from YAML
-      content = readFileSync(join(tempDir, '.kortix', 'triggers.yaml'), 'utf8')
+      content = readFileSync(join(tempDir, '.bapx', 'triggers.yaml'), 'utf8')
       expect(content).not.toContain('To Delete')
     })
 
@@ -460,7 +460,7 @@ describe('Triggers API E2E', () => {
         ],
       })
       const { writeFileSync } = require('fs')
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), yamlContent)
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), yamlContent)
 
       // Call sync
       const { json } = await req('POST', '/triggers/sync')

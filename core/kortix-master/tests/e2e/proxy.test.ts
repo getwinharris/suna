@@ -1,10 +1,10 @@
 import { describe, test, expect, beforeAll, afterAll } from "bun:test";
-import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startKortixMaster, type RuntimeFixture, type StartedServer } from "./helpers";
+import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startBapxMaster, type RuntimeFixture, type StartedServer } from "./helpers";
 
 /**
- * Kortix Sandbox Proxy E2E Tests
+ * Bapx Sandbox Proxy E2E Tests
  *
- * Tests the dynamic port proxy route (/proxy/:port/*) on kortix-master.
+ * Tests the dynamic port proxy route (/proxy/:port/*) on bapx-master.
  * The proxy enables the frontend to reach any service running inside the
  * sandbox container through the single exposed port 8000.
  *
@@ -113,12 +113,12 @@ async function stopTestServer(): Promise<void> {
 // Test suites
 // ---------------------------------------------------------------------------
 
-describe("Kortix Sandbox Proxy E2E", () => {
+describe("Bapx Sandbox Proxy E2E", () => {
   // ------ Setup / Teardown ------
   beforeAll(async () => {
-    runtime = createRuntimeFixture('kortix-proxy-');
+    runtime = createRuntimeFixture('bapx-proxy-');
     opencode = await startDummyOpenCode(9000);
-    master = await startKortixMaster(8000, runtime, {
+    master = await startBapxMaster(8000, runtime, {
       KORTIX_TOKEN: 'proxy-test-token',
       OPENCODE_PORT: '9000',
     });
@@ -139,8 +139,8 @@ describe("Kortix Sandbox Proxy E2E", () => {
 
   // ------ Health ------
   describe("Health", () => {
-    test("kortix-master health check returns ok", async () => {
-      const { status, data } = await proxyJson<{ status: string }>("/kortix/health");
+    test("bapx-master health check returns ok", async () => {
+      const { status, data } = await proxyJson<{ status: string }>("/bapx/health");
       expect(status).toBe(200);
       expect(data.status).toBe("ok");
     });

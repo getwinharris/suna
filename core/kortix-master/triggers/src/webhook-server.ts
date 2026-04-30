@@ -45,7 +45,7 @@ export class WebhookTriggerServer {
     private readonly dispatch: DispatchHandler,
   ) {}
 
-  /** Register a callback for POST /internal/reload. Used by kortix-master's
+  /** Register a callback for POST /internal/reload. Used by bapx-master's
    *  HTTP triggers route to poke the in-plugin manager after creating a
    *  trigger via direct DB access (since that path bypasses manager.createTrigger). */
   setReloadHandler(handler: () => Promise<void> | void): void {
@@ -54,14 +54,14 @@ export class WebhookTriggerServer {
 
   /** Register a callback for POST /internal/run/:id — dispatches a trigger
    *  through the in-memory manager (real fire path: action dispatcher runs).
-   *  kortix-master's HTTP /run hits this; without it, /run only logs a
+   *  bapx-master's HTTP /run hits this; without it, /run only logs a
    *  stale execution row and nothing actually fires. */
   setRunHandler(handler: (id: string) => Promise<{ executionId: string } | null>): void {
     this.runHandler = handler
   }
 
   /** Register a callback for POST /internal/write-through — flushes current
-   *  DB trigger state into .kortix/triggers.yaml. kortix-master's seed path
+   *  DB trigger state into .bapx/triggers.yaml. bapx-master's seed path
    *  writes triggers directly into the DB for atomicity (same process)
    *  but doesn't touch the YAML. Without this flush, the next YAML
    *  reconcile would see "DB has rows YAML doesn't know about" and delete
@@ -95,11 +95,11 @@ export class WebhookTriggerServer {
       // Health endpoint
       if (pathname === "/health") {
         res.writeHead(200, { "Content-Type": "application/json" })
-        res.end(JSON.stringify({ ok: true, service: "kortix-triggers", routes: this.routes.size }))
+        res.end(JSON.stringify({ ok: true, service: "bapx-triggers", routes: this.routes.size }))
         return
       }
 
-      // Internal run — kortix-master's /kortix/triggers/:id/run forwards here
+      // Internal run — bapx-master's /bapx/triggers/:id/run forwards here
       // so the trigger actually dispatches through the in-memory manager
       // (cron tick path). Direct DB execution inserts without this wouldn't
       // wake the action dispatcher.
@@ -132,7 +132,7 @@ export class WebhookTriggerServer {
       }
 
       // Internal write-through — flush current DB triggers to
-      // .kortix/triggers.yaml. Seed path calls this right after inserting
+      // .bapx/triggers.yaml. Seed path calls this right after inserting
       // rows directly into the DB, so the YAML reconciler doesn't later
       // wipe them as "DB has rows YAML doesn't know about".
       if (method === "POST" && pathname === "/internal/write-through") {
@@ -152,7 +152,7 @@ export class WebhookTriggerServer {
         return
       }
 
-      // Internal reload — kortix-master hits this after a /kortix/triggers
+      // Internal reload — bapx-master hits this after a /bapx/triggers
       // CRUD call to force the in-plugin manager to re-register cron jobs +
       // webhook routes from the DB.
       if (method === "POST" && pathname === "/internal/reload") {
@@ -207,7 +207,7 @@ export class WebhookTriggerServer {
       const headers = extractHeaders(req)
 
       if (route.trigger.source.secret) {
-        const supplied = headers["x-kortix-opencode-trigger-secret"] ?? headers["x-kortix-trigger-secret"] ?? ""
+        const supplied = headers["x-bapx-opencode-trigger-secret"] ?? headers["x-bapx-trigger-secret"] ?? ""
         if (supplied !== route.trigger.source.secret) {
           res.writeHead(401, { "Content-Type": "application/json" })
           res.end(JSON.stringify({ ok: false, error: "invalid_secret" }))

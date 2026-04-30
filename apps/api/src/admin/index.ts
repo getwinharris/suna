@@ -1,5 +1,5 @@
 /**
- * Admin Panel — self-contained admin dashboard served by kortix-api.
+ * Admin Panel — self-contained admin dashboard served by bapx-api.
  *
  * Serves an embedded HTML admin UI at /v1/admin and exposes JSON API endpoints
  * for managing platform-level .env credentials and listing all sandbox instances.
@@ -33,7 +33,7 @@ import {
   shouldReprovisionFailedJustAvpsSandbox,
 } from '../platform/services/sandbox-reinitialize';
 import { PROVIDER_REGISTRY, buildProviderKeySchema, LLM_PROVIDERS, TOOL_PROVIDERS } from '../providers/registry';
-import { supabaseAuth } from '../middleware/auth';
+import { trailbaseAuth } from '../middleware/auth';
 import { requireAdmin } from '../middleware/require-admin';
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { resolve, dirname } from 'path';
@@ -43,7 +43,7 @@ export const adminApp = new Hono<AppEnv>();
 
 // ─── Auth ───────────────────────────────────────────────────────────────────
 // All admin routes require a valid Supabase JWT AND admin/super_admin role.
-adminApp.use('/*', supabaseAuth, requireAdmin);
+adminApp.use('/*', trailbaseAuth, requireAdmin);
 
 // ─── Secret redaction ───────────────────────────────────────────────────────
 // Redacts sensitive fields from sandbox metadata and provider details before
@@ -181,7 +181,7 @@ async function fetchMasterJson<T>(path: string, init: RequestInit = {}, timeoutM
     const url = `${base}${path}`;
     try {
       const res = await fetchWithTimeout(url, init, timeoutMs);
-      // 503 from /kortix/health means "starting" — still return the JSON body
+      // 503 from /bapx/health means "starting" — still return the JSON body
       // so callers can inspect the status/opencode fields.
       if (!res.ok && res.status !== 503) { lastErr = new Error(`Master ${url} returned ${res.status}`); continue; }
       return (await res.json()) as T;
@@ -205,7 +205,7 @@ async function setSandboxEnv(keys: Record<string, string>): Promise<void> {
 
 // ─── Extended key groups (beyond provider registry) ─────────────────────────
 // These are platform-level keys not in the provider registry but configured
-// during get-kortix.sh setup.
+// during get-bapx.sh setup.
 
 interface KeyGroup {
   title: string;
@@ -385,7 +385,7 @@ adminApp.post('/api/env', async (c) => {
     if (existsSync(examplePath)) {
       writeFileSync(rootEnvPath, readFileSync(examplePath, 'utf-8'));
     } else {
-      writeFileSync(rootEnvPath, '# Kortix Environment Configuration\nENV_MODE=local\n');
+      writeFileSync(rootEnvPath, '# Bapx Environment Configuration\nENV_MODE=local\n');
     }
   }
 
@@ -398,7 +398,7 @@ adminApp.post('/api/env', async (c) => {
       if (existsSync(examplePath)) {
         writeFileSync(sandboxEnvPath, readFileSync(examplePath, 'utf-8'));
       } else {
-        writeFileSync(sandboxEnvPath, '# Kortix Sandbox Environment\nENV_MODE=local\n');
+        writeFileSync(sandboxEnvPath, '# Bapx Sandbox Environment\nENV_MODE=local\n');
       }
     }
     writeEnvFile(sandboxEnvPath, sandboxData);
@@ -418,7 +418,7 @@ adminApp.post('/api/env', async (c) => {
 adminApp.get('/api/instances', async (c) => {
   try {
     const { db } = await import('../shared/db');
-    const { sandboxes } = await import('@kortix/db');
+    const { sandboxes } = await import('@bapx/db');
 
     const rows = await db
       .select()
@@ -447,7 +447,7 @@ adminApp.get('/api/instances', async (c) => {
 adminApp.get('/api/sandboxes', async (c) => {
   try {
     const { db } = await import('../shared/db');
-    const { sandboxes, accounts } = await import('@kortix/db');
+    const { sandboxes, accounts } = await import('@bapx/db');
     const { desc, eq, sql, and, ilike, or } = await import('drizzle-orm');
 
     const q       = c.req.query('search')   || '';
@@ -549,7 +549,7 @@ adminApp.delete('/api/sandboxes/:id', async (c) => {
   try {
     const sandboxId = c.req.param('id');
     const { db } = await import('../shared/db');
-    const { sandboxes } = await import('@kortix/db');
+    const { sandboxes } = await import('@bapx/db');
     const { eq } = await import('drizzle-orm');
 
     const [row] = await db.select().from(sandboxes).where(eq(sandboxes.sandboxId, sandboxId)).limit(1);
@@ -579,7 +579,7 @@ adminApp.delete('/api/sandboxes/:id', async (c) => {
 adminApp.get('/api/accounts', async (c) => {
   try {
     const { db } = await import('../shared/db');
-    const { accounts, creditAccounts } = await import('@kortix/db');
+    const { accounts, creditAccounts } = await import('@bapx/db');
     const { and, asc, desc, eq, gte, ilike, inArray, isNotNull, lte, not, or, sql } =
       await import('drizzle-orm');
 
@@ -627,14 +627,14 @@ adminApp.get('/api/accounts', async (c) => {
     // multiple rows per account (one per Stripe customer / provider), which
     // would otherwise duplicate accounts in the result set.
     const billingCustomerIdSub = sql<string>`(
-      SELECT id FROM kortix.billing_customers
+      SELECT id FROM bapx.billing_customers
       WHERE account_id = ${accounts.accountId}
       ORDER BY active DESC NULLS LAST
       LIMIT 1
     )`;
 
     const billingCustomerEmailSub = sql<string>`(
-      SELECT email FROM kortix.billing_customers
+      SELECT email FROM bapx.billing_customers
       WHERE account_id = ${accounts.accountId}
       ORDER BY active DESC NULLS LAST
       LIMIT 1
@@ -759,9 +759,9 @@ adminApp.get('/api/accounts/:id/users', async (c) => {
   const { db } = await import('../shared/db');
   const { sql } = await import('drizzle-orm');
 
-  // Try kortix.account_members first, fall back to legacy basejump.account_user.
+  // Try bapx.account_members first, fall back to legacy basejump.account_user.
   // Pulls auth.users extras so the admin UI can show activity context.
-  async function run(table: 'kortix.account_members' | 'basejump.account_user') {
+  async function run(table: 'bapx.account_members' | 'basejump.account_user') {
     const mt = sql.raw(table);
     return db.execute(sql`
       SELECT
@@ -784,7 +784,7 @@ adminApp.get('/api/accounts/:id/users', async (c) => {
   try {
     let result;
     try {
-      result = await run('kortix.account_members');
+      result = await run('bapx.account_members');
     } catch {
       result = await run('basejump.account_user');
     }
@@ -800,7 +800,7 @@ adminApp.get('/api/accounts/:id/sandboxes', async (c) => {
   try {
     const accountId = c.req.param('id');
     const { db } = await import('../shared/db');
-    const { sandboxes } = await import('@kortix/db');
+    const { sandboxes } = await import('@bapx/db');
     const { eq, desc } = await import('drizzle-orm');
 
     const rows = await db
@@ -892,7 +892,7 @@ adminApp.get('/api/accounts/:id/ledger', async (c) => {
     const accountId = c.req.param('id');
     const limit = Math.min(200, Math.max(1, parseInt(c.req.query('limit') || '50', 10)));
     const { db } = await import('../shared/db');
-    const { creditLedger } = await import('@kortix/db');
+    const { creditLedger } = await import('@bapx/db');
     const { eq, desc } = await import('drizzle-orm');
     const rows = await db
       .select({
@@ -920,7 +920,7 @@ adminApp.get('/api/sandboxes/:id', async (c) => {
   try {
     const sandboxId = c.req.param('id');
     const { db } = await import('../shared/db');
-    const { sandboxes, accounts } = await import('@kortix/db');
+    const { sandboxes, accounts } = await import('@bapx/db');
     const { eq, sql } = await import('drizzle-orm');
     const { membersTableSql } = await import('./members-table');
     const mt = await membersTableSql();
@@ -996,7 +996,7 @@ adminApp.post('/api/sandboxes/:id/exec', async (c) => {
     }
 
     const { db } = await import('../shared/db');
-    const { sandboxes } = await import('@kortix/db');
+    const { sandboxes } = await import('@bapx/db');
     const { eq } = await import('drizzle-orm');
 
     const [row] = await db.select().from(sandboxes).where(eq(sandboxes.sandboxId, sandboxId)).limit(1);
@@ -1021,7 +1021,7 @@ adminApp.get('/api/sandboxes/:id/health', async (c) => {
   try {
     const sandboxId = c.req.param('id');
     const { db } = await import('../shared/db');
-    const { sandboxes } = await import('@kortix/db');
+    const { sandboxes } = await import('@bapx/db');
     const { eq } = await import('drizzle-orm');
     const [row] = await db.select().from(sandboxes).where(eq(sandboxes.sandboxId, sandboxId)).limit(1);
     if (!row) return c.json({ error: 'Sandbox not found' }, 404);
@@ -1061,7 +1061,7 @@ adminApp.post('/api/sandboxes/health-batch', async (c) => {
     }
 
     const { db } = await import('../shared/db');
-    const { sandboxes } = await import('@kortix/db');
+    const { sandboxes } = await import('@bapx/db');
     const { inArray } = await import('drizzle-orm');
     const rows = await db.select().from(sandboxes).where(inArray(sandboxes.sandboxId, sandboxIds));
 
@@ -1129,7 +1129,7 @@ adminApp.post('/api/sandboxes/:id/repair', async (c) => {
     }
 
     const { db } = await import('../shared/db');
-    const { sandboxes } = await import('@kortix/db');
+    const { sandboxes } = await import('@bapx/db');
     const { eq } = await import('drizzle-orm');
     const [row] = await db.select().from(sandboxes).where(eq(sandboxes.sandboxId, sandboxId)).limit(1);
     if (!row) return c.json({ error: 'Sandbox not found' }, 404);
@@ -1222,15 +1222,15 @@ adminApp.post('/api/sandboxes/:id/repair', async (c) => {
       }
       case 'restart_runtime': {
         queueRecovery((async () => {
-          const status = await callCore('/kortix/core/status', 'GET') as { services?: Array<{ id: string; scope: string }> };
+          const status = await callCore('/bapx/core/status', 'GET') as { services?: Array<{ id: string; scope: string }> };
           const targets = (status.services || []).filter((service) => service.scope === 'core').map((service) => service.id);
-          await Promise.allSettled(targets.map((service) => callCore(`/kortix/core/restart/${service}`)));
+          await Promise.allSettled(targets.map((service) => callCore(`/bapx/core/restart/${service}`)));
         })(), 'restart_runtime');
         return c.json({ success: true, action, state: 'recovering' }, 202);
       }
       case 'restart_service': {
         if (!serviceId) return c.json({ error: 'serviceId required for restart_service' }, 400);
-        queueRecovery(callCore(`/kortix/core/restart/${serviceId}`), `restart_service:${serviceId}`);
+        queueRecovery(callCore(`/bapx/core/restart/${serviceId}`), `restart_service:${serviceId}`);
         return c.json({ success: true, action, serviceId, state: 'recovering' }, 202);
       }
       default:
@@ -1252,7 +1252,7 @@ adminApp.post('/api/sandboxes/:id/action', async (c) => {
     }
 
     const { db } = await import('../shared/db');
-    const { sandboxes } = await import('@kortix/db');
+    const { sandboxes } = await import('@bapx/db');
     const { eq } = await import('drizzle-orm');
 
     const [row] = await db.select().from(sandboxes).where(eq(sandboxes.sandboxId, sandboxId)).limit(1);
@@ -1298,7 +1298,7 @@ adminApp.post('/api/sandboxes/:id/proxy-token', async (c) => {
   try {
     const sandboxId = c.req.param('id');
     const { db } = await import('../shared/db');
-    const { sandboxes } = await import('@kortix/db');
+    const { sandboxes } = await import('@bapx/db');
     const { eq } = await import('drizzle-orm');
 
     const [row] = await db.select().from(sandboxes).where(eq(sandboxes.sandboxId, sandboxId)).limit(1);
@@ -1345,7 +1345,7 @@ adminApp.get('/api/health', async (c) => {
 
   if (!repoRoot) {
     try {
-      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/kortix/health', {}, 5000);
+      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/bapx/health', {}, 5000);
       checks.sandbox = { ok: true };
       checks.docker = { ok: true };
       // If runtime isn't ready, sandbox is reachable but not fully operational
@@ -1396,7 +1396,7 @@ function getAdminHTML(): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kortix Admin</title>
+  <title>Bapx Admin</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1870,7 +1870,7 @@ function getAdminHTML(): string {
   <!-- Auth overlay -->
   <div id="auth-overlay" class="auth-overlay" style="display: none;">
     <div class="auth-box">
-      <h2>Kortix Admin</h2>
+      <h2>Bapx Admin</h2>
       <p>Enter your Supabase JWT or sign in to access the admin panel.</p>
       <input type="password" id="auth-token" placeholder="Bearer token" />
       <div id="auth-error" class="auth-error" style="display: none;"></div>
@@ -1881,7 +1881,7 @@ function getAdminHTML(): string {
   <!-- Main app -->
   <div class="app" id="main-app">
     <header>
-      <h1>Kortix Admin</h1>
+      <h1>Bapx Admin</h1>
       <div class="status-bar" id="status-bar">
         <span><span class="status-dot loading" id="dot-api"></span>API</span>
         <span><span class="status-dot loading" id="dot-docker"></span>Docker</span>
@@ -1947,11 +1947,11 @@ function getAdminHTML(): string {
 
     // ─── Auth ───────────────────────────────────────────────────
     function getStoredToken() {
-      return localStorage.getItem('kortix_admin_token') || '';
+      return localStorage.getItem('bapx_admin_token') || '';
     }
 
     function setStoredToken(t) {
-      localStorage.setItem('kortix_admin_token', t);
+      localStorage.setItem('bapx_admin_token', t);
     }
 
     async function authenticate() {

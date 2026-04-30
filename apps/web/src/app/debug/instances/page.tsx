@@ -37,7 +37,7 @@ const MOCK_USER = {
   user_metadata: { name: 'Debug User', avatar_url: undefined },
   aud: 'authenticated',
   created_at: new Date().toISOString(),
-  email: 'debug@kortix.dev',
+  email: 'debug@bapx.dev',
 } as unknown as User;
 
 function mockSandbox(overrides: Partial<SandboxInfo>): SandboxInfo {

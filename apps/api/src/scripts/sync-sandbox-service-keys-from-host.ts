@@ -1,8 +1,8 @@
 import { and, eq } from 'drizzle-orm';
-import { kortixApiKeys, sandboxes } from '@kortix/db';
+import { bapxApiKeys, sandboxes } from '@bapx/db';
 import { db } from '../shared/db';
 import { config } from '../config';
-import { generateSandboxKeyPair, hashSecretKey, isKortixToken } from '../shared/crypto';
+import { generateSandboxKeyPair, hashSecretKey, isBapxToken } from '../shared/crypto';
 import { isProxyTokenStale, refreshSandboxProxyToken } from '../platform/providers/justavps';
 
 function getArg(flag: string): string | null {
@@ -103,27 +103,27 @@ async function processRow(row: typeof sandboxes.$inferSelect) {
     if (!tokenRes.ok) throw new Error(`Toolbox token read failed (${tokenRes.status})`);
     const tokenBody = await tokenRes.json() as { stdout?: string; stderr?: string; exit_code?: number };
     const token = String(tokenBody.stdout ?? '').trim();
-    if (!isKortixToken(token)) throw new Error(`Invalid token from host: ${token.slice(0, 16)}`);
+    if (!isBapxToken(token)) throw new Error(`Invalid token from host: ${token.slice(0, 16)}`);
 
     const tokenHash = hashSecretKey(token);
     const [existingKey] = await db
-      .select({ keyId: kortixApiKeys.keyId })
-      .from(kortixApiKeys)
-      .where(eq(kortixApiKeys.secretKeyHash, tokenHash))
+      .select({ keyId: bapxApiKeys.keyId })
+      .from(bapxApiKeys)
+      .where(eq(bapxApiKeys.secretKeyHash, tokenHash))
       .limit(1);
 
     if (existingKey) {
       await db
-        .update(kortixApiKeys)
+        .update(bapxApiKeys)
         .set({
           sandboxId: row.sandboxId,
           accountId: row.accountId,
           status: 'active',
         })
-        .where(eq(kortixApiKeys.keyId, existingKey.keyId));
+        .where(eq(bapxApiKeys.keyId, existingKey.keyId));
     } else {
       const { publicKey } = generateSandboxKeyPair();
-      await db.insert(kortixApiKeys).values({
+      await db.insert(bapxApiKeys).values({
         sandboxId: row.sandboxId,
         accountId: row.accountId,
         publicKey,

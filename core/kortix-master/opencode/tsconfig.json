@@ -28,7 +28,7 @@
   },
   "exclude": [
     "**/*.test.ts",
-    "plugin/kortix-orchestrator/test.ts",
+    "plugin/bapx-orchestrator/test.ts",
     "plugin/opencode-morph-plugin/**",
     "plugin/opencode-pty/test/**",
     "skills/GENERAL-KNOWLEDGE-WORKER/webapp/template/**",

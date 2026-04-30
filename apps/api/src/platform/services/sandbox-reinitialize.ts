@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { sandboxes, type Database } from '@kortix/db';
+import { sandboxes, type Database } from '@bapx/db';
 import { createApiKey } from '../../repositories/api-keys';
 import type { SandboxProvider, SandboxStatus } from '../providers';
 import {

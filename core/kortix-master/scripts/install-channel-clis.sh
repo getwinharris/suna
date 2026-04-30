@@ -1,7 +1,7 @@
 #!/bin/sh
-# install-channel-clis.sh — Install all Kortix CLI wrappers into /usr/local/bin.
+# install-channel-clis.sh — Install all Bapx CLI wrappers into /usr/local/bin.
 #
-# All wrappers point to immutable runtime code under /ephemeral/kortix-master/.
+# All wrappers point to immutable runtime code under /ephemeral/bapx-master/.
 # This runs at container startup so CLIs always reflect the current build.
 #
 # CLIs installed:
@@ -13,7 +13,7 @@
 
 set -eu
 
-CHANNELS_DIR="/ephemeral/kortix-master/channels"
+CHANNELS_DIR="/ephemeral/bapx-master/channels"
 INSTALL_WRAPPER() {
   name="$1"
   target="$2"

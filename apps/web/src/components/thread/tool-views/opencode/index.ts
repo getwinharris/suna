@@ -1,5 +1,5 @@
 /**
- * OpenCode ToolView components for KortixComputer.
+ * OpenCode ToolView components for BapxComputer.
  *
  * These are registered in the ToolViewRegistry under the "oc-" prefix
  * to avoid collision with AgentPress tool names.
@@ -18,7 +18,7 @@ export { OcImageGenToolView } from './OcImageGenToolView';
 export { OcShowUserToolView } from './OcShowUserToolView';
 export { OcApplyPatchToolView } from './OcApplyPatchToolView';
 export { OcTaskToolView } from './OcTaskToolView';
-export { OcKortixTaskToolView } from './OcKortixTaskToolView';
+export { OcBapxTaskToolView } from './OcBapxTaskToolView';
 export { OcTodoToolView } from './OcTodoToolView';
 export { OcGenericToolView } from './OcGenericToolView';
 export { OcQuestionToolView } from './OcQuestionToolView';
@@ -87,7 +87,7 @@ import { OcConnectorGetToolView } from './OcConnectorGetToolView';
 import { OcConnectorSetupToolView } from './OcConnectorSetupToolView';
 import { OcTriggersToolView } from './OcTriggersToolView';
 import { OcSessionStatsToolView } from './OcSessionStatsToolView';
-import { OcKortixTaskToolView } from './OcKortixTaskToolView';
+import { OcBapxTaskToolView } from './OcBapxTaskToolView';
 
 /**
  * Registry entries for OpenCode tools.
@@ -155,64 +155,64 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-apply_patch': OcApplyPatchToolView,
 
   // Agent task tools (unified system)
-  'oc-agent_task': OcKortixTaskToolView,
-  'oc-agent-task': OcKortixTaskToolView,
-  'agent_task': OcKortixTaskToolView,
-  'agent-task': OcKortixTaskToolView,
-  'oc-agent_task_update': OcKortixTaskToolView,
-  'oc-agent-task-update': OcKortixTaskToolView,
-  'agent_task_update': OcKortixTaskToolView,
-  'agent-task-update': OcKortixTaskToolView,
-  'oc-agent_task_list': OcKortixTaskToolView,
-  'oc-agent-task-list': OcKortixTaskToolView,
-  'agent_task_list': OcKortixTaskToolView,
-  'agent-task-list': OcKortixTaskToolView,
-  'oc-agent_task_get': OcKortixTaskToolView,
-  'oc-agent-task-get': OcKortixTaskToolView,
-  'agent_task_get': OcKortixTaskToolView,
-  'agent-task-get': OcKortixTaskToolView,
-  'oc-task_create': OcKortixTaskToolView,
-  'oc-task-create': OcKortixTaskToolView,
-  'task_create': OcKortixTaskToolView,
-  'task-create': OcKortixTaskToolView,
-  'oc-task_update': OcKortixTaskToolView,
-  'oc-task-update': OcKortixTaskToolView,
-  'task_update': OcKortixTaskToolView,
-  'task-update': OcKortixTaskToolView,
-  'oc-task_list': OcKortixTaskToolView,
-  'oc-task-list': OcKortixTaskToolView,
-  'task_list': OcKortixTaskToolView,
-  'task-list': OcKortixTaskToolView,
-  'oc-task_get': OcKortixTaskToolView,
-  'oc-task-get': OcKortixTaskToolView,
-  'task_get': OcKortixTaskToolView,
-  'task-get': OcKortixTaskToolView,
+  'oc-agent_task': OcBapxTaskToolView,
+  'oc-agent-task': OcBapxTaskToolView,
+  'agent_task': OcBapxTaskToolView,
+  'agent-task': OcBapxTaskToolView,
+  'oc-agent_task_update': OcBapxTaskToolView,
+  'oc-agent-task-update': OcBapxTaskToolView,
+  'agent_task_update': OcBapxTaskToolView,
+  'agent-task-update': OcBapxTaskToolView,
+  'oc-agent_task_list': OcBapxTaskToolView,
+  'oc-agent-task-list': OcBapxTaskToolView,
+  'agent_task_list': OcBapxTaskToolView,
+  'agent-task-list': OcBapxTaskToolView,
+  'oc-agent_task_get': OcBapxTaskToolView,
+  'oc-agent-task-get': OcBapxTaskToolView,
+  'agent_task_get': OcBapxTaskToolView,
+  'agent-task-get': OcBapxTaskToolView,
+  'oc-task_create': OcBapxTaskToolView,
+  'oc-task-create': OcBapxTaskToolView,
+  'task_create': OcBapxTaskToolView,
+  'task-create': OcBapxTaskToolView,
+  'oc-task_update': OcBapxTaskToolView,
+  'oc-task-update': OcBapxTaskToolView,
+  'task_update': OcBapxTaskToolView,
+  'task-update': OcBapxTaskToolView,
+  'oc-task_list': OcBapxTaskToolView,
+  'oc-task-list': OcBapxTaskToolView,
+  'task_list': OcBapxTaskToolView,
+  'task-list': OcBapxTaskToolView,
+  'oc-task_get': OcBapxTaskToolView,
+  'oc-task-get': OcBapxTaskToolView,
+  'task_get': OcBapxTaskToolView,
+  'task-get': OcBapxTaskToolView,
 
   // Legacy agent tools (backwards compat for old sessions)
-  'oc-task': OcKortixTaskToolView,
-  'task': OcKortixTaskToolView,
-  'oc-agent_spawn': OcKortixTaskToolView,
-  'agent_spawn': OcKortixTaskToolView,
-  'agent-spawn': OcKortixTaskToolView,
-  'oc-agent_message': OcKortixTaskToolView,
-  'agent_message': OcKortixTaskToolView,
-  'agent-message': OcKortixTaskToolView,
-  'oc-agent_stop': OcKortixTaskToolView,
-  'agent_stop': OcKortixTaskToolView,
-  'agent-stop': OcKortixTaskToolView,
-  'oc-agent_status': OcKortixTaskToolView,
-  'agent_status': OcKortixTaskToolView,
-  'agent-status': OcKortixTaskToolView,
+  'oc-task': OcBapxTaskToolView,
+  'task': OcBapxTaskToolView,
+  'oc-agent_spawn': OcBapxTaskToolView,
+  'agent_spawn': OcBapxTaskToolView,
+  'agent-spawn': OcBapxTaskToolView,
+  'oc-agent_message': OcBapxTaskToolView,
+  'agent_message': OcBapxTaskToolView,
+  'agent-message': OcBapxTaskToolView,
+  'oc-agent_stop': OcBapxTaskToolView,
+  'agent_stop': OcBapxTaskToolView,
+  'agent-stop': OcBapxTaskToolView,
+  'oc-agent_status': OcBapxTaskToolView,
+  'agent_status': OcBapxTaskToolView,
+  'agent-status': OcBapxTaskToolView,
 
   // Session spawning (legacy — routed to unified renderer)
-  'oc-session_spawn': OcKortixTaskToolView,
-  'oc-session-spawn': OcKortixTaskToolView,
-  'session_spawn': OcKortixTaskToolView,
-  'session-spawn': OcKortixTaskToolView,
-  'oc-session_start_background': OcKortixTaskToolView,
-  'oc-session-start-background': OcKortixTaskToolView,
-  'session_start_background': OcKortixTaskToolView,
-  'session-start-background': OcKortixTaskToolView,
+  'oc-session_spawn': OcBapxTaskToolView,
+  'oc-session-spawn': OcBapxTaskToolView,
+  'session_spawn': OcBapxTaskToolView,
+  'session-spawn': OcBapxTaskToolView,
+  'oc-session_start_background': OcBapxTaskToolView,
+  'oc-session-start-background': OcBapxTaskToolView,
+  'session_start_background': OcBapxTaskToolView,
+  'session-start-background': OcBapxTaskToolView,
 
   // Todo / task management
   'oc-todowrite': OcTodoToolView,
@@ -240,7 +240,7 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-plan_enter': OcPlanToolView,
   'oc-plan-enter': OcPlanToolView,
 
-  // Memory tools (kortix-memory)
+  // Memory tools (bapx-memory)
   'oc-mem_search': OcMemSearchToolView,
   'oc-mem-search': OcMemSearchToolView,
   'mem_search': OcMemSearchToolView,
@@ -252,7 +252,7 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-mem_save': OcMemSaveToolView,
   'oc-mem-save': OcMemSaveToolView,
 
-  // Session tools (Kortix session surfaces)
+  // Session tools (Bapx session surfaces)
   'oc-session_list': OcSessionListToolView,
   'oc-session-list': OcSessionListToolView,
   'session_list': OcSessionListToolView,
@@ -281,7 +281,7 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-session-list-spawned': OcSessionListToolView,
   'session_list_spawned': OcSessionListToolView,
 
-  // Project tools (Kortix project surfaces)
+  // Project tools (Bapx project surfaces)
   'oc-project_list': OcProjectListToolView,
   'oc-project-list': OcProjectListToolView,
   'project_list': OcProjectListToolView,
@@ -301,7 +301,7 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'oc-project-delete': OcProjectGetToolView,
   'project_delete': OcProjectGetToolView,
 
-  // Connector tools (kortix-connectors plugin)
+  // Connector tools (bapx-connectors plugin)
   'oc-connector_list': OcConnectorListToolView,
   'oc-connector-list': OcConnectorListToolView,
   'connector_list': OcConnectorListToolView,
@@ -318,7 +318,7 @@ export const ocToolViewRegistrations: Record<string, ToolViewComponent> = {
   'get_mem': OcGetMemToolView,
   'get-mem': OcGetMemToolView,
 
-  // Trigger tools (Kortix trigger management)
+  // Trigger tools (Bapx trigger management)
   'oc-triggers': OcTriggersToolView,
   'triggers': OcTriggersToolView,
   'oc-trigger_create': OcTriggersToolView,

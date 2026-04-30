@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from "bun:test";
-import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startKortixMaster, type RuntimeFixture, type StartedServer } from "./helpers";
+import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startBapxMaster, type RuntimeFixture, type StartedServer } from "./helpers";
 
 describe("Environment Variable Persistence", () => {
   const baseURL = "http://localhost:8002"; // Different port for isolation
@@ -7,7 +7,7 @@ describe("Environment Variable Persistence", () => {
   let opencode: Awaited<ReturnType<typeof startDummyOpenCode>> | null = null;
   
   beforeAll(async () => {
-    fixture = createRuntimeFixture("kortix-persistence-");
+    fixture = createRuntimeFixture("bapx-persistence-");
     opencode = await startDummyOpenCode(9002);
   });
 
@@ -17,7 +17,7 @@ describe("Environment Variable Persistence", () => {
   });
 
   async function startServer(): Promise<StartedServer> {
-    return startKortixMaster(8002, fixture, {
+    return startBapxMaster(8002, fixture, {
       KORTIX_TOKEN: "persistence-test-token",
       OPENCODE_PORT: "9002",
     });

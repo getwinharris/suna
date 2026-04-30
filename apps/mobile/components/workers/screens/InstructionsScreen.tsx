@@ -47,7 +47,7 @@ export function InstructionsScreen({ agentId, onUpdate }: InstructionsScreenProp
   const handleSave = async () => {
     if (!hasChanges) return;
 
-    const isSunaAgent = agent?.metadata?.is_suna_default || false;
+    const isSunaAgent = agent?.metadata?.is_bapX_default || false;
     const restrictions = agent?.metadata?.restrictions || {};
     const isEditable = restrictions.system_prompt_editable !== false && !isSunaAgent;
 
@@ -55,7 +55,7 @@ export function InstructionsScreen({ agentId, onUpdate }: InstructionsScreenProp
       if (isSunaAgent) {
         Alert.alert(
           t('workers.instructions.cannotEditAlert'),
-          t('workers.instructions.sunaManaged')
+          t('workers.instructions.bapXManaged')
         );
       }
       return;
@@ -88,7 +88,7 @@ export function InstructionsScreen({ agentId, onUpdate }: InstructionsScreenProp
     );
   }
 
-  const isSunaAgent = agent?.metadata?.is_suna_default || false;
+  const isSunaAgent = agent?.metadata?.is_bapX_default || false;
   const restrictions = agent?.metadata?.restrictions || {};
   const isEditable = restrictions.system_prompt_editable !== false && !isSunaAgent;
 

@@ -30,7 +30,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 // ─── Cached SSH Meta ────────────────────────────────────────────────────────
 
-const SSH_META_KEY = 'kortix:ssh-access-meta:v1';
+const SSH_META_KEY = 'bapx:ssh-access-meta:v1';
 
 interface SSHMeta {
   ssh_command: string;
@@ -330,7 +330,7 @@ export function SSHPage({ page, onBack, onOpenDrawer, onOpenRightDrawer, isDrawe
               {/* VS Code / Cursor Config */}
               <CodeSection
                 title="VS Code / Cursor"
-                description="Add this to your SSH config, then connect with: ssh kortix-sandbox"
+                description="Add this to your SSH config, then connect with: ssh bapx-sandbox"
                 code={configCmd}
                 copyField="config-cmd"
                 copiedField={copiedField}
@@ -470,7 +470,7 @@ function CodeSection({
 const TOKEN_COLORS = {
   command: '#7DD3FC',    // sky-300 — commands like mkdir, ssh, cat, chmod
   flag: '#C4B5FD',      // violet-300 — flags like -i, -o, -p
-  path: '#86EFAC',      // emerald-300 — paths like ~/.ssh/kortix_sandbox
+  path: '#86EFAC',      // emerald-300 — paths like ~/.ssh/bapx_sandbox
   string: '#FDE68A',    // amber-200 — quoted strings and heredoc delimiters
   number: '#FCA5A5',    // red-300 — numbers like ports
   keyword: '#F9A8D4',   // pink-300 — keywords like Host, HostName, Port

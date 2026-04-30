@@ -18,18 +18,18 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  useKortixProject,
-  useKortixProjectSessions,
+  useBapxProject,
+  useBapxProjectSessions,
   usePatchProject,
-} from '@/hooks/kortix/use-kortix-projects';
+} from '@/hooks/bapx/use-bapx-projects';
 import {
-  useKortixTasks,
-  useStartKortixTask,
-  useApproveKortixTask,
-  useDeleteKortixTask,
-  type KortixTask,
-  type KortixTaskStatus,
-} from '@/hooks/kortix/use-kortix-tasks';
+  useBapxTasks,
+  useStartBapxTask,
+  useApproveBapxTask,
+  useDeleteBapxTask,
+  type BapxTask,
+  type BapxTaskStatus,
+} from '@/hooks/bapx/use-bapx-tasks';
 import {
   useTickets,
   useColumns,
@@ -44,37 +44,37 @@ import {
   readLastSeen,
   writeLastSeen,
   type Ticket,
-} from '@/hooks/kortix/use-kortix-tickets';
+} from '@/hooks/bapx/use-bapx-tickets';
 import { openTabAndNavigate } from '@/stores/tab-store';
 import {
   createFilesStore,
   FilesStoreProvider,
 } from '@/features/files/store/files-store';
 import { FileExplorerPage } from '@/features/files/components/file-explorer-page';
-import { relativeTime } from '@/lib/kortix/task-meta';
-import { classifySession } from '@/lib/kortix/session-category';
-import type { ProjectAgent } from '@/hooks/kortix/use-kortix-tickets';
+import { relativeTime } from '@/lib/bapx/task-meta';
+import { classifySession } from '@/lib/bapx/session-category';
+import type { ProjectAgent } from '@/hooks/bapx/use-bapx-tickets';
 import { useTriggers } from '@/hooks/scheduled-tasks';
 import { useQueries } from '@tanstack/react-query';
 import { getClient } from '@/lib/opencode-sdk';
 import { formatCost, formatTokens } from '@/ui/turns';
-import { AgentAvatar } from '@/components/kortix/agent-avatar';
+import { AgentAvatar } from '@/components/bapx/agent-avatar';
 import { ChevronDown, TimerIcon, Webhook as WebhookIcon } from 'lucide-react';
 import {
   ProjectHeader,
   type ProjectTab,
-} from '@/components/kortix/project-header';
-import { ProjectAbout } from '@/components/kortix/project-about';
-import { ProjectMembersTab } from '@/components/kortix/project-members-tab';
-import { TasksTab } from '@/components/kortix/tasks-tab';
-import { TaskDetailView } from '@/components/kortix/task-detail-view';
-import { NewTaskDialog } from '@/components/kortix/new-task-dialog';
-import { TicketBoard } from '@/components/kortix/ticket-board';
-import { TicketDetailDrawer } from '@/components/kortix/ticket-detail-drawer';
-import { NewTicketDialog } from '@/components/kortix/new-ticket-dialog';
-import { MilestonesTab } from '@/components/kortix/milestones-tab';
-import { ProjectSettingsTab } from '@/components/kortix/project-settings-tab';
-import { NotificationsBell } from '@/components/kortix/notifications-bell';
+} from '@/components/bapx/project-header';
+import { ProjectAbout } from '@/components/bapx/project-about';
+import { ProjectMembersTab } from '@/components/bapx/project-members-tab';
+import { TasksTab } from '@/components/bapx/tasks-tab';
+import { TaskDetailView } from '@/components/bapx/task-detail-view';
+import { NewTaskDialog } from '@/components/bapx/new-task-dialog';
+import { TicketBoard } from '@/components/bapx/ticket-board';
+import { TicketDetailDrawer } from '@/components/bapx/ticket-detail-drawer';
+import { NewTicketDialog } from '@/components/bapx/new-ticket-dialog';
+import { MilestonesTab } from '@/components/bapx/milestones-tab';
+import { ProjectSettingsTab } from '@/components/bapx/project-settings-tab';
+import { NotificationsBell } from '@/components/bapx/notifications-bell';
 import { useIsRouteActive } from '@/hooks/utils/use-is-route-active';
 
 export default function ProjectPage({ params }: { params?: Promise<{ id: string }> }) {
@@ -83,7 +83,7 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
   const projectFilesStoreRef = useRef(createFilesStore());
   const projectFilesStore = projectFilesStoreRef.current;
 
-  const { data: project, isLoading } = useKortixProject(pid);
+  const { data: project, isLoading } = useBapxProject(pid);
   const isV2 = project?.structure_version === 2;
   const userHandle = useUserHandle();
   const patchProject = usePatchProject();
@@ -113,17 +113,17 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
   const shouldLoadProjectSessions = isProjectRouteActive && tab === 'sessions';
   const shouldLoadProjectTasks = !isV2 && isProjectRouteActive && tab === 'tasks';
 
-  const { data: sessions } = useKortixProjectSessions(pid, { enabled: shouldLoadProjectSessions });
-  const { data: tasks } = useKortixTasks(project?.id, undefined, {
+  const { data: sessions } = useBapxProjectSessions(pid, { enabled: shouldLoadProjectSessions });
+  const { data: tasks } = useBapxTasks(project?.id, undefined, {
     enabled: shouldLoadProjectTasks,
     pollingEnabled: shouldLoadProjectTasks,
   });
-  const startTask = useStartKortixTask();
-  const approveTask = useApproveKortixTask();
-  const deleteTask = useDeleteKortixTask();
+  const startTask = useStartBapxTask();
+  const approveTask = useApproveBapxTask();
+  const deleteTask = useDeleteBapxTask();
 
   const sessionList = useMemo(() => sessions ?? [], [sessions]);
-  const taskList = useMemo<KortixTask[]>(() => tasks ?? [], [tasks]);
+  const taskList = useMemo<BapxTask[]>(() => tasks ?? [], [tasks]);
 
   // ─── v2 state ──────────────────────────────────────────────────────────
   const [openTicketId, setOpenTicketId] = useState<string | null>(null);
@@ -211,7 +211,7 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
     }
     setTabState(next);
   }, []);
-  const openTask = useCallback((task: KortixTask) => setOpenTaskId(task.id), []);
+  const openTask = useCallback((task: BapxTask) => setOpenTaskId(task.id), []);
   const closeTask = useCallback(() => setOpenTaskId(null), []);
   const openTicket = useCallback((t: Ticket) => setOpenTicketId(t.id), []);
   const closeTicket = useCallback(() => { setOpenTicketId(null); setFocusEventId(null); }, []);
@@ -222,8 +222,8 @@ export default function ProjectPage({ params }: { params?: Promise<{ id: string 
 
   // ─── v1 new-task dialog ────────────────────────────────────────────────
   const [newTaskOpen, setNewTaskOpen] = useState(false);
-  const [newTaskDefault, setNewTaskDefault] = useState<KortixTaskStatus | undefined>();
-  const openNewTask = useCallback((status?: KortixTaskStatus) => {
+  const [newTaskDefault, setNewTaskDefault] = useState<BapxTaskStatus | undefined>();
+  const openNewTask = useCallback((status?: BapxTaskStatus) => {
     setNewTaskDefault(status);
     setNewTaskOpen(true);
   }, []);
@@ -561,7 +561,7 @@ function SessionsList({
   const sessionIds = useMemo(() => sessions.map((s) => s.id), [sessions]);
   const statsQueries = useQueries({
     queries: sessionIds.map((id) => ({
-      queryKey: ['kortix-session-stats', id],
+      queryKey: ['bapx-session-stats', id],
       queryFn: () => fetchSessionStats(id),
       staleTime: 30_000,
       refetchInterval: 60_000,

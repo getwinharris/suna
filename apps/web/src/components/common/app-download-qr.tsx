@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 
 // Bapx Media Hub symbol SVG
-function KortixSymbol({ size = 24, className }: { size?: number; className?: string }) {
+function BapxSymbol({ size = 24, className }: { size?: number; className?: string }) {
   return (
     <svg 
       width={size} 
@@ -20,7 +20,7 @@ function KortixSymbol({ size = 24, className }: { size?: number; className?: str
 /**
  * Universal app download URL - middleware auto-redirects to correct store based on device
  */
-export const APP_DOWNLOAD_URL = 'https://www.kortix.com/app';
+export const APP_DOWNLOAD_URL = 'https://www.bapx.in/app';
 
 export interface AppDownloadQRProps {
   /** Size of the QR code in pixels */
@@ -58,7 +58,7 @@ export function AppDownloadQR({
       {showLogo && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="bg-white p-2 rounded-xl shadow-md">
-            <KortixSymbol size={logoSize} className="text-black" />
+            <BapxSymbol size={logoSize} className="text-black" />
           </div>
         </div>
       )}

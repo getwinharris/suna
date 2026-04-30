@@ -78,7 +78,7 @@ export default tool({
   },
   async execute(args, _context) {
     const apiBaseURL = getEnv("TAVILY_API_URL");
-    // When routed through the Kortix proxy (TAVILY_API_URL is set), use KORTIX_TOKEN
+    // When routed through the Bapx proxy (TAVILY_API_URL is set), use KORTIX_TOKEN
     // for auth — the proxy validates it and injects the real Tavily API key.
     // When hitting the real Tavily API directly, use the user's own TAVILY_API_KEY.
     const apiKey = apiBaseURL

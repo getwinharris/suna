@@ -2,11 +2,11 @@
  * Milestones API — outcome-level grouping inside a project.
  *
  * Routes are mounted TWICE in index.ts:
- *   - as a project-scoped router under /kortix/projects/:projectId/milestones
+ *   - as a project-scoped router under /bapx/projects/:projectId/milestones
  *   - re-used by agent tools that go through the same HTTP surface
  *
  * Auth/actor:
- *   - Headers X-Kortix-Actor-Type + X-Kortix-Actor-Id stamp the actor_type/id on
+ *   - Headers X-Bapx-Actor-Type + X-Bapx-Actor-Id stamp the actor_type/id on
  *     every write. Falls back to 'user'/null. Mirrors the ticket-events pattern.
  */
 
@@ -43,8 +43,8 @@ function scheduleContextSync(db: Database, project: ProjectRow) {
 
 function getDb(): Database {
   const workspace = process.env.WORKSPACE_DIR || process.env.KORTIX_WORKSPACE || '/workspace'
-  const dbPath = join(workspace, '.kortix', 'kortix.db')
-  if (!existsSync(dbPath)) throw new Error('kortix.db not found')
+  const dbPath = join(workspace, '.bapx', 'bapx.db')
+  if (!existsSync(dbPath)) throw new Error('bapx.db not found')
   const db = new Database(dbPath)
   db.exec('PRAGMA busy_timeout=5000')
   ensureTicketTables(db)
@@ -60,8 +60,8 @@ function resolveProject(db: Database, id: string): ProjectRow | null {
 }
 
 function actorFromHeaders(c: { req: { header: (k: string) => string | undefined } }): { type: ActorType; id: string | null } {
-  const rawType = c.req.header('x-kortix-actor-type') ?? c.req.header('X-Kortix-Actor-Type')
-  const rawId = c.req.header('x-kortix-actor-id') ?? c.req.header('X-Kortix-Actor-Id')
+  const rawType = c.req.header('x-bapx-actor-type') ?? c.req.header('X-Bapx-Actor-Type')
+  const rawId = c.req.header('x-bapx-actor-id') ?? c.req.header('X-Bapx-Actor-Id')
   const type: ActorType = rawType === 'agent' || rawType === 'system' ? rawType : 'user'
   return { type, id: rawId ? String(rawId) : null }
 }
@@ -87,7 +87,7 @@ function serialize(m: MilestoneWithProgress): Record<string, unknown> {
 
 const milestonesRouter = new Hono()
 
-// GET /kortix/projects/:projectId/milestones
+// GET /bapx/projects/:projectId/milestones
 milestonesRouter.get('/:projectId/milestones', (c) => {
   try {
     const db = getDb()
@@ -101,7 +101,7 @@ milestonesRouter.get('/:projectId/milestones', (c) => {
   }
 })
 
-// POST /kortix/projects/:projectId/milestones
+// POST /bapx/projects/:projectId/milestones
 milestonesRouter.post('/:projectId/milestones', async (c) => {
   try {
     const db = getDb()
@@ -132,7 +132,7 @@ milestonesRouter.post('/:projectId/milestones', async (c) => {
   }
 })
 
-// GET /kortix/projects/:projectId/milestones/:ref (id or number)
+// GET /bapx/projects/:projectId/milestones/:ref (id or number)
 milestonesRouter.get('/:projectId/milestones/:ref', (c) => {
   try {
     const db = getDb()
@@ -148,7 +148,7 @@ milestonesRouter.get('/:projectId/milestones/:ref', (c) => {
   }
 })
 
-// PATCH /kortix/projects/:projectId/milestones/:ref
+// PATCH /bapx/projects/:projectId/milestones/:ref
 milestonesRouter.patch('/:projectId/milestones/:ref', async (c) => {
   try {
     const db = getDb()
@@ -175,7 +175,7 @@ milestonesRouter.patch('/:projectId/milestones/:ref', async (c) => {
   }
 })
 
-// POST /kortix/projects/:projectId/milestones/:ref/close
+// POST /bapx/projects/:projectId/milestones/:ref/close
 milestonesRouter.post('/:projectId/milestones/:ref/close', async (c) => {
   try {
     const db = getDb()
@@ -200,7 +200,7 @@ milestonesRouter.post('/:projectId/milestones/:ref/close', async (c) => {
   }
 })
 
-// POST /kortix/projects/:projectId/milestones/:ref/reopen
+// POST /bapx/projects/:projectId/milestones/:ref/reopen
 milestonesRouter.post('/:projectId/milestones/:ref/reopen', (c) => {
   try {
     const db = getDb()
@@ -219,7 +219,7 @@ milestonesRouter.post('/:projectId/milestones/:ref/reopen', (c) => {
   }
 })
 
-// DELETE /kortix/projects/:projectId/milestones/:ref
+// DELETE /bapx/projects/:projectId/milestones/:ref
 milestonesRouter.delete('/:projectId/milestones/:ref', (c) => {
   try {
     const db = getDb()
@@ -237,7 +237,7 @@ milestonesRouter.delete('/:projectId/milestones/:ref', (c) => {
   }
 })
 
-// GET /kortix/projects/:projectId/milestones/:ref/events
+// GET /bapx/projects/:projectId/milestones/:ref/events
 milestonesRouter.get('/:projectId/milestones/:ref/events', (c) => {
   try {
     const db = getDb()

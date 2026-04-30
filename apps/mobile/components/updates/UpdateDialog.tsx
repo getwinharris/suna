@@ -32,7 +32,7 @@ import {
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
-import { KortixLogo } from '@/components/ui/KortixLogo';
+import { BapxLogo } from '@/components/ui/BapxLogo';
 import { useThemeColors, getSheetBg } from '@/lib/theme-colors';
 import type { ChangelogEntry } from '@/lib/platform/client';
 
@@ -445,7 +445,7 @@ function UpdatingSplash({
 
   return (
     <Animated.View style={{ alignItems: 'center', opacity: fadeAnim }}>
-      <KortixLogo size={28} variant="symbol" />
+      <BapxLogo size={28} variant="symbol" />
       <Text
         className="font-roobert-medium text-foreground/90 tracking-tight"
         style={{ fontSize: 13, marginTop: 20 }}

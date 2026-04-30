@@ -1,5 +1,5 @@
 /**
- * Kortix Tickets API — v2 project boards.
+ * Bapx Tickets API — v2 project boards.
  *
  * Status is a free string keyed off project_columns. Assignees are polymorphic
  * (user|agent). Column rules auto-assign on status change and produce a
@@ -52,8 +52,8 @@ import { config } from '../config'
 
 function getDb(): Database {
   const workspace = process.env.WORKSPACE_DIR || process.env.KORTIX_WORKSPACE || '/workspace'
-  const dbPath = join(workspace, '.kortix', 'kortix.db')
-  if (!existsSync(dbPath)) throw new Error('kortix.db not found')
+  const dbPath = join(workspace, '.bapx', 'bapx.db')
+  if (!existsSync(dbPath)) throw new Error('bapx.db not found')
   const db = new Database(dbPath)
   db.exec('PRAGMA busy_timeout=5000')
   ensureTicketTables(db)
@@ -369,7 +369,7 @@ ticketsRouter.delete('/:id', (c) => {
 export { ticketsRouter }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// Project-scoped ticket configuration: /kortix/projects/:id/{columns,fields,templates,agents,context,seed}
+// Project-scoped ticket configuration: /bapx/projects/:id/{columns,fields,templates,agents,context,seed}
 // ═════════════════════════════════════════════════════════════════════════════
 
 const ticketProjectsRouter = new Hono()
@@ -469,8 +469,8 @@ ticketProjectsRouter.post('/:id/agents', async (c) => {
   if (getAgentBySlug(db, project.id, body.slug)) {
     return c.json({ error: 'Agent with this slug already exists' }, 409)
   }
-  const filePath = join(project.path, '.kortix', 'agents', `${body.slug}.md`)
-  await fs.mkdir(join(project.path, '.kortix', 'agents'), { recursive: true })
+  const filePath = join(project.path, '.bapx', 'agents', `${body.slug}.md`)
+  await fs.mkdir(join(project.path, '.bapx', 'agents'), { recursive: true })
   await fs.writeFile(filePath, body.body_md, 'utf8')
   const agent = insertAgent(db, project.id, {
     slug: body.slug,
@@ -566,7 +566,7 @@ ticketProjectsRouter.put('/:id/context', async (c) => {
 // ── Activity / notifications ────────────────────────────────────────────────
 
 /**
- * GET /kortix/projects/:id/activity?since=<iso>&limit=<n>
+ * GET /bapx/projects/:id/activity?since=<iso>&limit=<n>
  *
  * Returns ticket_events across every ticket in the project, newest first.
  * Client computes "what's unread for me" by filtering on actor_id / payload.

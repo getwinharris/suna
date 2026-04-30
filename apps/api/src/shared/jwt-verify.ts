@@ -38,11 +38,11 @@ let jwksFetchedAt = 0;
 const JWKS_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 async function loadJwks(): Promise<void> {
-  const supabaseUrl = config.SUPABASE_URL;
-  if (!supabaseUrl) return;
+  const trailbaseUrl = config.TRAILBASE_URL;
+  if (!trailbaseUrl) return;
 
   try {
-    const res = await fetch(`${supabaseUrl}/auth/v1/.well-known/jwks.json`, {
+    const res = await fetch(`${trailbaseUrl}/api/auth/v1/.well-known/jwks.json`, {
       signal: AbortSignal.timeout(5_000),
     });
     if (!res.ok) return;
@@ -53,7 +53,9 @@ async function loadJwks(): Promise<void> {
       try {
         let algorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams;
 
-        if (jwk.alg === 'ES256' || (jwk.kty === 'EC' && jwk.crv === 'P-256')) {
+        if (jwk.alg === 'EdDSA' || (jwk.kty === 'OKP' && jwk.crv === 'Ed25519')) {
+          algorithm = { name: 'Ed25519' } as any;
+        } else if (jwk.alg === 'ES256' || (jwk.kty === 'EC' && jwk.crv === 'P-256')) {
           algorithm = { name: 'ECDSA', namedCurve: 'P-256' } as EcKeyImportParams;
         } else if (jwk.alg === 'RS256' || jwk.kty === 'RSA') {
           algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' } as RsaHashedImportParams;
@@ -76,7 +78,7 @@ async function loadJwks(): Promise<void> {
 
     jwksFetchedAt = Date.now();
   } catch {
-    // Supabase not reachable yet — will retry on next auth check
+    // TrailBase not reachable yet — will retry on next auth check
   }
 }
 
@@ -127,12 +129,9 @@ interface VerifyFailure {
 }
 
 /**
- * Verify a Supabase JWT locally using cached JWKS.
- *
- * Returns `{ ok: false, reason: 'no-keys' }` when JWKS is unavailable —
- * callers should fall back to the network getUser() call in that case.
+ * Verify a TrailBase JWT locally using cached JWKS.
  */
-export async function verifySupabaseJwt(token: string): Promise<VerifyResult | VerifyFailure> {
+export async function verifyTrailbaseJwt(token: string): Promise<VerifyResult | VerifyFailure> {
   await ensureKeys();
 
   if (keyCache.size === 0) {
@@ -174,7 +173,9 @@ export async function verifySupabaseJwt(token: string): Promise<VerifyResult | V
 
   // Determine verify algorithm from header
   let algorithm: AlgorithmIdentifier | EcdsaParams | RsaPssParams;
-  if (header.alg === 'ES256') {
+  if (header.alg === 'EdDSA') {
+    algorithm = { name: 'Ed25519' } as any;
+  } else if (header.alg === 'ES256') {
     algorithm = { name: 'ECDSA', hash: 'SHA-256' } as EcdsaParams;
   } else if (header.alg === 'RS256') {
     algorithm = { name: 'RSASSA-PKCS1-v1_5' };

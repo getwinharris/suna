@@ -7,8 +7,8 @@ import { Hono } from 'hono'
 const marketplaceRouter = new Hono()
 const execFileAsync = promisify(execFile)
 
-const KORTIX_MARKETPLACE_NAMESPACE = 'kortix'
-const KORTIX_MARKETPLACE_REGISTRY_URL = 'https://kortix-registry-6om.pages.dev'
+const KORTIX_MARKETPLACE_NAMESPACE = 'bapx'
+const KORTIX_MARKETPLACE_REGISTRY_URL = 'https://bapx-registry-6om.pages.dev'
 
 function getWorkspacePaths() {
   const workspaceRoot = process.env.KORTIX_WORKSPACE || '/workspace'
@@ -16,7 +16,7 @@ function getWorkspacePaths() {
   return {
     workspaceRoot,
     opencodeDir,
-    legacyOpencodeDir: path.join(workspaceRoot, '.kortix', '.opencode'),
+    legacyOpencodeDir: path.join(workspaceRoot, '.bapx', '.opencode'),
     ocxConfigPath: path.join(opencodeDir, 'ocx.jsonc'),
     opencodeConfigPath: path.join(opencodeDir, 'opencode.jsonc'),
   }
@@ -92,13 +92,13 @@ async function ensureWorkspaceConfigFiles(): Promise<void> {
   }
 }
 
-async function ensureKortixRegistry(): Promise<void> {
+async function ensureBapxRegistry(): Promise<void> {
   const { ocxConfigPath } = getWorkspacePaths()
   const configText = await readFile(ocxConfigPath, 'utf8').catch(() => '')
-  const hasKortixRegistry =
-    configText.includes('"kortix"') && configText.includes(KORTIX_MARKETPLACE_REGISTRY_URL)
+  const hasBapxRegistry =
+    configText.includes('"bapx"') && configText.includes(KORTIX_MARKETPLACE_REGISTRY_URL)
 
-  if (!hasKortixRegistry) {
+  if (!hasBapxRegistry) {
     await runOcx([
       'registry',
       'add',
@@ -122,7 +122,7 @@ async function listInstalledMarketplaceComponents(): Promise<string[]> {
   const components = payload.data?.components ?? []
   return components
     .filter((component) => component.name.startsWith(`${KORTIX_MARKETPLACE_NAMESPACE}/`))
-    .map((component) => component.name.replace(/^kortix\//, ''))
+    .map((component) => component.name.replace(/^bapx\//, ''))
     .sort((a, b) => a.localeCompare(b))
 }
 
@@ -133,7 +133,7 @@ marketplaceRouter.get('/status', async (c) => {
     const installedComponents = await listInstalledMarketplaceComponents()
     const ocxConfigText = await readFile(ocxConfigPath, 'utf8').catch(() => '')
     const registryConfigured =
-      ocxConfigText.includes('"kortix"') && ocxConfigText.includes(KORTIX_MARKETPLACE_REGISTRY_URL)
+      ocxConfigText.includes('"bapx"') && ocxConfigText.includes(KORTIX_MARKETPLACE_REGISTRY_URL)
 
     return c.json({
       success: true,
@@ -178,7 +178,7 @@ marketplaceRouter.post('/install', async (c) => {
     }
 
     await ensureMarketplaceWorkspaceReady()
-    await ensureKortixRegistry()
+    await ensureBapxRegistry()
     const qualifiedName = `${namespace}/${componentName}`
     const result = await runOcx(['add', qualifiedName])
 

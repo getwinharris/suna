@@ -24,7 +24,7 @@ export interface TicketCreateActionResult {
 
 function getWorkspaceDbPath(): string {
   const root = process.env.WORKSPACE_DIR || process.env.KORTIX_WORKSPACE || "/workspace"
-  return join(root, ".kortix", "kortix.db")
+  return join(root, ".bapx", "bapx.db")
 }
 
 function getPathValue(input: unknown, path: string): unknown {
@@ -73,7 +73,7 @@ export async function executeTicketCreateAction(
         throw new Error(
           `ticket_create: trigger is stamped with project_id="${projectId}" but that project does not exist. ` +
           `The trigger was likely created with a hallucinated id. ` +
-          `Fix via PATCH /kortix/triggers/<id> or recreate with the correct project_id.`,
+          `Fix via PATCH /bapx/triggers/<id> or recreate with the correct project_id.`,
         )
       }
     } finally { probeDb.close() }

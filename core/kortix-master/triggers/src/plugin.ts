@@ -10,16 +10,16 @@ import { describeCron } from "./trigger-store.js"
 type TriggerManagerRegistry = Map<string, TriggerManager>
 
 function getTriggerManagerRegistry(): TriggerManagerRegistry {
-  const g = globalThis as typeof globalThis & { __kortixTriggerManagers?: TriggerManagerRegistry }
-  if (!g.__kortixTriggerManagers) g.__kortixTriggerManagers = new Map()
-  return g.__kortixTriggerManagers
+  const g = globalThis as typeof globalThis & { __bapxTriggerManagers?: TriggerManagerRegistry }
+  if (!g.__bapxTriggerManagers) g.__bapxTriggerManagers = new Map()
+  return g.__bapxTriggerManagers
 }
 
 function createLogger(client: PluginContextShape["client"], fallback?: TriggerPluginOptions["logger"]) {
   return (level: "info" | "warn" | "error", message: string) => {
     fallback?.(level, message)
     try {
-      client.app?.log?.({ body: { service: "kortix-triggers", level, message } }).catch(() => undefined)
+      client.app?.log?.({ body: { service: "bapx-triggers", level, message } }).catch(() => undefined)
     } catch {}
   }
 }
@@ -79,7 +79,7 @@ Actions:
 
 Examples:
   triggers action=list
-  triggers action=create name="Daily Report" source_type=cron cron_expr="0 0 9 * * *" action_type=prompt prompt="Generate the daily report" agent_name=kortix
+  triggers action=create name="Daily Report" source_type=cron cron_expr="0 0 9 * * *" action_type=prompt prompt="Generate the daily report" agent_name=bapx
   triggers action=create name="Backup" source_type=cron cron_expr="0 0 2 * * *" action_type=command command="bash" args='["-c","./scripts/backup.sh"]'
   triggers action=create name="Deploy Hook" source_type=webhook path="/hooks/deploy" action_type=prompt prompt="Handle deploy" secret=mysecret
   triggers action=run trigger_id=xxx
@@ -194,7 +194,7 @@ Examples:
                       try {
                         const path = require("node:path") as typeof import("node:path")
                         const root = process.env.WORKSPACE_DIR || process.env.KORTIX_WORKSPACE || normalizedOptions.directory || "/workspace"
-                        const dbPath = path.join(root, ".kortix", "kortix.db")
+                        const dbPath = path.join(root, ".bapx", "bapx.db")
                         const { Database } = require("bun:sqlite") as typeof import("bun:sqlite")
                         const wsDb = new Database(dbPath)
                         try {
@@ -532,7 +532,7 @@ Examples:
                     source_config: { path: webhookPath, method: "POST" },
                     action_type: "prompt",
                     action_config: { prompt: args.prompt },
-                    agent_name: args.agent_name ?? "kortix",
+                    agent_name: args.agent_name ?? "bapx",
                     model_id: args.model_id,
                     session_mode: args.session_mode ?? "new",
                     pipedream_app: args.app,

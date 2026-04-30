@@ -11,7 +11,7 @@ let _db: Database | null = null
 function getDb(): Database {
   if (_db) return _db
   const root = process.env.KORTIX_WORKSPACE || '/workspace'
-  const dbPath = `${root}/.kortix/kortix.db`
+  const dbPath = `${root}/.bapx/bapx.db`
   _db = new Database(dbPath)
   _db.exec("PRAGMA journal_mode=DELETE; PRAGMA busy_timeout=5000")
   // Ensure table exists (idempotent)

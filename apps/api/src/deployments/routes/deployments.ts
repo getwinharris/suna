@@ -2,14 +2,14 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { eq, and, desc, count } from 'drizzle-orm';
 import { db } from '../../shared/db';
-import { deployments } from '@kortix/db';
+import { deployments } from '@bapx/db';
 import { NotFoundError, ValidationError } from '../../errors';
 import { config } from '../../config';
 import type { AppEnv } from '../../types';
 
 // ─── Dynamic Freestyle config ────────────────────────────────────────────────
-// The Kortix API runs in a separate container from the sandbox. API keys set
-// via the Secrets Manager are stored in the sandbox's secret store (Kortix
+// The Bapx API runs in a separate container from the sandbox. API keys set
+// via the Secrets Manager are stored in the sandbox's secret store (Bapx
 // Master /env). We fetch them from there at deploy-time so keys set after
 // startup work without restarting the API service.
 
@@ -22,7 +22,7 @@ function getMasterUrlCandidates(): string[] {
   return Array.from(new Set(candidates));
 }
 
-/** Try to read a single secret from the sandbox's Kortix Master /env/:key endpoint. */
+/** Try to read a single secret from the sandbox's Bapx Master /env/:key endpoint. */
 async function readSandboxSecret(key: string): Promise<string> {
   const candidates = getMasterUrlCandidates();
   const serviceKey = process.env.INTERNAL_SERVICE_KEY;

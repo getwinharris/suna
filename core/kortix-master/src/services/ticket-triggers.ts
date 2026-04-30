@@ -131,7 +131,7 @@ export async function fireAgentTrigger(opts: FireTriggerOptions): Promise<string
 
   // Persistent-mode busy-check: if the agent's single session is mid-turn,
   // firing now would abort their current work. Queue this assignment and
-  // bail — the session.idle hook in the kortix-system plugin will drain
+  // bail — the session.idle hook in the bapx-system plugin will drain
   // pending_agent_triggers for this agent the next time their session
   // goes idle.
   if (agent.execution_mode === 'persistent' && sessionId) {

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/trailbase/client';
 import { getEnv } from '@/lib/env-config';
 import { useTunnelStore } from '@/stores/tunnel-store';
 import { createSSEStream, type SSEStream } from '@/lib/utils/sse-stream';

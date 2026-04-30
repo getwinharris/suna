@@ -6,7 +6,7 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@bapx/db';
 import { db } from '../../shared/db';
 import { config } from '../../config';
 import * as pool from '../../pool';

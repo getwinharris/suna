@@ -1,6 +1,6 @@
 import { eq, and, or, asc, lt, sql } from 'drizzle-orm';
 import { randomBytes } from 'crypto';
-import { poolSandboxes } from '@kortix/db';
+import { poolSandboxes } from '@bapx/db';
 import { db } from '../shared/db';
 import { getProvider, type ProviderName } from '../platform/providers';
 import { config } from '../config';

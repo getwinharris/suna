@@ -5,7 +5,7 @@ import { existsSync, lstatSync, readlinkSync } from 'node:fs';
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const VERSION_FILE = '/ephemeral/metadata/.version';
-const KORTIX_DATA_DIR = '/workspace/.kortix';
+const KORTIX_DATA_DIR = '/workspace/.bapx';
 const UPDATE_STATUS_FILE = KORTIX_DATA_DIR + '/update-status.json';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@ function readVersionInfo(version: string): VersionInfo {
     persistentRoot,
     persistentMode,
     opencodeLegacyLinked,
-    opencodeStateGuardAvailable: existsSync('/usr/local/bin/kortix-opencode-state'),
+    opencodeStateGuardAvailable: existsSync('/usr/local/bin/bapx-opencode-state'),
   };
 }
 interface UpdateStatus {
@@ -96,14 +96,14 @@ async function setStatus(status: UpdateStatus): Promise<void> {
 
 const updateRoutes = new Hono();
 
-// POST /kortix/update — Trigger a Docker image-based update
-// The actual image pull + container recreate is handled by the kortix-api
+// POST /bapx/update — Trigger a Docker image-based update
+// The actual image pull + container recreate is handled by the bapx-api
 // (local-docker provider). This endpoint just signals readiness and version info.
 updateRoutes.post(
   '/',
   describeRoute({
     tags: ['update'],
-    description: 'Signal sandbox update. Actual image pull + recreate is handled by kortix-api.',
+    description: 'Signal sandbox update. Actual image pull + recreate is handled by bapx-api.',
     responses: {
       200: { description: 'Update acknowledged' },
       400: { description: 'Bad request' },
@@ -134,7 +134,7 @@ updateRoutes.post(
     await setStatus({
       inProgress: true,
       phase: 'pending_recreate',
-      message: `Update to ${targetVersion} pending — container will be recreated by kortix-api`,
+      message: `Update to ${targetVersion} pending — container will be recreated by bapx-api`,
       targetVersion,
       previousVersion: currentVersion,
       error: null,
@@ -142,7 +142,7 @@ updateRoutes.post(
 
     return c.json({
       success: true,
-      message: `Update to ${targetVersion} acknowledged. Container recreate will be triggered by kortix-api.`,
+      message: `Update to ${targetVersion} acknowledged. Container recreate will be triggered by bapx-api.`,
       currentVersion,
       targetVersion,
       action: 'recreate',
@@ -150,7 +150,7 @@ updateRoutes.post(
   },
 );
 
-// GET /kortix/update/status — Check update status
+// GET /bapx/update/status — Check update status
 updateRoutes.get(
   '/status',
   describeRoute({
@@ -167,7 +167,7 @@ updateRoutes.get(
   },
 );
 
-// GET /kortix/update/version — Get current version info
+// GET /bapx/update/version — Get current version info
 updateRoutes.get(
   '/version',
   describeRoute({

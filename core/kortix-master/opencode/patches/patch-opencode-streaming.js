@@ -48,7 +48,7 @@ function findBinaries() {
   ];
 
   const paths = new Set();
-  const extra = [process.env.KORTIX_OPENCODE_OUTPUT_BIN, "/usr/local/bin/opencode-kortix"];
+  const extra = [process.env.KORTIX_OPENCODE_OUTPUT_BIN, "/usr/local/bin/opencode-bapx"];
   for (const candidate of extra) {
     if (candidate && fs.existsSync(candidate) && fs.statSync(candidate).size > 1_000_000) {
       paths.add(candidate);

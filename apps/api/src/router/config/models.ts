@@ -16,7 +16,7 @@ export interface ModelConfig {
 }
 
 /**
- * Kortix model registry — maps model IDs exposed through the Kortix provider
+ * Bapx model registry — maps model IDs exposed through the Bapx provider
  * to their OpenRouter equivalents with pricing.
  *
  * Model IDs use the real provider/model format (e.g. "moonshotai/kimi-k2.5")
@@ -58,13 +58,13 @@ export const MODELS: Record<string, ModelConfig> = {
     tier: 'free',
     cacheReadPer1M: 0.10,
   },
-  // Opencode-side aliases (from core/kortix-master/opencode/opencode.jsonc).
+  // Opencode-side aliases (from core/bapx-master/opencode/opencode.jsonc).
   // Opencode's openai-compatible client ships the alias as the model param
-  // — e.g. `kortix/minimax-m27`, not the resolved upstream id — so the
+  // — e.g. `bapx/minimax-m27`, not the resolved upstream id — so the
   // router needs to translate them. Without these, every agent call from
   // opencode 400s with "is not a valid model ID" and PM/team hangs at
   // 0 tokens / ready_at=null.
-  'kortix/minimax-m27': {
+  'bapx/minimax-m27': {
     openrouterId: 'minimax/minimax-m2.7',
     inputPer1M: 0.30,
     outputPer1M: 1.20,
@@ -72,7 +72,7 @@ export const MODELS: Record<string, ModelConfig> = {
     tier: 'free',
     cacheReadPer1M: 0.06,
   },
-  'kortix/glm-turbo': {
+  'bapx/glm-turbo': {
     openrouterId: 'z-ai/glm-5-turbo',
     inputPer1M: 1.20,
     outputPer1M: 4.00,
@@ -80,7 +80,7 @@ export const MODELS: Record<string, ModelConfig> = {
     tier: 'free',
     cacheReadPer1M: 0.24,
   },
-  'kortix/kimi': {
+  'bapx/kimi': {
     openrouterId: 'moonshotai/kimi-k2.5',
     inputPer1M: 0.45,
     outputPer1M: 2.20,
@@ -88,7 +88,7 @@ export const MODELS: Record<string, ModelConfig> = {
     tier: 'free',
     cacheReadPer1M: 0.225,
   },
-  'kortix/minimax': {
+  'bapx/minimax': {
     openrouterId: 'minimax/minimax-m2.5',
     inputPer1M: 0.20,
     outputPer1M: 1.17,
@@ -99,7 +99,7 @@ export const MODELS: Record<string, ModelConfig> = {
 };
 
 /**
- * Default model for Kortix-managed contexts (cron, memory, etc.)
+ * Default model for Bapx-managed contexts (cron, memory, etc.)
  * that need a sensible default without user input.
  */
 export const DEFAULT_MODEL_ID = 'minimax/minimax-m2.7';
@@ -170,7 +170,7 @@ export function getAllModels() {
   return Object.entries(MODELS).map(([id, cfg]) => ({
     id,
     object: 'model' as const,
-    owned_by: 'kortix',
+    owned_by: 'bapx',
     context_window: cfg.contextWindow,
     pricing: {
       input: cfg.inputPer1M,

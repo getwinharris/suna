@@ -66,8 +66,8 @@ import { QuestionPrompt } from './QuestionPrompt';
 import { useSessions } from '@/lib/platform/hooks';
 import { FileViewer } from '@/components/files/FileViewer';
 import type { SandboxFile } from '@/api/types';
-import KortixSymbolBlack from '@/assets/brand/kortix-symbol-scale-effect-black.svg';
-import KortixSymbolWhite from '@/assets/brand/kortix-symbol-scale-effect-white.svg';
+import BapxSymbolBlack from '@/assets/brand/bapx-symbol-scale-effect-black.svg';
+import BapxSymbolWhite from '@/assets/brand/bapx-symbol-scale-effect-white.svg';
 
 // AnimatedToggleIcon was extracted to components/ui/animated-toggle-icon.tsx
 // so it can be shared with PageHeader and page-level headers across the app.
@@ -928,9 +928,9 @@ export function SessionPage({ sessionId, onBack, onOpenDrawer, onOpenRightDrawer
                   {/* Compacting indicator */}
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                     {isDark ? (
-                      <KortixSymbolWhite width={14} height={14} />
+                      <BapxSymbolWhite width={14} height={14} />
                     ) : (
-                      <KortixSymbolBlack width={14} height={14} />
+                      <BapxSymbolBlack width={14} height={14} />
                     )}
                     <RNText style={{ fontSize: 14, fontFamily: 'Roobert', color: isDark ? '#888' : '#666' }}>
                       Compacting session...
@@ -980,7 +980,7 @@ export function SessionPage({ sessionId, onBack, onOpenDrawer, onOpenRightDrawer
       {/* Project picker — only on fresh sessions, above the chat input.
           Mirrors the web's dashboard/empty-state ProjectSelector: shared
           selection store so the picked project survives app restarts and
-          scopes the next `/kortix/task`-creating send. */}
+          scopes the next `/bapx/task`-creating send. */}
       {showFreshHero && !onboardingMode && !hasQuestion && (
         <ProjectPicker />
       )}
@@ -1089,7 +1089,7 @@ function FreshSessionHero({
   visible: boolean;
   windowWidth: number;
 }) {
-  const Symbol = isDark ? KortixSymbolWhite : KortixSymbolBlack;
+  const Symbol = isDark ? BapxSymbolWhite : BapxSymbolBlack;
   const greeting = useMemo(() => getGreetingLabel(), []);
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;

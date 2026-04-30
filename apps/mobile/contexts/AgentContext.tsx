@@ -118,8 +118,8 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
         }
 
         // No valid stored agent - select default
-        const sunaAgent = agents.find(agent => agent.metadata?.is_suna_default);
-        const defaultAgent = sunaAgent || agents[0];
+        const bapXAgent = agents.find(agent => agent.metadata?.is_bapX_default);
+        const defaultAgent = bapXAgent || agents[0];
 
         if (defaultAgent) {
           log.log('✅ Auto-selected default agent:', defaultAgent.name);
@@ -163,8 +163,8 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
   }, [refetch]);
 
   const getDefaultAgent = React.useCallback((): Agent | null => {
-    const sunaAgent = agents.find(agent => agent.metadata?.is_suna_default);
-    return sunaAgent || agents[0] || null;
+    const bapXAgent = agents.find(agent => agent.metadata?.is_bapX_default);
+    return bapXAgent || agents[0] || null;
   }, [agents]);
 
   const getCurrentAgent = React.useCallback((): Agent | null => {
@@ -174,7 +174,7 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
 
   const isSunaAgent = React.useCallback((): boolean => {
     const currentAgent = getCurrentAgent();
-    return currentAgent?.metadata?.is_suna_default || false;
+    return currentAgent?.metadata?.is_bapX_default || false;
   }, [getCurrentAgent]);
 
   const clearSelection = React.useCallback(async () => {

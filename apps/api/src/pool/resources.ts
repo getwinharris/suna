@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { poolResources } from '@kortix/db';
+import { poolResources } from '@bapx/db';
 import { db } from '../shared/db';
 import type { PoolResource, ResourceInput } from './types';
 

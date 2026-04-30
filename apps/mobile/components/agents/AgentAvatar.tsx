@@ -15,7 +15,7 @@ interface AgentAvatarProps extends ViewProps {
  * Automatically handles:
  * - Agent icon from backend (icon_name)
  * - Agent colors (icon_color, icon_background)
- * - SUNA/KORTIX SUPER WORKER special case (Kortix symbol)
+ * - SUNA/KORTIX SUPER WORKER special case (Bapx symbol)
  * - Fallback to agent name initial
  * 
  * @example
@@ -23,10 +23,10 @@ interface AgentAvatarProps extends ViewProps {
  */
 export function AgentAvatar({ agent, size = 48, style, ...props }: AgentAvatarProps) {
   // Check if this is the SUNA/KORTIX SUPER WORKER
-  const isSunaAgent = agent?.metadata?.is_suna_default || 
-                      agent?.name?.toLowerCase() === 'suna' ||
+  const isSunaAgent = agent?.metadata?.is_bapX_default || 
+                      agent?.name?.toLowerCase() === 'bapX' ||
                       agent?.name?.toLowerCase() === 'superworker' ||
-                      agent?.name?.toLowerCase() === 'kortix super worker';
+                      agent?.name?.toLowerCase() === 'bapx super worker';
 
   return (
     <Avatar
@@ -35,7 +35,7 @@ export function AgentAvatar({ agent, size = 48, style, ...props }: AgentAvatarPr
       icon={agent?.icon_name || undefined}
       iconColor={isSunaAgent ? undefined : agent?.icon_color}
       backgroundColor={isSunaAgent ? undefined : agent?.icon_background}
-      useKortixSymbol={isSunaAgent}
+      useBapxSymbol={isSunaAgent}
       fallbackText={agent?.name}
       style={style}
       {...props}

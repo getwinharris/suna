@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from 'bun:test'
 import { Hono } from 'hono'
 
 /**
- * Tests for GET /kortix/health
+ * Tests for GET /bapx/health
  *
  * The health endpoint reads /ephemeral/metadata/.version (a JSON file with { version })
  * and checks OpenCode readiness. Behaviour:
@@ -16,7 +16,7 @@ import { Hono } from 'hono'
  * standalone Hono app per test and mock Bun.file to return controlled values.
  */
 
-describe('GET /kortix/health', () => {
+describe('GET /bapx/health', () => {
   const originalBunFile = Bun.file
 
   afterEach(() => {
@@ -32,7 +32,7 @@ describe('GET /kortix/health', () => {
    */
   function buildApp(openCodeReady: boolean) {
     const app = new Hono()
-    app.get('/kortix/health', async (c) => {
+    app.get('/bapx/health', async (c) => {
       let version = '0.0.0'
       try {
         const file = Bun.file('/ephemeral/metadata/.version')
@@ -62,7 +62,7 @@ describe('GET /kortix/health', () => {
     }
 
     const app = buildApp(true)
-    const res = await app.request('/kortix/health')
+    const res = await app.request('/bapx/health')
 
     expect(res.status).toBe(200)
     const body = await res.json()
@@ -85,7 +85,7 @@ describe('GET /kortix/health', () => {
     }
 
     const app = buildApp(false)
-    const res = await app.request('/kortix/health')
+    const res = await app.request('/bapx/health')
 
     expect(res.status).toBe(503)
     const body = await res.json()
@@ -108,7 +108,7 @@ describe('GET /kortix/health', () => {
     }
 
     const app = buildApp(true)
-    const res = await app.request('/kortix/health')
+    const res = await app.request('/bapx/health')
 
     expect(res.status).toBe(200)
     const body = await res.json()
@@ -127,7 +127,7 @@ describe('GET /kortix/health', () => {
     }
 
     const app = buildApp(true)
-    const res = await app.request('/kortix/health')
+    const res = await app.request('/bapx/health')
 
     expect(res.status).toBe(200)
     const body = await res.json()
@@ -146,7 +146,7 @@ describe('GET /kortix/health', () => {
     }
 
     const app = buildApp(true)
-    const res = await app.request('/kortix/health')
+    const res = await app.request('/bapx/health')
 
     expect(res.status).toBe(200)
     const body = await res.json()
@@ -165,7 +165,7 @@ describe('GET /kortix/health', () => {
     }
 
     const app = buildApp(true)
-    const res = await app.request('/kortix/health')
+    const res = await app.request('/bapx/health')
 
     expect(res.status).toBe(200)
     const body = await res.json()
@@ -184,7 +184,7 @@ describe('GET /kortix/health', () => {
     }
 
     const app = buildApp(true)
-    const res = await app.request('/kortix/health')
+    const res = await app.request('/bapx/health')
 
     expect(res.headers.get('content-type')).toContain('application/json')
   })
@@ -201,7 +201,7 @@ describe('GET /kortix/health', () => {
     }
 
     const app = buildApp(true)
-    const res = await app.request('/kortix/health')
+    const res = await app.request('/bapx/health')
 
     expect(res.status).toBe(200)
     const body = await res.json()
@@ -222,7 +222,7 @@ describe('GET /kortix/health', () => {
     }
 
     const app = buildApp(false)
-    const res = await app.request('/kortix/health')
+    const res = await app.request('/bapx/health')
 
     expect(res.status).toBe(503)
     expect(res.headers.get('content-type')).toContain('application/json')

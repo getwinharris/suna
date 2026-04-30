@@ -733,7 +733,7 @@ export function getToolInfo(tool: string, input: Record<string, any> = {}): Tool
     case 'session-start-background':
       return {
         icon: 'square-kanban',
-        title: `Worker (${input.agent || 'KortixWorker'})`,
+        title: `Worker (${input.agent || 'BapxWorker'})`,
         subtitle: input.description || input.prompt?.slice(0, 60),
       };
     case 'bash':

@@ -27,8 +27,8 @@ describe('Slack channel webhook route', () => {
   beforeEach(async () => {
     workspace = mkdtempSync(join(tmpdir(), 'slack-route-e2e-'))
     process.env.KORTIX_WORKSPACE = workspace
-    process.env.INTERNAL_SERVICE_KEY = 'kortix_sb_test'
-    process.env.KORTIX_TOKEN = 'kortix_sb_test'
+    process.env.INTERNAL_SERVICE_KEY = 'bapx_sb_test'
+    process.env.KORTIX_TOKEN = 'bapx_sb_test'
     fetchCalls.length = 0
 
     globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -56,8 +56,8 @@ describe('Slack channel webhook route', () => {
     const { default: channelWebhooksRouter } = await import(`../../src/routes/channel-webhooks.ts${cacheBust}`)
     const channelId = crypto.randomUUID()
     const webhookPath = `/hooks/slack/${channelId}`
-    mkdirSync(join(workspace, '.kortix'), { recursive: true })
-    const db = new Database(join(workspace, '.kortix', 'kortix.db'))
+    mkdirSync(join(workspace, '.bapx'), { recursive: true })
+    const db = new Database(join(workspace, '.bapx', 'bapx.db'))
     db.exec(`
       CREATE TABLE IF NOT EXISTS channels (
         id TEXT PRIMARY KEY,
@@ -70,7 +70,7 @@ describe('Slack channel webhook route', () => {
         webhook_path TEXT NOT NULL UNIQUE,
         bot_id TEXT,
         bot_username TEXT,
-        default_agent TEXT DEFAULT 'kortix',
+        default_agent TEXT DEFAULT 'bapx',
         default_model TEXT DEFAULT '',
         bridge_instructions TEXT,
         instructions TEXT,
@@ -82,7 +82,7 @@ describe('Slack channel webhook route', () => {
     const now = new Date().toISOString()
     db.prepare(`
       INSERT INTO channels (id, platform, name, enabled, bot_token, signing_secret, webhook_secret, webhook_path, bot_id, bot_username, default_agent, default_model, bridge_instructions, instructions, created_by, created_at, updated_at)
-      VALUES (?, 'slack', 'Slack Route Test', 1, 'xoxb-test', 'signing-secret', 'webhook-secret', ?, 'U0LAN0Z89', 'kortix-bot', 'kortix', 'openai/gpt-4.1-mini', 'Always answer with a brief confirmation first.', 'You are the Slack support bot for this workspace.', NULL, ?, ?)
+      VALUES (?, 'slack', 'Slack Route Test', 1, 'xoxb-test', 'signing-secret', 'webhook-secret', ?, 'U0LAN0Z89', 'bapx-bot', 'bapx', 'openai/gpt-4.1-mini', 'Always answer with a brief confirmation first.', 'You are the Slack support bot for this workspace.', NULL, ?, ?)
     `).run(channelId, webhookPath, now, now)
 
     const payload = fixture('slack-event-app-mention.json') as Record<string, unknown>
@@ -105,7 +105,7 @@ describe('Slack channel webhook route', () => {
     expect(json.sessionId).toBe('sess-slack-route')
 
     const createCall = fetchCalls.find((call) => call.url === 'http://localhost:4096/session')
-    expect(createCall?.body?.agent).toBe('kortix')
+    expect(createCall?.body?.agent).toBe('bapx')
     expect(createCall?.body?.systemPrompt).toBe('You are the Slack support bot for this workspace.')
 
     const promptCall = fetchCalls.find((call) => call.url === 'http://localhost:4096/session/sess-slack-route/prompt_async')

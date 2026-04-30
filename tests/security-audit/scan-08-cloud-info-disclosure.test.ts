@@ -1,7 +1,7 @@
 /**
  * Security Scan: Cloud API - Information Disclosure
  *
- * LIVE scan against https://computer-preview-api.kortix.com
+ * LIVE scan against https://computer-preview-api.bapx.in
  * Checks what information is exposed via public endpoints, error messages,
  * and version endpoints.
  *
@@ -24,7 +24,7 @@
 
 import { describe, test, expect } from 'bun:test';
 
-const CLOUD = 'https://computer-preview-api.kortix.com';
+const CLOUD = 'https://computer-preview-api.bapx.in';
 
 async function get(path: string): Promise<{ status: number; body: any }> {
   try {

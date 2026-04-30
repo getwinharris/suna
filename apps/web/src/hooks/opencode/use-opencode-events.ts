@@ -28,7 +28,7 @@ import { useSyncStore } from "@/stores/opencode-sync-store";
 import { useServerStore, getActiveOpenCodeUrl } from "@/stores/server-store";
 import { ptyKeys } from "./use-opencode-pty";
 import { opencodeKeys, type Session, type MessageWithParts } from "./use-opencode-sessions";
-import { kortixKeys } from "@/hooks/kortix/use-kortix-projects";
+import { bapxKeys } from "@/hooks/bapx/use-bapx-projects";
 import { saveSessionToIDB, deleteSessionFromIDB } from "@/lib/idb-sync-cache";
 import { resetPrefetchState } from "./use-session-prefetch";
 
@@ -547,7 +547,7 @@ export function useOpenCodeEventStream() {
 							toolName === "project_delete" ||
 							toolName === "project_select"
 						) {
-							queryClient.invalidateQueries({ queryKey: kortixKeys.projects() });
+							queryClient.invalidateQueries({ queryKey: bapxKeys.projects() });
 						}
 					}
 
@@ -850,7 +850,7 @@ export function useOpenCodeEventStream() {
 						const questionText =
 							props.questions?.[0]?.question ||
 							props.questions?.[0]?.header ||
-							"Kortix needs your input";
+							"Bapx needs your input";
 						notifyQuestion(
 							props.sessionID,
 							questionText,

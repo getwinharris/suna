@@ -41,8 +41,8 @@ export async function proxyToAnthropic(
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
       'anthropic-version': ANTHROPIC_VERSION,
-      'HTTP-Referer': config.FRONTEND_URL || 'https://kortix.ai',
-      'X-Title': 'Kortix',
+      'HTTP-Referer': config.FRONTEND_URL || 'https://bapx.ai',
+      'X-Title': 'Bapx',
     },
     body: JSON.stringify(body),
   });

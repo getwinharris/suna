@@ -8,7 +8,7 @@ A Bapx Media Hub *is* a company. One shared machine where every agent sees the s
 
 The reason this works is that coding agents — agents that operate inside a real computer with bash, a filesystem, and the full power of a Linux machine — are the optimal harness for all knowledge work, not just software engineering. They can write scripts, call APIs, manipulate files, browse the web, run databases, parse documents, generate reports, manage infrastructure — anything a human can do at a terminal. Pair that with agent skills, persistent memory, triggers, and orchestration, and you can build complete agents for sales, finance, operations, legal, recruiting, customer support, and every other function a company needs.
 
-We are building Bapx Media Hub as our own internal operating system at [Bapx Media Hub](https://kortix.com) to run our own companies and products. Every agent, skill, and workflow we ship is something we use ourselves — battle-tested against real workloads, not demos. 
+We are building Bapx Media Hub as our own internal operating system at [Bapx Media Hub](https://bapx.in) to run our own companies and products. Every agent, skill, and workflow we ship is something we use ourselves — battle-tested against real workloads, not demos. 
 
 **What you get:** A cloud computer where AI agents do the actual work of running a company. Full Linux Ubuntu sandbox, persistent memory, 60+ skills, 3,000+ integrations, cron/webhook triggers, multi-channel access. Agents work 24/7 — code, APIs, documents, spreadsheets, infrastructure — whether you're there or not. Everything is Linux, bash, files. The agent runtime is [OpenCode](https://github.com/anomalyco/opencode).
 
@@ -17,7 +17,7 @@ We are building Bapx Media Hub as our own internal operating system at [Bapx Med
 Run locally on your laptop or on a VPS/server — the installer handles both.
 
 ```bash
-curl -fsSL https://kortix.com/install | bash
+curl -fsSL https://bapx.in/install | bash
 ```
 
 The installer will ask where you're running:
@@ -25,26 +25,26 @@ The installer will ask where you're running:
 1. **Local machine** (laptop/desktop) — binds to `localhost`
 2. **VPS / Server** — binds to `0.0.0.0`, accessible over the network
 
-Bapx Media Hub works best when it can run 24/7 — even when your laptop is closed. We recommend a server or VPS: [Bapx Media Hub Cloud](https://kortix.com/) (managed), your own server, or a VPS from [Hetzner](https://hetzner.com/) or [JustAVPS](https://justavps.com/).
+Bapx Media Hub works best when it can run 24/7 — even when your laptop is closed. We recommend a server or VPS: [Bapx Media Hub Cloud](https://bapx.in/) (managed), your own server, or a VPS from [Hetzner](https://hetzner.com/) or [JustAVPS](https://justavps.com/).
 
 On any server, just SSH in and run the same install command:
 
 ```bash
 # SSH into your server, then run the same install:
-curl -fsSL https://kortix.com/install | bash
+curl -fsSL https://bapx.in/install | bash
 ```
 
-After install, manage everything with the `kortix` CLI:
+After install, manage everything with the `bapx` CLI:
 
 ```
-kortix start       Start all services
-kortix stop        Stop all services
-kortix restart     Restart all services
-kortix logs        Tail logs
-kortix status      Show service status
-kortix update      Pull latest images and restart
-kortix reset       Wipe local data and start fresh
-kortix uninstall   Remove Bapx Media Hub completely
+bapx start       Start all services
+bapx stop        Stop all services
+bapx restart     Restart all services
+bapx logs        Tail logs
+bapx status      Show service status
+bapx update      Pull latest images and restart
+bapx reset       Wipe local data and start fresh
+bapx uninstall   Remove Bapx Media Hub completely
 ```
 
 ## DEV Commands

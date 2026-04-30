@@ -1,7 +1,7 @@
 /**
- * @kortix/shared
+ * @bapx/shared
  *
- * Shared TypeScript code for Kortix frontend applications.
+ * Shared TypeScript code for Bapx frontend applications.
  * Contains utilities, error classes, and tool metadata.
  */
 

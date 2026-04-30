@@ -35,7 +35,7 @@ import {
 } from '../../src/services/ticket-service'
 import { seedV2Project, syncTeamSection, DEFAULT_PM_SLUG, TEAM_SECTION_START, TEAM_SECTION_END } from '../../src/services/project-v2-seed'
 import { fireAgentTrigger, fireAgentTriggers, type OpenCodeClientLike } from '../../src/services/ticket-triggers'
-import { findAgentForSession, agentHasGroup, TOOL_GROUPS, ticketToolGateHook } from '../../opencode/plugin/kortix-system/ticket-tools'
+import { findAgentForSession, agentHasGroup, TOOL_GROUPS, ticketToolGateHook } from '../../opencode/plugin/bapx-system/ticket-tools'
 
 /**
  * Test shim: insertAgent + flip ready_at to now. Production code leaves a
@@ -99,11 +99,11 @@ function makeMockClient(): MockClient {
 }
 
 function makeFixture(): Fixture {
-  const dir = mkdtempSync(path.join(tmpdir(), 'kortix-tickets-e2e-'))
+  const dir = mkdtempSync(path.join(tmpdir(), 'bapx-tickets-e2e-'))
   const projectPath = path.join(dir, 'workspace')
-  const dbDir = path.join(projectPath, '.kortix')
+  const dbDir = path.join(projectPath, '.bapx')
   mkdirSync(dbDir, { recursive: true })
-  const dbPath = path.join(dbDir, 'kortix.db')
+  const dbPath = path.join(dbDir, 'bapx.db')
   const db = new Database(dbPath, { create: true, readwrite: true })
 
   db.exec(`
@@ -182,7 +182,7 @@ describe('v2 project seeding', () => {
     const done = cols.find((c) => c.key === 'done')!
     expect(done.is_terminal).toBe(1)
 
-    const ctx = await fs.readFile(path.join(fx.project.path, '.kortix', 'CONTEXT.md'), 'utf8')
+    const ctx = await fs.readFile(path.join(fx.project.path, '.bapx', 'CONTEXT.md'), 'utf8')
     expect(ctx).toContain(TEAM_SECTION_START)
     expect(ctx).toContain(TEAM_SECTION_END)
     expect(ctx).toContain('@project-manager')
@@ -232,7 +232,7 @@ describe('ticket lifecycle', () => {
   test('assign_to on create routes to listed owner, skips column default, and is self-stripped for the creator', async () => {
     const fx = await setupSeededProject()
     const pm = getAgentBySlug(fx.db, fx.project.id, DEFAULT_PM_SLUG)!
-    const engPersona = path.join(fx.project.path, '.kortix', 'agents', 'engineer.md')
+    const engPersona = path.join(fx.project.path, '.bapx', 'agents', 'engineer.md')
     await fs.mkdir(path.dirname(engPersona), { recursive: true })
     await fs.writeFile(engPersona, '# Engineer', 'utf8')
     const eng = insertAgent(fx.db, fx.project.id, {
@@ -287,7 +287,7 @@ describe('ticket lifecycle', () => {
 
   test('status change to a column with default assignee auto-assigns and emits a trigger', async () => {
     const fx = await setupSeededProject()
-    const qaPersona = path.join(fx.project.path, '.kortix', 'agents', 'qa.md')
+    const qaPersona = path.join(fx.project.path, '.bapx', 'agents', 'qa.md')
     await fs.mkdir(path.dirname(qaPersona), { recursive: true })
     await fs.writeFile(qaPersona, '# QA\nYou verify.', 'utf8')
     const qa = insertAgent(fx.db, fx.project.id, {
@@ -336,7 +336,7 @@ describe('comments + @-mentions', () => {
 
   test('comment with @-mention emits a trigger for each mentioned agent', async () => {
     const fx = await setupSeededProject()
-    const engPersona = path.join(fx.project.path, '.kortix', 'agents', 'engineer.md')
+    const engPersona = path.join(fx.project.path, '.bapx', 'agents', 'engineer.md')
     await fs.mkdir(path.dirname(engPersona), { recursive: true })
     await fs.writeFile(engPersona, '# Engineer', 'utf8')
     const eng = insertAgent(fx.db, fx.project.id, {
@@ -396,7 +396,7 @@ describe('per-ticket execution mode', () => {
 
   test('per_assignment mode spawns a new session each time', async () => {
     const fx = await setupSeededProject()
-    const persona = path.join(fx.project.path, '.kortix', 'agents', 'eng2.md')
+    const persona = path.join(fx.project.path, '.bapx', 'agents', 'eng2.md')
     await fs.mkdir(path.dirname(persona), { recursive: true })
     await fs.writeFile(persona, '# Engineer', 'utf8')
     const agent = insertAgent(fx.db, fx.project.id, {
@@ -450,7 +450,7 @@ describe('per-ticket execution mode', () => {
 describe('tool_group enforcement', () => {
   test('agent with only project_action cannot call team_create_agent', async () => {
     const fx = await setupSeededProject()
-    const persona = path.join(fx.project.path, '.kortix', 'agents', 'worker.md')
+    const persona = path.join(fx.project.path, '.bapx', 'agents', 'worker.md')
     await fs.mkdir(path.dirname(persona), { recursive: true })
     await fs.writeFile(persona, '# Worker', 'utf8')
     const worker = insertAgent(fx.db, fx.project.id, {
@@ -501,7 +501,7 @@ describe('structure_version branching', () => {
 
   test('syncTeamSection updates the CONTEXT.md after a new agent is registered', async () => {
     const fx = await setupSeededProject()
-    const engPath = path.join(fx.project.path, '.kortix', 'agents', 'engineer.md')
+    const engPath = path.join(fx.project.path, '.bapx', 'agents', 'engineer.md')
     await fs.mkdir(path.dirname(engPath), { recursive: true })
     await fs.writeFile(engPath, '# Engineer', 'utf8')
     insertAgent(fx.db, fx.project.id, {
@@ -509,7 +509,7 @@ describe('structure_version branching', () => {
       tool_groups: ['project_action'],
     })
     await syncTeamSection(fx.db, fx.project)
-    const ctx = await fs.readFile(path.join(fx.project.path, '.kortix', 'CONTEXT.md'), 'utf8')
+    const ctx = await fs.readFile(path.join(fx.project.path, '.bapx', 'CONTEXT.md'), 'utf8')
     expect(ctx).toContain('@engineer')
     expect(ctx).toContain('@project-manager')
   })
@@ -517,7 +517,7 @@ describe('structure_version branching', () => {
   test('buildTeamSection uses provided user_handle and drops "You" wording', async () => {
     const fx = await setupSeededProject()
     await syncTeamSection(fx.db, { ...fx.project, user_handle: 'vukasinkubet' })
-    const ctx = await fs.readFile(path.join(fx.project.path, '.kortix', 'CONTEXT.md'), 'utf8')
+    const ctx = await fs.readFile(path.join(fx.project.path, '.bapx', 'CONTEXT.md'), 'utf8')
     expect(ctx).toContain('@vukasinkubet')
     expect(ctx).not.toContain('@human')
     expect(ctx).not.toContain('@user')
@@ -578,7 +578,7 @@ describe('sub-tickets + parent_id permission', () => {
     // Two projects in the SAME db so the cross-project lookup finds the parent
     // but rejects on project_id mismatch.
     const fx = await setupSeededProject()
-    const otherDir = mkdtempSync(path.join(tmpdir(), 'kortix-other-'))
+    const otherDir = mkdtempSync(path.join(tmpdir(), 'bapx-other-'))
     fixtures.push({ ...fx, dir: otherDir } as Fixture)
     const otherId = `proj-other-${Date.now().toString(36)}`
     fx.db.prepare('INSERT INTO projects (id,name,path,description,created_at) VALUES ($id,$n,$p,$d,$c)').run({

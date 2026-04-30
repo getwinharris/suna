@@ -1,7 +1,7 @@
 /**
  * Sandbox Health Monitor
  *
- * Periodic health check that ensures kortix-api can always reach the sandbox.
+ * Periodic health check that ensures bapx-api can always reach the sandbox.
  * Self-heals by re-syncing the canonical sandbox auth bundle on auth failures.
  *
  * Runs every HEALTH_CHECK_INTERVAL_MS. On failure:
@@ -100,9 +100,9 @@ async function checkSandboxHealth(): Promise<void> {
 
   try {
     // 1. Check basic reachability (health endpoint bypasses auth)
-    // 503 means Kortix Master is running but the agent runtime isn't ready yet —
+    // 503 means Bapx Master is running but the agent runtime isn't ready yet —
     // treat it as a soft failure (sandbox is reachable but not fully ready).
-    const healthRes = await fetch(`${baseUrl}/kortix/health`, {
+    const healthRes = await fetch(`${baseUrl}/bapx/health`, {
       signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
     });
 
@@ -127,13 +127,13 @@ async function checkSandboxHealth(): Promise<void> {
     // 2. Check auth works (protected endpoint)
     const fetchAuthorized = async (): Promise<Response> => {
       for (const authToken of authCandidates) {
-        const res = await fetch(`${baseUrl}/kortix/ports`, {
+        const res = await fetch(`${baseUrl}/bapx/ports`, {
           headers: { Authorization: `Bearer ${authToken}` },
           signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
         });
         if (res.status !== 401 && res.status !== 403) return res;
       }
-      return fetch(`${baseUrl}/kortix/ports`, {
+      return fetch(`${baseUrl}/bapx/ports`, {
         headers: { Authorization: `Bearer ${authCandidates[0] || ''}` },
         signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
       });
@@ -182,7 +182,7 @@ async function checkSandboxHealth(): Promise<void> {
 /**
  * Attempt to sync the canonical auth bundle + API URLs to the sandbox container.
  * Tries the secrets manager /env API first (preferred — triple-write + no restart needed).
- * Falls back to docker exec if the API is unreachable (e.g. kortix-master down).
+ * Falls back to docker exec if the API is unreachable (e.g. bapx-master down).
  */
 async function attemptKeySync(baseUrl: string, canonicalServiceKey: string, authCandidates: string[]): Promise<boolean> {
   if (!canonicalServiceKey) return false;
@@ -264,7 +264,7 @@ async function attemptKeySync(baseUrl: string, canonicalServiceKey: string, auth
 
 /**
  * Fallback: write core env vars directly to s6 env dir via docker exec.
- * Used when the /env API is unreachable (e.g. kortix-master auth mismatch).
+ * Used when the /env API is unreachable (e.g. bapx-master auth mismatch).
  */
 async function attemptKeySyncFallback(keys: Record<string, string>): Promise<boolean> {
   // Only works in local docker mode (not network mode)

@@ -31,7 +31,7 @@ import { getSandboxUrl } from '@/lib/platform-client';
 import { toast } from 'sonner';
 import { ScheduleBuilder } from './schedule-builder';
 import { cn } from '@/lib/utils';
-import { useTickets, useColumns, useProjectAgents } from '@/hooks/kortix/use-kortix-tickets';
+import { useTickets, useColumns, useProjectAgents } from '@/hooks/bapx/use-bapx-tickets';
 
 // Shared selectors from ChatInput (same as used in channels)
 import { AgentSelector, flattenModels } from '@/components/session/session-chat-input';
@@ -297,7 +297,7 @@ export function TaskConfigDialog({ open, onOpenChange, onCreated, projectId, def
                     <p className="text-xs text-muted-foreground mt-1">
                       Send a <span className="font-mono">POST</span> request to this URL to fire the trigger.
                       {webhookSecret ? ' Include the secret in the ' : ' Optionally protect with a secret via '}
-                      <code className="text-xs font-mono">X-Kortix-Trigger-Secret</code> header.
+                      <code className="text-xs font-mono">X-Bapx-Trigger-Secret</code> header.
                     </p>
                   </div>
 

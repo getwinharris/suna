@@ -1,9 +1,8 @@
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { locales, defaultLocale, type Locale } from '@/i18n/config';
 import { detectBestLocaleFromHeaders } from '@/lib/utils/geo-detection-server';
-import { KORTIX_SUPABASE_AUTH_COOKIE } from '@/lib/supabase/constants';
+import { BAPX_TRAILBASE_AUTH_COOKIE } from '@/lib/trailbase/client';
 import {
   ACTIVE_INSTANCE_COOKIE,
   buildInstancePath,
@@ -208,70 +207,33 @@ export async function middleware(request: NextRequest) {
     pathname === route || pathname.startsWith(route + '/')
   );
 
-  // Create a single Supabase client instance that we'll reuse
-  let supabaseResponse = NextResponse.next({
+  // Create a single Trailbase client instance that we'll reuse
+  let trailbaseResponse = NextResponse.next({
     request,
   });
 
-  // IMPORTANT: NEXT_PUBLIC_ vars are inlined at build time by Next.js, so in
-  // Docker containers they contain placeholder values. We MUST use runtime
-  // env vars (SUPABASE_URL, SUPABASE_ANON_KEY) with fallback to NEXT_PUBLIC_.
-  //
-  // SUPABASE_SERVER_URL is the internal Docker network URL (e.g. http://supabase-kong:8000)
-  // used for server-side auth calls. SUPABASE_URL / NEXT_PUBLIC_SUPABASE_URL is the
-  // public-facing URL that the browser uses. The middleware runs server-side inside
-  // the Docker container, so it needs the internal URL to reach Supabase.
-  const supabaseUrl = process.env.SUPABASE_SERVER_URL || process.env.SUPABASE_URL || process.env.KORTIX_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.KORTIX_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookieOptions: {
-        name: KORTIX_SUPABASE_AUTH_COOKIE,
-        path: '/',
-        sameSite: 'lax',
-      },
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  // Fetch user ONCE and reuse for both locale detection and auth checks.
-  // IMPORTANT: Skip getUser() for auth routes — the auth page handles its
-  // own session client-side. Calling getUser() here can trigger a server-side
-  // token refresh that consumes the refresh token (GoTrue refresh tokens are
-  // single-use). The updated cookie is set on the response, but if the browser
-  // does a client-side navigation (router.push) instead of a full page load,
-  // the Set-Cookie header may not be processed, leaving the browser with a
-  // stale (revoked) refresh token → "Refresh Token Not Found" on the next request.
-  let user: { id: string; user_metadata?: { locale?: string } } | null = null;
+  const trailbaseUrl = process.env.TRAILBASE_URL || 'http://localhost:4000';
+  const token = request.cookies.get(BAPX_TRAILBASE_AUTH_COOKIE)?.value;
+  
+  let user: any | null = null;
   let authError: Error | null = null;
-  
-  const isAuthRoute = pathname === '/auth' || pathname.startsWith('/auth/');
-  
-  if (!isAuthRoute) {
+
+  if (token) {
     try {
-      const { data: { user: fetchedUser }, error: fetchedError } = await supabase.auth.getUser();
-      user = fetchedUser;
-      authError = fetchedError as Error | null;
-    } catch (error) {
-      // User might not be authenticated, continue
-      authError = error as Error;
+      const res = await fetch(`${trailbaseUrl}/api/auth/v1/user`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        user = await res.json();
+      } else {
+        authError = new Error('Invalid token');
+      }
+    } catch (err) {
+      authError = err as Error;
     }
   }
+
+  const isAuthRoute = pathname === '/auth' || pathname.startsWith('/auth/');
 
   // FAST PATH: Authenticated users hitting the homepage get an instant 302
   // to /dashboard. This avoids the old client-side redirect chain that caused
@@ -329,7 +291,7 @@ export async function middleware(request: NextRequest) {
   // Returning a fresh NextResponse.next() would discard refreshed auth cookies,
   // causing the session to break on the next navigation.
   if (PUBLIC_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
-    return supabaseResponse;
+    return trailbaseResponse;
   }
 
   // Everything else requires authentication - reuse the user we already fetched

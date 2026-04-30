@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: 'Careers at Bapx Media Hub – Build the Autonomous Company OS',
     description:
       'An extremely small, tight-knit team building the operating system for autonomous companies. Founders, builders, hackers, engineers — we care that you\'ve built something real.',
-    url: 'https://www.kortix.com/careers',
+    url: 'https://www.bapx.in/careers',
     images: [
       {
         url: '/images/careers/shackleton.png',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     images: ['/images/careers/shackleton.png'],
   },
   alternates: {
-    canonical: 'https://www.kortix.com/careers',
+    canonical: 'https://www.bapx.in/careers',
   },
 };
 

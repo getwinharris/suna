@@ -1,6 +1,6 @@
 /**
  * Channel DB — SQLite-backed channel configuration store.
- * Lives in .kortix/kortix.db alongside connectors, triggers, etc.
+ * Lives in .bapx/bapx.db alongside connectors, triggers, etc.
  *
  * Used by: ktelegram, kslack, kchannel CLIs, and the webhook bridges.
  */
@@ -18,15 +18,15 @@ function resolveDbPath(): string {
       : (process.env.HOME ? path.join(process.env.HOME, "") : process.cwd()))
   // Try known paths
   for (const candidate of [
-    path.join(root, ".kortix", "kortix.db"),
-    "/workspace/.kortix/kortix.db",
+    path.join(root, ".bapx", "bapx.db"),
+    "/workspace/.bapx/bapx.db",
   ]) {
     const dir = path.dirname(candidate)
     if (existsSync(dir)) return candidate
   }
-  const dbDir = path.join(root, ".kortix")
+  const dbDir = path.join(root, ".bapx")
   mkdirSync(dbDir, { recursive: true })
-  return path.join(dbDir, "kortix.db")
+  return path.join(dbDir, "bapx.db")
 }
 
 let _db: Database | null = null
@@ -55,7 +55,7 @@ export function getDb(): Database {
       webhook_path TEXT NOT NULL UNIQUE,
       bot_id TEXT,
       bot_username TEXT,
-      default_agent TEXT DEFAULT 'kortix',
+      default_agent TEXT DEFAULT 'bapx',
       default_model TEXT DEFAULT '',
       bridge_instructions TEXT,
       instructions TEXT,
@@ -84,7 +84,7 @@ export function getDb(): Database {
           webhook_path TEXT NOT NULL UNIQUE,
           bot_id TEXT,
           bot_username TEXT,
-          default_agent TEXT DEFAULT 'kortix',
+          default_agent TEXT DEFAULT 'bapx',
           default_model TEXT DEFAULT '',
           bridge_instructions TEXT,
           instructions TEXT,
@@ -165,11 +165,11 @@ export function generateChannelName(createdBy?: string): string {
   for (let i = 0; i < 100; i++) {
     const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)]
     const suffix = createdBy ? ` (by ${createdBy})` : ""
-    const name = `Kortix ${adj}${suffix}`
+    const name = `Bapx ${adj}${suffix}`
     if (!usedNames.has(name)) return name
   }
   // Fallback with random number
-  return `Kortix ${Date.now().toString(36)}${createdBy ? ` (by ${createdBy})` : ""}`
+  return `Bapx ${Date.now().toString(36)}${createdBy ? ` (by ${createdBy})` : ""}`
 }
 
 // ─── CRUD ────────────────────────────────────────────────────────────────────
@@ -208,7 +208,7 @@ export function createChannel(opts: {
     id, opts.platform, name, enabled, opts.bot_token, opts.signing_secret || null,
     webhookSecret, webhookPath,
     opts.bot_id || null, opts.bot_username || null,
-    opts.default_agent || "kortix", opts.default_model || "", opts.bridge_instructions || null,
+    opts.default_agent || "bapx", opts.default_model || "", opts.bridge_instructions || null,
     opts.instructions || null, opts.project_id || null, opts.created_by || null, now, now,
   )
 

@@ -5,7 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Environment, ContactShadows, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
-interface KortixBoxModelProps {
+interface BapxBoxModelProps {
   progressRef: MutableRefObject<number>;
   isOn: boolean;
   setIsOn: (isOn: boolean) => void;
@@ -35,10 +35,10 @@ function useGlowTexture() {
   }, []);
 }
 
-function KortixBoxModel({ progressRef, isOn, setIsOn }: KortixBoxModelProps) {
+function BapxBoxModel({ progressRef, isOn, setIsOn }: BapxBoxModelProps) {
   const groupRef = useRef<THREE.Group>(null!);
   const innerRef = useRef<THREE.Group>(null!);
-  const { scene } = useGLTF('/models/kortix_box.glb');
+  const { scene } = useGLTF('/models/bapx_box.glb');
   const [ready, setReady] = useState(false);
   const [hovered, setHovered] = useState(false);
   const ledMatRef = useRef<THREE.MeshStandardMaterial>(null!);
@@ -184,7 +184,7 @@ function KortixBoxModel({ progressRef, isOn, setIsOn }: KortixBoxModelProps) {
       }
     }
     
-    // Start front-on (LED visible), tilt to reveal top (Kortix engraving) on scroll
+    // Start front-on (LED visible), tilt to reveal top (Bapx engraving) on scroll
     const scrollRX = t * 0.55;
     const scrollRY = t * 1.8;
     const scrollY = -t * 0.5;
@@ -310,7 +310,7 @@ export default function MacMiniScene({ scrollProgressRef, isOn, setIsOn }: MacMi
       >
         <CinematicLights progressRef={scrollProgressRef} isOn={isOn} />
         <Suspense fallback={null}>
-          <KortixBoxModel progressRef={scrollProgressRef} isOn={isOn} setIsOn={setIsOn} />
+          <BapxBoxModel progressRef={scrollProgressRef} isOn={isOn} setIsOn={setIsOn} />
           <ContactShadows
             position={[0, -1.5, 0]}
             opacity={0.4}
@@ -326,4 +326,4 @@ export default function MacMiniScene({ scrollProgressRef, isOn, setIsOn }: MacMi
   );
 }
 
-useGLTF.preload('/models/kortix_box.glb');
+useGLTF.preload('/models/bapx_box.glb');

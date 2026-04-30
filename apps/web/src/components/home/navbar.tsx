@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter, usePathname } from 'next/navigation';
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { BapxLogo } from '@/components/sidebar/bapx-logo';
 import { useTranslations } from 'next-intl';
 import { trackCtaSignup } from '@/lib/analytics/gtm';
 import { AppDownloadQR } from '@/components/common/app-download-qr';
@@ -158,7 +158,7 @@ export function Navbar({ isAbsolute = false }: NavbarProps) {
   const lastScrollY = useRef(0);
 
   const filteredNavLinks = siteConfig.nav.links;
-  const { formattedStars, loading: starsLoading } = useGitHubStars('kortix-ai', 'kortix');
+  const { formattedStars, loading: starsLoading } = useGitHubStars('bapx-ai', 'bapx');
 
   const ctaLink = '/auth';
 
@@ -210,7 +210,7 @@ export function Navbar({ isAbsolute = false }: NavbarProps) {
         <ContextMenu>
           <ContextMenuTrigger asChild>
             <Link href="/" className="flex items-center shrink-0">
-              <KortixLogo size={18} variant='logomark' />
+              <BapxLogo size={18} variant='logomark' />
             </Link>
           </ContextMenuTrigger>
           <ContextMenuContent className="w-48">
@@ -221,12 +221,12 @@ export function Navbar({ isAbsolute = false }: NavbarProps) {
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-40">
                 {[
-                  { label: 'Black · SVG', href: '/brandkit/Logo/Brandmark/SVG/Brandmark Black.svg', file: 'kortix-symbol-black.svg' },
-                  { label: 'Black · PNG', href: '/brandkit/Logo/Brandmark/PNG/Brandmark Black.png', file: 'kortix-symbol-black.png' },
-                  { label: 'White · SVG', href: '/brandkit/Logo/Brandmark/SVG/Brandmark White.svg', file: 'kortix-symbol-white.svg' },
-                  { label: 'White · PNG', href: '/brandkit/Logo/Brandmark/PNG/Brandmark White.png', file: 'kortix-symbol-white.png' },
+                  { label: 'Black · SVG', href: '/brandkit/Logo/Brandmark/SVG/Brandmark Black.svg', file: 'bapx-symbol-black.svg' },
+                  { label: 'Black · PNG', href: '/brandkit/Logo/Brandmark/PNG/Brandmark Black.png', file: 'bapx-symbol-black.png' },
+                  { label: 'White · SVG', href: '/brandkit/Logo/Brandmark/SVG/Brandmark White.svg', file: 'bapx-symbol-white.svg' },
+                  { label: 'White · PNG', href: '/brandkit/Logo/Brandmark/PNG/Brandmark White.png', file: 'bapx-symbol-white.png' },
                 ].map((d) => (
-                  <ContextMenuItem key={d.file} onClick={() => { const a = document.createElement('a'); a.href = d.href; a.download = d.file; a.click(); }} className="text-[13px] cursor-pointer">
+                  <ContextMenuItem key={`symbol-${d.file}`} onClick={() => { const a = document.createElement('a'); a.href = d.href; a.download = d.file; a.click(); }} className="text-[13px] cursor-pointer">
                     {d.label}
                   </ContextMenuItem>
                 ))}
@@ -239,12 +239,12 @@ export function Navbar({ isAbsolute = false }: NavbarProps) {
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-40">
                 {[
-                  { label: 'Black · SVG', href: '/brandkit/Logo/Wordmark/SVG/Wordmark Black.svg', file: 'kortix-wordmark-black.svg' },
-                  { label: 'Black · PNG', href: '/brandkit/Logo/Wordmark/PNG/Wordmark Black.png', file: 'kortix-wordmark-black.png' },
-                  { label: 'White · SVG', href: '/brandkit/Logo/Wordmark/SVG/Wordmark White.svg', file: 'kortix-wordmark-white.svg' },
-                  { label: 'White · PNG', href: '/brandkit/Logo/Wordmark/PNG/Wordmark White.png', file: 'kortix-wordmark-white.png' },
+                  { label: 'Black · SVG', href: '/brandkit/Logo/Wordmark/SVG/Wordmark Black.svg', file: 'bapx-wordmark-black.svg' },
+                  { label: 'Black · PNG', href: '/brandkit/Logo/Wordmark/PNG/Wordmark Black.png', file: 'bapx-wordmark-black.png' },
+                  { label: 'White · SVG', href: '/brandkit/Logo/Wordmark/SVG/Wordmark White.svg', file: 'bapx-wordmark-white.svg' },
+                  { label: 'White · PNG', href: '/brandkit/Logo/Wordmark/PNG/Wordmark White.png', file: 'bapx-wordmark-white.png' },
                 ].map((d) => (
-                  <ContextMenuItem key={d.file} onClick={() => { const a = document.createElement('a'); a.href = d.href; a.download = d.file; a.click(); }} className="text-[13px] cursor-pointer">
+                  <ContextMenuItem key={`wordmark-${d.file}`} onClick={() => { const a = document.createElement('a'); a.href = d.href; a.download = d.file; a.click(); }} className="text-[13px] cursor-pointer">
                     {d.label}
                   </ContextMenuItem>
                 ))}
@@ -282,7 +282,7 @@ export function Navbar({ isAbsolute = false }: NavbarProps) {
         <div className="flex items-center gap-1 shrink-0">
           {/* GitHub stars (hidden on mobile) */}
           <a
-            href="https://github.com/kortix-ai/suna"
+            href="https://github.com/bapx-ai/bapX"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
@@ -340,7 +340,7 @@ export function Navbar({ isAbsolute = false }: NavbarProps) {
             {/* Header - matches navbar positioning */}
             <div className="flex h-[56px] items-center justify-between px-6 py-2">
               <Link href="/" className="flex items-center gap-3" onClick={() => setIsDrawerOpen(false)}>
-                <KortixLogo size={18} variant='logomark' />
+                <BapxLogo size={18} variant='logomark' />
               </Link>
               <Button
                 onClick={toggleDrawer}

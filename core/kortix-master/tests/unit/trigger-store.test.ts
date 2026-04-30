@@ -32,7 +32,7 @@ describe('TriggerStore', () => {
         source_config: { cron_expr: '0 0 9 * * *', timezone: 'UTC' },
         action_type: 'prompt',
         action_config: { prompt: 'Generate the daily report' },
-        agent_name: 'kortix',
+        agent_name: 'bapx',
         model_id: 'anthropic/claude-sonnet-4-20250514',
         session_mode: 'new',
       })
@@ -115,13 +115,13 @@ describe('TriggerStore', () => {
         action_config: { prompt: 'New PR' },
         pipedream_app: 'github',
         pipedream_component: 'github-new-pull-request',
-        pipedream_props: { repo: 'kortix-ai/computer' },
+        pipedream_props: { repo: 'bapx-ai/computer' },
       })
 
       expect(trigger.pipedream_app).toBe('github')
       expect(trigger.pipedream_component).toBe('github-new-pull-request')
       const props = JSON.parse(trigger.pipedream_props)
-      expect(props.repo).toBe('kortix-ai/computer')
+      expect(props.repo).toBe('bapx-ai/computer')
     })
   })
 

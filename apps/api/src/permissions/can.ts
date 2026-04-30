@@ -1,4 +1,4 @@
-import type { Database } from '@kortix/db';
+import type { Database } from '@bapx/db';
 
 import type { UserTeamContext } from '../teams/services/access';
 import type { SandboxRef } from '../teams/domain/types';

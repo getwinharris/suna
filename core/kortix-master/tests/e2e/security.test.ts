@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll, afterAll } from "bun:test";
 import { readFileSync, existsSync, statSync } from "fs";
-import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startKortixMaster, waitForHttp, type RuntimeFixture, type StartedServer } from "./helpers";
+import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startBapxMaster, waitForHttp, type RuntimeFixture, type StartedServer } from "./helpers";
 
 describe("Security Tests", () => {
   const baseURL = "http://localhost:8003";
@@ -10,9 +10,9 @@ describe("Security Tests", () => {
   let fixture: RuntimeFixture;
 
   beforeAll(async () => {
-    fixture = createRuntimeFixture("kortix-security-");
+    fixture = createRuntimeFixture("bapx-security-");
     opencode = await startDummyOpenCode(9003);
-    serverProcess = await startKortixMaster(8003, fixture, {
+    serverProcess = await startBapxMaster(8003, fixture, {
       KORTIX_TOKEN: "security-test-token",
       OPENCODE_PORT: "9003",
     });
@@ -86,7 +86,7 @@ describe("Security Tests", () => {
 
     // Start server with different token on a different port.
       const newBaseUrl = "http://localhost:8004";
-      const newServerProcess = await startKortixMaster(8004, fixture, {
+      const newServerProcess = await startBapxMaster(8004, fixture, {
         KORTIX_TOKEN: "different-security-test-token",
         OPENCODE_PORT: "9004",
       });

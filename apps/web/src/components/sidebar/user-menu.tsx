@@ -25,7 +25,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/trailbase/client';
 import { useTheme } from 'next-themes';
 import { isBillingEnabled } from '@/lib/config';
 import { transitionFromElement } from '@/lib/view-transition';

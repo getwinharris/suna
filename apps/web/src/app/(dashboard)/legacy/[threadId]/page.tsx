@@ -251,7 +251,7 @@ function LegacyTurn({
 					<div className="flex items-center gap-2 mt-3">
 						{/* eslint-disable-next-line @next/next/no-img-element */}
 						<img
-							src="/kortix-logomark-white.svg"
+							src="/bapx-logomark-white.svg"
 							alt="Bapx Media Hub"
 							className="dark:invert-0 invert flex-shrink-0"
 							style={{ height: '14px', width: 'auto' }}

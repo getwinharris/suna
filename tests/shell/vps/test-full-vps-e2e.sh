@@ -3,7 +3,7 @@
 # ║  E2E Test: Full VPS lifecycle                                              ║
 # ║                                                                            ║
 # ║  Tests the COMPLETE lifecycle a real VPS user would experience:            ║
-# ║    1. Fresh install via raw GitHub URL (get-kortix.sh)                     ║
+# ║    1. Fresh install via raw GitHub URL (get-bapx.sh)                     ║
 # ║    2. Verify all services healthy (Caddy, frontend, API, Supabase, sandbox)║
 # ║    3. Test HTTPS / TLS termination                                        ║
 # ║    4. Test authentication flow (owner bootstrap, sign-in)                  ║
@@ -18,9 +18,9 @@
 # ║                                                                            ║
 # ║  Environment variables:                                                    ║
 # ║    VPS_DOMAIN       Domain or IP to test against                           ║
-# ║    OWNER_EMAIL      Owner account email (default: e2e@kortix.ai)           ║
+# ║    OWNER_EMAIL      Owner account email (default: e2e@bapx.ai)           ║
 # ║    OWNER_PASSWORD   Owner account password (default: e2e-test-pass-42)     ║
-# ║    INSTALLER_URL    URL to get-kortix.sh (default: raw GitHub URL)         ║
+# ║    INSTALLER_URL    URL to get-bapx.sh (default: raw GitHub URL)         ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 set -uo pipefail
@@ -33,10 +33,10 @@ BLUE=$'\033[0;34m'; CYAN=$'\033[0;36m'; BOLD=$'\033[1m'
 DIM=$'\033[2m'; NC=$'\033[0m'
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${KORTIX_HOME:-$HOME/.kortix}"
-OWNER_EMAIL="${OWNER_EMAIL:-e2e@kortix.ai}"
+INSTALL_DIR="${KORTIX_HOME:-$HOME/.bapx}"
+OWNER_EMAIL="${OWNER_EMAIL:-e2e@bapx.ai}"
 OWNER_PASSWORD="${OWNER_PASSWORD:-e2e-test-pass-42}"
-INSTALLER_URL="${INSTALLER_URL:-https://raw.githubusercontent.com/kortix-ai/suna/main/scripts/get-kortix.sh}"
+INSTALLER_URL="${INSTALLER_URL:-https://raw.githubusercontent.com/bapx-ai/bapX/main/scripts/get-bapx.sh}"
 IP_ONLY=false
 SKIP_INSTALL=false
 KEEP_INSTALL=false
@@ -98,7 +98,7 @@ wait_for_url() {
 echo ""
 echo "${BOLD}${CYAN}"
 echo "  ╔═══════════════════════════════════════════════╗"
-echo "  ║  Kortix — Full VPS E2E Test Suite             ║"
+echo "  ║  Bapx — Full VPS E2E Test Suite             ║"
 echo "  ╚═══════════════════════════════════════════════╝"
 echo "${NC}"
 echo "  ${DIM}Domain/IP:${NC}  ${BOLD}${VPS_DOMAIN}${NC}"
@@ -118,18 +118,18 @@ if [ "$SKIP_INSTALL" = "false" ]; then
     docker compose --profile vps down -v --remove-orphans 2>/dev/null || true
     cd /
   fi
-  docker ps -a --format '{{.Names}}' | grep -E '^kortix-' | xargs -r docker rm -f 2>/dev/null || true
-  docker volume ls --format '{{.Name}}' | grep -i kortix | xargs -r docker volume rm -f 2>/dev/null || true
-  rm -f /usr/local/bin/kortix 2>/dev/null || true
+  docker ps -a --format '{{.Names}}' | grep -E '^bapx-' | xargs -r docker rm -f 2>/dev/null || true
+  docker volume ls --format '{{.Name}}' | grep -i bapx | xargs -r docker volume rm -f 2>/dev/null || true
+  rm -f /usr/local/bin/bapx 2>/dev/null || true
   rm -rf "$INSTALL_DIR"
   pass "Existing installation removed"
 
   # Verify clean state
-  run_test "No kortix containers running" \
-    "! docker ps --format '{{.Names}}' | grep -q kortix"
-  run_test "No kortix volumes" \
-    "! docker volume ls --format '{{.Name}}' | grep -qi kortix"
-  run_test "No ~/.kortix directory" \
+  run_test "No bapx containers running" \
+    "! docker ps --format '{{.Names}}' | grep -q bapx"
+  run_test "No bapx volumes" \
+    "! docker volume ls --format '{{.Name}}' | grep -qi bapx"
+  run_test "No ~/.bapx directory" \
     "[ ! -d '$INSTALL_DIR' ]"
 
   section "PHASE 2: Fresh install via raw GitHub URL"
@@ -147,7 +147,7 @@ if [ "$SKIP_INSTALL" = "false" ]; then
     INSTALL_STDIN=$(printf "2\n1\n1\n%s\nn\n%s\n%s\n%s\nn\n" "$VPS_DOMAIN" "$OWNER_EMAIL" "$OWNER_PASSWORD" "$OWNER_PASSWORD")
   fi
 
-  INSTALL_LOG="/tmp/kortix-vps-e2e-install.log"
+  INSTALL_LOG="/tmp/bapx-vps-e2e-install.log"
 
   # Support both local file paths and remote URLs
   if [ -f "$INSTALLER_URL" ]; then
@@ -172,7 +172,7 @@ if [ "$SKIP_INSTALL" = "false" ]; then
   run_test "docker-compose.yml created" "[ -f '$INSTALL_DIR/docker-compose.yml' ]"
   run_test ".env created" "[ -f '$INSTALL_DIR/.env' ]"
   run_test ".credentials created" "[ -f '$INSTALL_DIR/.credentials' ]"
-  run_test "CLI script created" "[ -x '$INSTALL_DIR/kortix' ]"
+  run_test "CLI script created" "[ -x '$INSTALL_DIR/bapx' ]"
   run_test "Caddyfile created" "[ -f '$INSTALL_DIR/Caddyfile' ]"
   run_test "Kong config created" "[ -d '$INSTALL_DIR/volumes/api' ]"
   run_test "DB init scripts created" "[ -d '$INSTALL_DIR/volumes/db' ]"
@@ -189,7 +189,7 @@ if [ "$SKIP_INSTALL" = "false" ]; then
   fi
 
   # Verify CLI is in PATH
-  run_test "kortix CLI in PATH" "which kortix"
+  run_test "bapx CLI in PATH" "which bapx"
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -235,7 +235,7 @@ else
 fi
 
 # Containers running
-for name in caddy frontend kortix-api supabase-kong supabase-auth supabase-db supabase-rest; do
+for name in caddy frontend bapx-api supabase-kong supabase-auth supabase-db supabase-rest; do
   if docker ps --format '{{.Names}}' | grep -q "$name"; then
     pass "Container '$name' is running"
   else
@@ -352,48 +352,48 @@ done
 section "PHASE 7: CLI commands"
 
 # version
-CLI_VERSION=$(kortix version 2>&1)
-if echo "$CLI_VERSION" | grep -q 'kortix'; then
-  pass "kortix version"
+CLI_VERSION=$(bapx version 2>&1)
+if echo "$CLI_VERSION" | grep -q 'bapx'; then
+  pass "bapx version"
 else
-  fail "kortix version"
+  fail "bapx version"
 fi
 
 # status
-if kortix status >/dev/null 2>&1; then
-  pass "kortix status"
+if bapx status >/dev/null 2>&1; then
+  pass "bapx status"
 else
-  fail "kortix status"
+  fail "bapx status"
 fi
 
 # credentials
-if kortix credentials >/dev/null 2>&1; then
-  pass "kortix credentials"
+if bapx credentials >/dev/null 2>&1; then
+  pass "bapx credentials"
 else
-  fail "kortix credentials"
+  fail "bapx credentials"
 fi
 
 # help (default case shows help)
-HELP_OUTPUT=$(kortix 2>&1 || true)
+HELP_OUTPUT=$(bapx 2>&1 || true)
 if echo "$HELP_OUTPUT" | grep -q 'start'; then
-  pass "kortix help (default)"
+  pass "bapx help (default)"
 else
-  fail "kortix help (default)"
+  fail "bapx help (default)"
 fi
 
 # stop
 echo "  ${BLUE}[e2e]${NC} Testing stop..."
-if kortix stop >/dev/null 2>&1; then
+if bapx stop >/dev/null 2>&1; then
   sleep 5
   # Verify containers are actually stopped
-  RUNNING=$(docker ps --format '{{.Names}}' 2>/dev/null | grep -c 'kortix-' || true)
+  RUNNING=$(docker ps --format '{{.Names}}' 2>/dev/null | grep -c 'bapx-' || true)
   if [ "${RUNNING:-0}" -eq 0 ] 2>/dev/null; then
-    pass "kortix stop (all containers stopped)"
+    pass "bapx stop (all containers stopped)"
   else
-    pass "kortix stop (completed, $RUNNING containers winding down)"
+    pass "bapx stop (completed, $RUNNING containers winding down)"
   fi
 else
-  fail "kortix stop"
+  fail "bapx stop"
 fi
 
 # Verify frontend is down after stop
@@ -405,10 +405,10 @@ fi
 
 # start
 echo "  ${BLUE}[e2e]${NC} Testing start..."
-if kortix start >/dev/null 2>&1; then
-  pass "kortix start"
+if bapx start >/dev/null 2>&1; then
+  pass "bapx start"
 else
-  fail "kortix start"
+  fail "bapx start"
 fi
 
 echo "  ${BLUE}[e2e]${NC} Waiting for services after start..."
@@ -420,10 +420,10 @@ fi
 
 # restart
 echo "  ${BLUE}[e2e]${NC} Testing restart..."
-if kortix restart >/dev/null 2>&1; then
-  pass "kortix restart"
+if bapx restart >/dev/null 2>&1; then
+  pass "bapx restart"
 else
-  fail "kortix restart"
+  fail "bapx restart"
 fi
 
 echo "  ${BLUE}[e2e]${NC} Waiting for services after restart..."
@@ -434,11 +434,11 @@ else
 fi
 
 # logs (just verify it doesn't crash — capture a few lines)
-LOG_OUTPUT=$(timeout 5 kortix logs --tail 5 2>&1; true)
+LOG_OUTPUT=$(timeout 5 bapx logs --tail 5 2>&1; true)
 if [ -n "$LOG_OUTPUT" ]; then
-  pass "kortix logs produces output"
+  pass "bapx logs produces output"
 else
-  skip "kortix logs (no output in 5s)"
+  skip "bapx logs (no output in 5s)"
 fi
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -447,10 +447,10 @@ fi
 section "PHASE 8: Update"
 
 echo "  ${BLUE}[e2e]${NC} Testing update (pulls and restarts)..."
-if kortix update >/dev/null 2>&1; then
-  pass "kortix update completed"
+if bapx update >/dev/null 2>&1; then
+  pass "bapx update completed"
 else
-  fail "kortix update"
+  fail "bapx update"
 fi
 
 echo "  ${BLUE}[e2e]${NC} Waiting for services after update..."
@@ -480,10 +480,10 @@ fi
 section "PHASE 9: Reset"
 
 echo "  ${BLUE}[e2e]${NC} Testing reset --yes (wipes and recreates)..."
-if kortix reset --yes >/dev/null 2>&1; then
-  pass "kortix reset --yes completed"
+if bapx reset --yes >/dev/null 2>&1; then
+  pass "bapx reset --yes completed"
 else
-  fail "kortix reset --yes"
+  fail "bapx reset --yes"
 fi
 
 echo "  ${BLUE}[e2e]${NC} Waiting for services after reset..."
@@ -519,25 +519,25 @@ if [ "$KEEP_INSTALL" = "false" ]; then
 
   echo "  ${BLUE}[e2e]${NC} Testing uninstall (with volume deletion)..."
   # The uninstall command is interactive — answer 'y' to delete volumes
-  echo "y" | kortix uninstall 2>&1 || true
+  echo "y" | bapx uninstall 2>&1 || true
 
   # Allow containers to fully stop
   sleep 5
 
   # Belt-and-suspenders: clean up anything the uninstall missed
-  docker ps -a --format '{{.Names}}' 2>/dev/null | grep -E '^kortix-' | xargs -r docker rm -f 2>/dev/null || true
+  docker ps -a --format '{{.Names}}' 2>/dev/null | grep -E '^bapx-' | xargs -r docker rm -f 2>/dev/null || true
 
   # Verify uninstall
   run_test "Install directory removed" "[ ! -d '$INSTALL_DIR' ]"
 
-  KORTIX_CONTAINERS=$(docker ps -a --format '{{.Names}}' 2>/dev/null | grep -c 'kortix-' || true)
+  KORTIX_CONTAINERS=$(docker ps -a --format '{{.Names}}' 2>/dev/null | grep -c 'bapx-' || true)
   if [ "${KORTIX_CONTAINERS:-0}" -eq 0 ] 2>/dev/null; then
-    pass "All kortix containers removed"
+    pass "All bapx containers removed"
   else
-    fail "Kortix containers still exist ($KORTIX_CONTAINERS)"
+    fail "Bapx containers still exist ($KORTIX_CONTAINERS)"
   fi
 
-  run_test "CLI removed from PATH" "! which kortix 2>/dev/null"
+  run_test "CLI removed from PATH" "! which bapx 2>/dev/null"
 
   if ! curl -k -sf "$BASE_URL" >/dev/null 2>&1; then
     pass "Frontend unreachable after uninstall"
@@ -551,9 +551,9 @@ if [ "$KEEP_INSTALL" = "false" ]; then
   section "PHASE 11: Re-install (clean second install)"
 
   # Thorough cleanup of anything uninstall may have missed
-  docker ps -a --format '{{.Names}}' 2>/dev/null | grep -E '^kortix-' | xargs -r docker rm -f 2>/dev/null || true
-  docker volume ls --format '{{.Name}}' | grep -i kortix | xargs -r docker volume rm -f 2>/dev/null || true
-  rm -f /usr/local/bin/kortix 2>/dev/null || true
+  docker ps -a --format '{{.Names}}' 2>/dev/null | grep -E '^bapx-' | xargs -r docker rm -f 2>/dev/null || true
+  docker volume ls --format '{{.Name}}' | grep -i bapx | xargs -r docker volume rm -f 2>/dev/null || true
+  rm -f /usr/local/bin/bapx 2>/dev/null || true
   rm -rf "$INSTALL_DIR" 2>/dev/null || true
 
   echo "  ${BLUE}[e2e]${NC} Running installer again..."
@@ -565,7 +565,7 @@ if [ "$KEEP_INSTALL" = "false" ]; then
     REINSTALL_STDIN=$(printf "2\n1\n1\n%s\nn\n%s\n%s\n%s\nn\n" "$VPS_DOMAIN" "$OWNER_EMAIL" "$OWNER_PASSWORD" "$OWNER_PASSWORD")
   fi
 
-  REINSTALL_LOG="/tmp/kortix-vps-e2e-reinstall.log"
+  REINSTALL_LOG="/tmp/bapx-vps-e2e-reinstall.log"
   if [ -f "$INSTALLER_URL" ]; then
     echo "$REINSTALL_STDIN" | bash "$INSTALLER_URL" >"$REINSTALL_LOG" 2>&1 || {
       fail "Re-install failed"
@@ -585,7 +585,7 @@ if [ "$KEEP_INSTALL" = "false" ]; then
   # Verify re-install
   run_test "docker-compose.yml created (reinstall)" "[ -f '$INSTALL_DIR/docker-compose.yml' ]"
   run_test ".env created (reinstall)" "[ -f '$INSTALL_DIR/.env' ]"
-  run_test "CLI in PATH (reinstall)" "which kortix"
+  run_test "CLI in PATH (reinstall)" "which bapx"
 
   echo "  ${BLUE}[e2e]${NC} Waiting for services after re-install..."
   if wait_for_url "$BASE_URL" 90 "-k -sf"; then
@@ -635,7 +635,7 @@ fi
 if [ "$FAIL" -eq 0 ]; then
   echo "${GREEN}${BOLD}  ✅  All E2E tests passed!${NC}"
   echo ""
-  echo "  ${CYAN}Kortix VPS:${NC}  ${BOLD}${BASE_URL}${NC}"
+  echo "  ${CYAN}Bapx VPS:${NC}  ${BOLD}${BASE_URL}${NC}"
   echo "  ${CYAN}Login:${NC}       ${OWNER_EMAIL} / ${OWNER_PASSWORD}"
 else
   echo "${RED}${BOLD}  ❌  $FAIL test(s) failed${NC}"

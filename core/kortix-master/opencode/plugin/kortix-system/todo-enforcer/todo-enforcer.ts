@@ -1,5 +1,5 @@
 /**
- * Kortix Todo Enforcer — native todo continuation.
+ * Bapx Todo Enforcer — native todo continuation.
  *
  * When a session goes idle with pending/in-progress native OpenCode todos,
  * it re-prompts the same session to keep working until that tracked work is
@@ -9,13 +9,13 @@
 import type { Plugin } from "@opencode-ai/plugin"
 import type { Todo } from "@opencode-ai/sdk"
 import { autoworkActiveSessions } from "../autowork/autowork"
-import { wrapInKortixSystemTags } from "../lib/message-transform"
+import { wrapInBapxSystemTags } from "../lib/message-transform"
 import { clearStartupAbortedSession, hasStartupAbortedSession } from "../lib/startup-aborted-sessions"
 import { DEFAULT_CONFIG, TODO_ENFORCER_INTERNAL_MARKER, createInitialContinuationState, type ContinuationState } from "./config"
 import { evaluate } from "./engine"
 
 function wrapSystemPrompt(text: string): string {
-	return wrapInKortixSystemTags(text, { type: "passive-continuation", source: "kortix-native-todo-enforcing" })
+	return wrapInBapxSystemTags(text, { type: "passive-continuation", source: "bapx-native-todo-enforcing" })
 }
 
 function extractMessageText(input: any): string {
@@ -32,7 +32,7 @@ function extractMessageText(input: any): string {
 function isInternalMessage(text: string): boolean {
 	if (text.includes(TODO_ENFORCER_INTERNAL_MARKER)) return true
 	if (text.includes("[SYSTEM REMINDER")) return true
-	if (text.includes("<kortix_system")) return true
+	if (text.includes("<bapx_system")) return true
 	return false
 }
 
@@ -114,7 +114,7 @@ const TodoEnforcerPlugin: Plugin = async ({ client }) => {
 
 	const log = (level: "info" | "warn" | "error", message: string) => {
 		try {
-			client.app.log({ body: { service: "kortix-todo-enforcing", level, message } }).catch(() => {})
+			client.app.log({ body: { service: "bapx-todo-enforcing", level, message } }).catch(() => {})
 		} catch {
 			// ignore logging failures
 		}

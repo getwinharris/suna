@@ -14,7 +14,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import type { User } from '@supabase/supabase-js';
 import { ChevronDown, Loader2, LogOut, Settings } from 'lucide-react';
 
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { BapxLogo } from '@/components/sidebar/bapx-logo';
 import { UserSettingsModal } from '@/components/settings/user-settings-modal';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/trailbase/client';
 import { clearUserLocalStorage } from '@/lib/utils/clear-local-storage';
 
 // ─── User menu ─────────────────────────────────────────────────────────────
@@ -125,7 +125,7 @@ export function InstancesTopBar({
     <>
       <header className="flex items-center justify-between px-6 py-4 shrink-0 gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <KortixLogo size={20} />
+          <BapxLogo size={20} />
           {leading}
         </div>
         <UserMenu
@@ -167,7 +167,7 @@ export function ComputerHeroCard({
     <div className="rounded-2xl border border-border/50 bg-gradient-to-b from-background to-muted/20 px-8 py-12 flex flex-col items-center text-center gap-6">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/kortix-computer.png"
+        src="/bapx-computer.png"
         alt="Bapx Media Hub Computer"
         className="h-40 w-40 object-contain select-none pointer-events-none"
         draggable={false}

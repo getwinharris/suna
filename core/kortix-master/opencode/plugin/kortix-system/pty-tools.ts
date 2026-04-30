@@ -65,7 +65,7 @@ function buildPtyOutput(
     footer,
     `</pty_output>`,
   ].join('\n')
-  return `<kortix_system type="pty-output" source="opencode-pty">\n${inner}\n</kortix_system>`
+  return `<bapx_system type="pty-output" source="opencode-pty">\n${inner}\n</bapx_system>`
 }
 
 const PtyToolsPlugin: Plugin = async ({ client, directory, serverUrl }) => {
@@ -109,7 +109,7 @@ const PtyToolsPlugin: Plugin = async ({ client, directory, serverUrl }) => {
             'PID: ' + info.pid,
             'Status: ' + info.status,
           ].join('\n')
-          return `<kortix_system type="pty-spawn" source="opencode-pty">\n<pty_spawned>\n${inner}\n</pty_spawned>\n</kortix_system>`
+          return `<bapx_system type="pty-spawn" source="opencode-pty">\n<pty_spawned>\n${inner}\n</pty_spawned>\n</bapx_system>`
         },
       }),
 
@@ -138,7 +138,7 @@ const PtyToolsPlugin: Plugin = async ({ client, directory, serverUrl }) => {
             .replace(new RegExp(EOT, 'g'), '^D')
             .replace(/\n/g, '\\n')
             .replace(/\r/g, '\\r')
-          return `<kortix_system type="pty-write" source="opencode-pty">\nSent ${args.data.length} bytes to ${args.id}: "${displayPreview}"\n</kortix_system>`
+          return `<bapx_system type="pty-write" source="opencode-pty">\nSent ${args.data.length} bytes to ${args.id}: "${displayPreview}"\n</bapx_system>`
         },
       }),
 
@@ -165,7 +165,7 @@ const PtyToolsPlugin: Plugin = async ({ client, directory, serverUrl }) => {
             const result = manager.search(args.id, regex, offset, limit)
             if (!result) throw notFound(args.id)
             if (result.matches.length === 0) {
-              return `<kortix_system type="pty-output" source="opencode-pty">\n<pty_output id="${args.id}" status="${session.status}" pattern="${args.pattern}">\nNo lines matched the pattern '${args.pattern}'.\nTotal lines in buffer: ${result.totalLines}\n</pty_output>\n</kortix_system>`
+              return `<bapx_system type="pty-output" source="opencode-pty">\n<pty_output id="${args.id}" status="${session.status}" pattern="${args.pattern}">\nNo lines matched the pattern '${args.pattern}'.\nTotal lines in buffer: ${result.totalLines}\n</pty_output>\n</bapx_system>`
             }
             const lines = result.matches.map((match) => formatLine(match.text, match.lineNumber, MAX_LINE_LENGTH))
             const footer = result.hasMore
@@ -177,7 +177,7 @@ const PtyToolsPlugin: Plugin = async ({ client, directory, serverUrl }) => {
           const result = manager.read(args.id, offset, limit)
           if (!result) throw notFound(args.id)
           if (result.lines.length === 0) {
-            return `<kortix_system type="pty-output" source="opencode-pty">\n<pty_output id="${args.id}" status="${session.status}">\n(No output available - buffer is empty)\nTotal lines: ${result.totalLines}\n</pty_output>\n</kortix_system>`
+            return `<bapx_system type="pty-output" source="opencode-pty">\n<pty_output id="${args.id}" status="${session.status}">\n(No output available - buffer is empty)\nTotal lines: ${result.totalLines}\n</pty_output>\n</bapx_system>`
           }
           const lines = result.lines.map((line, index) => formatLine(line, result.offset + index + 1, MAX_LINE_LENGTH))
           const footer = result.hasMore
@@ -193,10 +193,10 @@ const PtyToolsPlugin: Plugin = async ({ client, directory, serverUrl }) => {
         async execute() {
           const sessions = await manager.list()
           if (sessions.length === 0) {
-            return `<kortix_system type="pty-list" source="opencode-pty">\n<pty_list>\nNo active PTY sessions.\n</pty_list>\n</kortix_system>`
+            return `<bapx_system type="pty-list" source="opencode-pty">\n<pty_list>\nNo active PTY sessions.\n</pty_list>\n</bapx_system>`
           }
           const inner = ['<pty_list>', ...sessions.flatMap((session) => formatSessionInfo(session)), `Total: ${sessions.length} session(s)`, '</pty_list>'].join('\n')
-          return `<kortix_system type="pty-list" source="opencode-pty">\n${inner}\n</kortix_system>`
+          return `<bapx_system type="pty-list" source="opencode-pty">\n${inner}\n</bapx_system>`
         },
       }),
 
@@ -223,7 +223,7 @@ const PtyToolsPlugin: Plugin = async ({ client, directory, serverUrl }) => {
             `Final line count: ${session.lineCount}`,
             '</pty_killed>',
           ].join('\n')
-          return `<kortix_system type="pty-kill" source="opencode-pty">\n${inner}\n</kortix_system>`
+          return `<bapx_system type="pty-kill" source="opencode-pty">\n${inner}\n</bapx_system>`
         },
       }),
     },

@@ -1,5 +1,5 @@
 ---
-description: "Plan before execution. Writes PRD + test spec artifacts under .kortix/docs/plans/ and stops before implementation."
+description: "Plan before execution. Writes PRD + test spec artifacts under .bapx/docs/plans/ and stops before implementation."
 agent: general
 ---
 
@@ -11,12 +11,12 @@ This command is the planning half of the autowork system. Your job is to make th
 
 ## What to produce
 
-Create project-local planning artifacts under `.kortix/docs/`:
+Create project-local planning artifacts under `.bapx/docs/`:
 
-1. A context snapshot in `.kortix/docs/context/`
-2. A PRD in `.kortix/docs/plans/prd-<slug>.md`
-3. A test spec in `.kortix/docs/plans/test-spec-<slug>.md`
-4. Optionally a launch hint in `.kortix/docs/plans/launch-hint-<slug>.json`
+1. A context snapshot in `.bapx/docs/context/`
+2. A PRD in `.bapx/docs/plans/prd-<slug>.md`
+3. A test spec in `.bapx/docs/plans/test-spec-<slug>.md`
+4. Optionally a launch hint in `.bapx/docs/plans/launch-hint-<slug>.json`
 
 ## Rules
 

@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { supabaseAuth } from '../middleware/auth';
+import { trailbaseAuth } from '../middleware/auth';
 import {
   getThreadsByAccount,
   getThreadById,
@@ -14,7 +14,7 @@ import type { MigrationResult } from './types';
 
 export const legacyApp = new Hono();
 
-legacyApp.use('*', supabaseAuth);
+legacyApp.use('*', trailbaseAuth);
 
 legacyApp.get('/threads', async (c: any) => {
   const accountId = c.get('userId') as string;

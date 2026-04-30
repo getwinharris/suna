@@ -18,7 +18,7 @@ import { mkdirSync, writeFileSync, existsSync, rmSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 
 mock.module('../middleware/auth', () => ({
-  supabaseAuth: async (c: any, next: any) => {
+  trailbaseAuth: async (c: any, next: any) => {
     c.set('userId', '00000000-0000-0000-0000-000000000000');
     c.set('userEmail', 'test@example.com');
     await next();
@@ -27,7 +27,7 @@ mock.module('../middleware/auth', () => ({
 
 const { setupApp } = await import('../setup');
 
-const TEST_DIR = `/tmp/kortix-setup-test-${Date.now()}`;
+const TEST_DIR = `/tmp/bapx-setup-test-${Date.now()}`;
 
 // ─── Test app factory ───────────────────────────────────────────────────────
 
@@ -189,7 +189,7 @@ describe('/v1/setup', () => {
 
     it('core/docker/.env has KORTIX_API_URL', async () => {
       const content = readFileSync(resolve(TEST_DIR, 'core/docker/.env'), 'utf-8');
-      expect(content).toContain('KORTIX_API_URL=http://kortix-api:8008');
+      expect(content).toContain('KORTIX_API_URL=http://bapx-api:8008');
     });
 
     it('rejects invalid body', async () => {

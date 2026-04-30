@@ -1,20 +1,20 @@
 import type { Context } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 
-import type { KortixUserContext } from './kortix-user-context'
+import type { BapxUserContext } from './bapx-user-context'
 
-export type KortixScope = string
+export type BapxScope = string
 
-const WILDCARD: KortixScope = '*'
+const WILDCARD: BapxScope = '*'
 const MANAGER_ROLES = new Set(['owner', 'platform_admin'])
 
-function getUser(c: Context): KortixUserContext | undefined {
-  return c.get('kortixUser') as KortixUserContext | undefined
+function getUser(c: Context): BapxUserContext | undefined {
+  return c.get('bapxUser') as BapxUserContext | undefined
 }
 
 export function hasScope(
-  user: KortixUserContext | undefined,
-  scope: KortixScope,
+  user: BapxUserContext | undefined,
+  scope: BapxScope,
 ): boolean {
   if (!user) return true
   if (MANAGER_ROLES.has(user.sandboxRole)) return true
@@ -23,13 +23,13 @@ export function hasScope(
 }
 
 export function hasScopeIn(
-  user: KortixUserContext | undefined,
-  ...scopes: KortixScope[]
+  user: BapxUserContext | undefined,
+  ...scopes: BapxScope[]
 ): boolean {
   return scopes.some((s) => hasScope(user, s))
 }
 
-export function requireScope(scope: KortixScope) {
+export function requireScope(scope: BapxScope) {
   return async (c: Context, next: () => Promise<void>) => {
     const user = getUser(c)
     if (!hasScope(user, scope)) {
@@ -39,14 +39,14 @@ export function requireScope(scope: KortixScope) {
   }
 }
 
-export function assertScope(c: Context, scope: KortixScope): void {
+export function assertScope(c: Context, scope: BapxScope): void {
   const user = getUser(c)
   if (!hasScope(user, scope)) {
     throw new HTTPException(403, { message: `Missing permission: ${scope}` })
   }
 }
 
-export function isManager(user: KortixUserContext | undefined): boolean {
+export function isManager(user: BapxUserContext | undefined): boolean {
   if (!user) return true
   return MANAGER_ROLES.has(user.sandboxRole)
 }

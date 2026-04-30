@@ -1,5 +1,5 @@
 import { eq, and, desc, inArray, sql } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@bapx/db';
 import { db } from '../../shared/db';
 import { createApiKey } from '../../repositories/api-keys';
 import {

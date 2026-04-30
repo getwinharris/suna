@@ -136,13 +136,13 @@ Load the `openalex-paper-search` skill for OpenAlex API reference. Search strate
 
 ```bash
 # Seminal/highly-cited papers
-curl -s "https://api.openalex.org/works?search=YOUR+TOPIC&filter=cited_by_count:>50,type:article,has_abstract:true&sort=cited_by_count:desc&per_page=15&select=id,display_name,publication_year,cited_by_count,doi,authorships,abstract_inverted_index&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=YOUR+TOPIC&filter=cited_by_count:>50,type:article,has_abstract:true&sort=cited_by_count:desc&per_page=15&select=id,display_name,publication_year,cited_by_count,doi,authorships,abstract_inverted_index&mailto=agent@bapx.ai"
 
 # Recent work (last 2-3 years)
-curl -s "https://api.openalex.org/works?search=YOUR+TOPIC&filter=publication_year:>2023,type:article&sort=publication_date:desc&per_page=15&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=YOUR+TOPIC&filter=publication_year:>2023,type:article&sort=publication_date:desc&per_page=15&mailto=agent@bapx.ai"
 
 # Review/survey papers
-curl -s "https://api.openalex.org/works?search=YOUR+TOPIC&filter=type:review&sort=cited_by_count:desc&per_page=10&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=YOUR+TOPIC&filter=type:review&sort=cited_by_count:desc&per_page=10&mailto=agent@bapx.ai"
 ```
 
 ### 2b. Generate BibTeX entries
@@ -150,7 +150,7 @@ curl -s "https://api.openalex.org/works?search=YOUR+TOPIC&filter=type:review&sor
 Pipe OpenAlex results through the converter:
 
 ```bash
-curl -s "https://api.openalex.org/works?search=YOUR+TOPIC&per_page=20&mailto=agent@kortix.ai" | \
+curl -s "https://api.openalex.org/works?search=YOUR+TOPIC&per_page=20&mailto=agent@bapx.ai" | \
     python3 "$SKILL_DIR/scripts/openalex_to_bibtex.py" >> "paper/$SLUG/references.bib"
 ```
 

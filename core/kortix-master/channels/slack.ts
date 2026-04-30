@@ -443,8 +443,8 @@ async function main(): Promise<void> {
       const channelId = flags["channel-id"] || "new"
       const webhookUrl = joinPublicBaseUrl(publicUrl, `/hooks/slack/${channelId}`)
       const manifest = {
-        display_information: { name: flags.name || `Kortix ${["Atlas","Nova","Sage","Echo","Bolt","Iris","Dash","Cleo","Finn","Luna","Juno","Axel","Niko","Zara","Milo","Ruby","Hugo","Aria","Leo","Ivy"][Math.floor(Math.random()*20)]}`, description: "Kortix AI instance", background_color: "#1a1a2e" },
-        features: { bot_user: { display_name: flags.name || "Kortix", always_online: true } },
+        display_information: { name: flags.name || `Bapx ${["Atlas","Nova","Sage","Echo","Bolt","Iris","Dash","Cleo","Finn","Luna","Juno","Axel","Niko","Zara","Milo","Ruby","Hugo","Aria","Leo","Ivy"][Math.floor(Math.random()*20)]}`, description: "Bapx AI instance", background_color: "#1a1a2e" },
+        features: { bot_user: { display_name: flags.name || "Bapx", always_online: true } },
         oauth_config: { scopes: { bot: [
           "app_mentions:read", "channels:history", "channels:read", "channels:join",
           "chat:write", "chat:write.public", "files:read", "files:write",

@@ -49,11 +49,11 @@ interface Fixture {
 }
 
 function makeFixture(): Fixture {
-  const dir = mkdtempSync(path.join(tmpdir(), 'kortix-milestones-e2e-'))
+  const dir = mkdtempSync(path.join(tmpdir(), 'bapx-milestones-e2e-'))
   const projectPath = path.join(dir, 'workspace')
-  const dbDir = path.join(projectPath, '.kortix')
+  const dbDir = path.join(projectPath, '.bapx')
   mkdirSync(dbDir, { recursive: true })
-  const dbPath = path.join(dbDir, 'kortix.db')
+  const dbPath = path.join(dbDir, 'bapx.db')
   const db = new Database(dbPath, { create: true, readwrite: true })
 
   db.exec(`
@@ -357,7 +357,7 @@ describe('milestones — CONTEXT.md sync', () => {
     })
     createMilestone(fx.db, { project_id: fx.project.id, title: 'Admin' })
     await syncMilestonesSection(fx.db, fx.project)
-    const ctx = await fs.readFile(path.join(fx.project.path, '.kortix', 'CONTEXT.md'), 'utf8')
+    const ctx = await fs.readFile(path.join(fx.project.path, '.bapx', 'CONTEXT.md'), 'utf8')
     expect(ctx).toContain(MILESTONES_SECTION_START)
     expect(ctx).toContain(MILESTONES_SECTION_END)
     expect(ctx).toContain('## Milestones')
@@ -373,7 +373,7 @@ describe('milestones — CONTEXT.md sync', () => {
     const b = createMilestone(fx.db, { project_id: fx.project.id, title: 'Done deal' })
     closeMilestone(fx.db, b.id, { actor_type: 'user' })
     await syncMilestonesSection(fx.db, fx.project)
-    const ctx = await fs.readFile(path.join(fx.project.path, '.kortix', 'CONTEXT.md'), 'utf8')
+    const ctx = await fs.readFile(path.join(fx.project.path, '.bapx', 'CONTEXT.md'), 'utf8')
     expect(ctx).toContain('Active')
     expect(ctx).not.toContain('Done deal')
     void a
@@ -382,7 +382,7 @@ describe('milestones — CONTEXT.md sync', () => {
   test('empty (no open milestones) renders the friendly placeholder, not a stale list', async () => {
     const fx = await setupSeededProject()
     await syncMilestonesSection(fx.db, fx.project)
-    const ctx = await fs.readFile(path.join(fx.project.path, '.kortix', 'CONTEXT.md'), 'utf8')
+    const ctx = await fs.readFile(path.join(fx.project.path, '.bapx', 'CONTEXT.md'), 'utf8')
     expect(ctx).toContain('## Milestones')
     expect(ctx).toContain('No open milestones')
   })

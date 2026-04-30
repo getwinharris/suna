@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/trailbase/client';
 import { getEnv } from '@/lib/env-config';
 
 export interface StressTestConfig {

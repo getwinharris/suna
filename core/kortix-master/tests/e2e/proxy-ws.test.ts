@@ -18,7 +18,7 @@ let opencode: Awaited<ReturnType<typeof startDummyOpenCode>> | null = null
 let upstreamWsServer: Bun.Server | null = null
 let lastUpstreamOrigin: string | null = null
 
-async function startKortixMasterForTest(
+async function startBapxMasterForTest(
   port: number,
   fixture: RuntimeFixture,
   extraEnv: Record<string, string> = {},
@@ -144,11 +144,11 @@ function waitForEvent<T>(
   })
 }
 
-describe('Kortix Sandbox Proxy WebSocket E2E', () => {
+describe('Bapx Sandbox Proxy WebSocket E2E', () => {
   beforeAll(async () => {
-    runtime = createRuntimeFixture('kortix-proxy-ws-')
+    runtime = createRuntimeFixture('bapx-proxy-ws-')
     opencode = await startDummyOpenCode(OPENCODE_TEST_PORT)
-    master = await startKortixMasterForTest(MASTER_PORT, runtime, {
+    master = await startBapxMasterForTest(MASTER_PORT, runtime, {
       KORTIX_TOKEN: 'proxy-test-token',
       OPENCODE_PORT: String(OPENCODE_TEST_PORT),
     })

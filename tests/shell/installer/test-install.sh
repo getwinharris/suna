@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Test Suite: get-kortix.sh (unified installer)                             ║
+# ║  Test Suite: get-bapx.sh (unified installer)                             ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 ROOT_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
-SCRIPT="$ROOT_DIR/scripts/get-kortix.sh"
+SCRIPT="$ROOT_DIR/scripts/get-bapx.sh"
 
 PASS=0; FAIL=0; TOTAL=0
 
@@ -12,16 +12,16 @@ pass() { PASS=$((PASS+1)); TOTAL=$((TOTAL+1)); printf "\033[0;32m  ✓ %s\033[0m
 fail() { FAIL=$((FAIL+1)); TOTAL=$((TOTAL+1)); printf "\033[0;31m  ✗ %s\033[0m\n" "$1"; }
 
 echo ""
-echo "  Testing get-kortix.sh structure"
+echo "  Testing get-bapx.sh structure"
 echo "  ════════════════════════════════"
 echo ""
 
 # ── Core structure ──
 
 if [ -f "$SCRIPT" ]; then
-  pass "get-kortix.sh exists"
+  pass "get-bapx.sh exists"
 else
-  fail "get-kortix.sh exists"
+  fail "get-bapx.sh exists"
 fi
 
 if grep -q 'banner()' "$SCRIPT"; then
@@ -96,7 +96,7 @@ fi
 
 # ── PostgreSQL ──
 
-if grep -q 'POSTGRES_IMAGE\|kortix/postgres' "$SCRIPT"; then
+if grep -q 'POSTGRES_IMAGE\|bapx/postgres' "$SCRIPT"; then
   pass "references postgres image"
 else
   fail "references postgres image"
@@ -109,9 +109,9 @@ else
 fi
 
 if grep -q 'DATABASE_URL.*postgres' "$SCRIPT"; then
-  pass "compose sets DATABASE_URL for kortix-api"
+  pass "compose sets DATABASE_URL for bapx-api"
 else
-  fail "compose sets DATABASE_URL for kortix-api"
+  fail "compose sets DATABASE_URL for bapx-api"
 fi
 
 if grep -q 'supabase-db-data' "$SCRIPT"; then
@@ -252,7 +252,7 @@ else
   fail "no git clone/pull (Docker-only)"
 fi
 
-if grep -q 'kortix/kortix-frontend' "$SCRIPT" && grep -q 'kortix/kortix-api' "$SCRIPT"; then
+if grep -q 'bapx/bapx-frontend' "$SCRIPT" && grep -q 'bapx/bapx-api' "$SCRIPT"; then
   pass "uses pre-built Docker images"
 else
   fail "uses pre-built Docker images"
@@ -261,15 +261,15 @@ fi
 # ── Old scripts deleted ──
 
 if [ ! -f "$ROOT_DIR/scripts/install.sh" ]; then
-  pass "install.sh deleted (unified into get-kortix.sh)"
+  pass "install.sh deleted (unified into get-bapx.sh)"
 else
-  fail "install.sh deleted (unified into get-kortix.sh)"
+  fail "install.sh deleted (unified into get-bapx.sh)"
 fi
 
-if [ ! -f "$ROOT_DIR/scripts/kortix.sh" ]; then
-  pass "kortix.sh deleted (unified into get-kortix.sh)"
+if [ ! -f "$ROOT_DIR/scripts/bapx.sh" ]; then
+  pass "bapx.sh deleted (unified into get-bapx.sh)"
 else
-  fail "kortix.sh deleted (unified into get-kortix.sh)"
+  fail "bapx.sh deleted (unified into get-bapx.sh)"
 fi
 
 # ── Summary ──

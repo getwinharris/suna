@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { eq, and, ne } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@bapx/db';
 import { config } from '../config';
 import { combinedAuth } from '../middleware/auth';
 import { preview, proxyToDaytona } from './routes/preview';
@@ -11,9 +11,9 @@ import { db } from '../shared/db';
 import { isProxyTokenStale, refreshSandboxProxyToken } from '../platform/providers/justavps';
 import { resolvePreviewUserContext } from '../shared/preview-ownership';
 import {
-  encodeKortixUserContext,
+  encodeBapxUserContext,
   KORTIX_USER_CONTEXT_HEADER,
-} from '../shared/kortix-user-context';
+} from '../shared/bapx-user-context';
 
 async function buildSignedUserContextHeader(
   sandboxId: string,
@@ -33,9 +33,9 @@ async function buildSignedUserContextHeader(
     );
     return {};
   }
-  const signed = encodeKortixUserContext(payload, serviceKey);
+  const signed = encodeBapxUserContext(payload, serviceKey);
   console.log(
-    `[PREVIEW] signing X-Kortix-User-Context user=${userId} sandbox=${sandboxId} role=${payload.sandboxRole} tokenPrefix=${signed.slice(0, 16)}`,
+    `[PREVIEW] signing X-Bapx-User-Context user=${userId} sandbox=${sandboxId} role=${payload.sandboxRole} tokenPrefix=${signed.slice(0, 16)}`,
   );
   return { [KORTIX_USER_CONTEXT_HEADER]: signed };
 }
@@ -51,7 +51,7 @@ sandboxProxyApp.route('/auth', getAuthToken);
 sandboxProxyApp.route('/share', shareApp);
 
 // ── Path-based proxy ────────────────────────────────────────────────────────
-// Auth middleware for both modes (Supabase JWT, kortix_ tokens, cookies).
+// Auth middleware for both modes (Supabase JWT, bapx_ tokens, cookies).
 sandboxProxyApp.use('/:sandboxId/:port/*', combinedAuth);
 sandboxProxyApp.use('/:sandboxId/:port', combinedAuth);
 
@@ -222,7 +222,7 @@ if (enabledCount === 1 && config.isDaytonaEnabled()) {
 
   sandboxProxyApp.route('/', localOnlyProxy);
 } else if (enabledCount === 1 && config.isJustAVPSEnabled()) {
-  // JustAVPS-only: route through CF Worker proxy at {port}--{slug}.kortix.cloud
+  // JustAVPS-only: route through CF Worker proxy at {port}--{slug}.bapx.cloud
   const justavpsOnlyProxy = new Hono<{ Variables: { userId: string; userEmail: string } }>();
 
   justavpsOnlyProxy.all('/:sandboxId/:port/*', async (c) => {
@@ -246,7 +246,7 @@ if (enabledCount === 1 && config.isDaytonaEnabled()) {
     const proxyDomain = config.JUSTAVPS_PROXY_DOMAIN;
     const cfProxyUrl = `https://${port}--${resolved.slug}.${proxyDomain}`;
 
-    // Auth: proxy token for CF Worker, service key for core/kortix-master
+    // Auth: proxy token for CF Worker, service key for core/bapx-master
     const extraHeaders: Record<string, string> = {};
     if (resolved.proxyToken) {
       extraHeaders['X-Proxy-Token'] = resolved.proxyToken;

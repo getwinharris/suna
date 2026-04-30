@@ -51,15 +51,15 @@ function resolveDbPath(): string {
       ? path.dirname(path.resolve(process.env.OPENCODE_CONFIG_DIR))
       : (process.env.HOME ? path.join(process.env.HOME, "") : process.cwd()))
   for (const candidate of [
-    path.join(root, ".kortix", "kortix.db"),
-    "/workspace/.kortix/kortix.db",
+    path.join(root, ".bapx", "bapx.db"),
+    "/workspace/.bapx/bapx.db",
   ]) {
     const dir = path.dirname(candidate)
     if (existsSync(dir)) return candidate
   }
-  const dbDir = path.join(root, ".kortix")
+  const dbDir = path.join(root, ".bapx")
   mkdirSync(dbDir, { recursive: true })
-  return path.join(dbDir, "kortix.db")
+  return path.join(dbDir, "bapx.db")
 }
 
 let _db: Database | null = null

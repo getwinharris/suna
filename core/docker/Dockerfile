@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 #
-# kortix/computer — sandbox image
+# bapx/computer — sandbox image
 #
 # ONE image. Everything baked at build time. No OTA, no npm, no symlinks.
 # Updates = pull new image + recreate container.
@@ -10,7 +10,7 @@
 # │                                                                        │
 # │  /workspace/   = PERSISTENT  (Docker volume, survives everything)      │
 # │  /opt/         = AVAILABLE   (user/system, container layer)            │
-# │  /ephemeral/   = SHIPPED     (Kortix runtime, REPLACED on update)     │
+# │  /ephemeral/   = SHIPPED     (Bapx runtime, REPLACED on update)     │
 # │  /run/s6/      = TMPFS       (rebuilt from /workspace on boot)         │
 # │                                                                        │
 # │  Rule: ALL user state MUST live under /workspace/.                     │
@@ -26,7 +26,7 @@
 #     .local/bin/, .local/lib/     User pip packages
 #     .npm-global/                 User npm -g packages
 #     .opencode/                   OpenCode config (skills, agents from marketplace)
-#     .kortix/                     Kortix state, package manifests
+#     .bapx/                     Bapx state, package manifests
 #     .lss/                        LSS search index
 #     .browser-profile/            Chromium profile
 #     .cache/opencode/             OpenCode runtime cache
@@ -34,7 +34,7 @@
 #     *                            User code, projects, files
 #
 #   EPHEMERAL (/ephemeral/ — shipped runtime, replaced on update):
-#     /ephemeral/kortix-master/    Hono server, OpenCode config, channels, triggers
+#     /ephemeral/bapx-master/    Hono server, OpenCode config, channels, triggers
 #     /ephemeral/metadata/         Version metadata, service spec, changelog
 #     /ephemeral/agent-browser-viewer/ Browser viewer HTML
 #     /ephemeral/services/         Service scripts
@@ -68,7 +68,7 @@ ARG OCX_VERSION=2.0.0
 COPY LICENSE /LICENSE
 
 # ── Skill/runtime requirement inventory ──────────────────────────────────────
-# The skill tree under core/kortix-master/opencode/skills/ currently references
+# The skill tree under core/bapx-master/opencode/skills/ currently references
 # or strongly implies the following baked-in runtime surface:
 #   - Baseline CLIs: bash, bun, curl, git, gh, jq, docker cli, ripgrep,
 #     rsync, ssh, unzip, uv, node/npm, python3/pip
@@ -232,7 +232,7 @@ RUN mkdir -p /workspace/.browser-profile \
     /workspace/.local/share/opencode /workspace/.local/share/opencode/log \
     /workspace/.local/share/opencode/storage /workspace/.local/share/opencode/snapshot \
     /workspace/.XDG /workspace/.config \
-    /workspace/.kortix \
+    /workspace/.bapx \
     /workspace/.secrets \
     /workspace/.opencode /workspace/.opencode/skills \
     /workspace/.local/bin \
@@ -240,15 +240,15 @@ RUN mkdir -p /workspace/.browser-profile \
     /workspace/.npm-global/lib \
     && chmod 700 /workspace/.secrets \
     # Bake .gitignore so these dirs are always excluded from git snapshots.
-    # kortix-env-setup.sh commits this in the initial workspace commit.
+    # bapx-env-setup.sh commits this in the initial workspace commit.
     && printf '%s\n' \
-        '# kortix/opencode internal dirs — excluded from agent snapshots' \
+        '# bapx/opencode internal dirs — excluded from agent snapshots' \
         '.local/share/opencode/' \
         '.cache/' \
         '.config/' \
         '.opencode/' \
-        '.kortix/' \
-        '.kortix-state/' \
+        '.bapx/' \
+        '.bapx-state/' \
         '.secrets/' \
         '.browser-profile/' \
         '.agent-browser/' \
@@ -279,7 +279,7 @@ ENV KORTIX_WORKSPACE=/workspace
 
 # ── Services (s6-rc.d longrun) ──────────────────────────────────────────────
 COPY core/s6-services/ /etc/s6-overlay/s6-rc.d/
-RUN for svc in svc-kortix-master svc-opencode-serve svc-opencode-state-sync \
+RUN for svc in svc-bapx-master svc-opencode-serve svc-opencode-state-sync \
         svc-chromium-persistent svc-agent-browser-session svc-agent-browser-viewer \
         svc-static-web svc-lss-sync svc-sshd svc-docker svc-port-shim; do \
         touch "/etc/s6-overlay/s6-rc.d/user/contents.d/${svc}"; \
@@ -298,7 +298,7 @@ RUN printf '#!/bin/bash\nPID_FILE="/de-pid"\nif [ ! -r "$PID_FILE" ]; then exit 
 RUN mkdir -p /custom-cont-init.d
 COPY core/init-scripts/95-setup-sshd.sh /custom-cont-init.d/95-setup-sshd
 COPY core/init-scripts/97-secrets-to-s6-env.sh /custom-cont-init.d/97-secrets-to-s6-env
-COPY core/init-scripts/kortix-env-setup.sh /custom-cont-init.d/98-kortix-env
+COPY core/init-scripts/bapx-env-setup.sh /custom-cont-init.d/98-bapx-env
 COPY core/init-scripts/99-restore-packages.sh /custom-cont-init.d/99-restore-packages
 COPY core/init-scripts/99-fix-opencode-ownership.sh /custom-cont-init.d/zz-fix-opencode-ownership
 RUN chmod +x /custom-cont-init.d/*
@@ -307,8 +307,8 @@ RUN chmod +x /custom-cont-init.d/*
 COPY core/scripts/apt-persist /usr/local/bin/apt-persist
 RUN chmod +x /usr/local/bin/apt-persist
 
-COPY core/scripts/kortix-opencode-state /usr/local/bin/kortix-opencode-state
-RUN chmod +x /usr/local/bin/kortix-opencode-state
+COPY core/scripts/bapx-opencode-state /usr/local/bin/bapx-opencode-state
+RUN chmod +x /usr/local/bin/bapx-opencode-state
 
 # ── Docker-in-Docker readiness helper ───────────────────────────────────────
 # Polls `docker info` until dockerd is reachable. Use from anywhere that
@@ -338,30 +338,30 @@ COPY core/tests/ /ephemeral/tests/
 RUN chmod +x /ephemeral/tests/*.sh 2>/dev/null || true
 
 # ── Copy source packages to build staging area ──────────────────────────────
-# All sandbox packages are now consolidated inside core/kortix-master/
-#   kortix-master/opencode/   — OpenCode config dir (agents, skills, plugins, tools)
-#   kortix-master/channels/   — CLIs: ktelegram, kslack, kchannel, kconnectors, kpipedream
-#   kortix-master/triggers/   — Cron + webhook triggers
-COPY core/kortix-master  /opt/build/kortix-master
+# All sandbox packages are now consolidated inside core/bapx-master/
+#   bapx-master/opencode/   — OpenCode config dir (agents, skills, plugins, tools)
+#   bapx-master/channels/   — CLIs: ktelegram, kslack, kchannel, kconnectors, kpipedream
+#   bapx-master/triggers/   — Cron + webhook triggers
+COPY core/bapx-master  /opt/build/bapx-master
 COPY core/s6-services/svc-agent-browser-viewer/index.html /opt/build/browser-viewer/index.html
 
 # ── Build sandbox runtime ────────────────────────────────────────────────────
 RUN set -eo pipefail && echo "[docker] Building sandbox runtime v${SANDBOX_VERSION}..." && \
     \
-    # ── 1. kortix-master (single bun install — includes triggers, channels, opencode deps) ── \
-    mkdir -p /ephemeral/kortix-master && \
+    # ── 1. bapx-master (single bun install — includes triggers, channels, opencode deps) ── \
+    mkdir -p /ephemeral/bapx-master && \
     rsync -a --exclude=node_modules --exclude=bun.lock --exclude=.git \
-      /opt/build/kortix-master/ /ephemeral/kortix-master/ && \
-    cd /ephemeral/kortix-master && bun install 2>&1 && \
-    test -d /ephemeral/kortix-master/node_modules && \
-    chmod +x /ephemeral/kortix-master/scripts/*.sh 2>/dev/null || true && \
-    echo "[docker] kortix-master: bun install OK (includes triggers, channel CLIs, opencode)" && \
+      /opt/build/bapx-master/ /ephemeral/bapx-master/ && \
+    cd /ephemeral/bapx-master && bun install 2>&1 && \
+    test -d /ephemeral/bapx-master/node_modules && \
+    chmod +x /ephemeral/bapx-master/scripts/*.sh 2>/dev/null || true && \
+    echo "[docker] bapx-master: bun install OK (includes triggers, channel CLIs, opencode)" && \
     \
-    # ── 1b. Install Kortix CLI wrappers into /usr/local/bin ── \
-    /ephemeral/kortix-master/scripts/install-channel-clis.sh && \
+    # ── 1b. Install Bapx CLI wrappers into /usr/local/bin ── \
+    /ephemeral/bapx-master/scripts/install-channel-clis.sh && \
     \
     # ── 2. skills shipped in-tree under skills/KORTIX-system/ (recursive discovery) ── \
-    echo "[docker] skills: agent-tunnel, agent-browser, presentations in /ephemeral/kortix-master/opencode/skills/KORTIX-system/" && \
+    echo "[docker] skills: agent-tunnel, agent-browser, presentations in /ephemeral/bapx-master/opencode/skills/KORTIX-system/" && \
     \
     # ── 4. Agent browser viewer ── \
     mkdir -p /ephemeral/agent-browser-viewer && \
@@ -382,11 +382,11 @@ RUN set -eo pipefail && echo "[docker] Building sandbox runtime v${SANDBOX_VERSI
     echo "[docker] Global binaries: opencode=$(opencode --version 2>/dev/null || echo '?'), agent-browser, ocx" && \
     \
     # ── 7. Binary patches (MUST run after npm install -g opencode-ai) ── \
-    bash /ephemeral/kortix-master/opencode/patches/apply.sh && \
+    bash /ephemeral/bapx-master/opencode/patches/apply.sh && \
     \
     # ── 8. Fix ownership ── \
     # CRITICAL: Use abc:abc (UID 911) — NOT 1000:1000. The linuxserver base image \
-    # creates user abc with UID 911. All runtime processes (opencode, kortix-master) \
+    # creates user abc with UID 911. All runtime processes (opencode, bapx-master) \
     # run as abc via s6-setuidgid. Using 1000 causes EACCES everywhere at runtime. \
     chown -R abc:abc /ephemeral \
       2>/dev/null || true && \
@@ -406,7 +406,7 @@ RUN chmod +x /ephemeral/startup.sh
 #
 # pip:    PYTHONUSERBASE + PIP_USER=1  → /workspace/.local/
 # npm -g: NPM_CONFIG_PREFIX           → /workspace/.npm-global/
-# apt:    apt-persist wrapper         → manifest in /workspace/.kortix/packages/
+# apt:    apt-persist wrapper         → manifest in /workspace/.bapx/packages/
 #
 ENV PYTHONUSERBASE=/workspace/.local
 ENV PIP_USER=1
@@ -416,15 +416,15 @@ ENV PATH="/workspace/.npm-global/bin:/workspace/.local/bin:${PATH}"
 
 # ── Environment ───────────────────────────────────────────────────────────────
 ENV AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-ENV AGENT_BROWSER_SESSION=kortix
-ENV AGENT_BROWSER_PRIMARY_SESSION=kortix
+ENV AGENT_BROWSER_SESSION=bapx
+ENV AGENT_BROWSER_PRIMARY_SESSION=bapx
 ENV AGENT_BROWSER_HEADED=0
 ENV AGENT_BROWSER_SOCKET_DIR=/dev/shm/agent-browser
 ENV AGENT_BROWSER_ARGS="--no-sandbox,--disable-gpu,--disable-dev-shm-usage,--disable-infobars,--disable-blink-features=AutomationControlled,--disable-features=VizDisplayCompositor"
 ENV AGENT_BROWSER_USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 ENV AGENT_BROWSER_IDLE_TIMEOUT_MS=0
 ENV AGENT_BROWSER_STREAM_PORT=9223
-ENV OPENCODE_CONFIG_DIR=/ephemeral/kortix-master/opencode
+ENV OPENCODE_CONFIG_DIR=/ephemeral/bapx-master/opencode
 ENV KORTIX_PERSISTENT_ROOT=/persistent
 ENV OPENCODE_STORAGE_BASE=/persistent/opencode
 ENV OPENCODE_SHADOW_STORAGE_BASE=/persistent/opencode-shadow
@@ -451,7 +451,7 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 # Ports
 ENV CUSTOM_PORT=6080
 ENV CUSTOM_HTTPS_PORT=6081
-ENV TITLE="Kortix Computer"
+ENV TITLE="Bapx Computer"
 # Resolution: auto-adapt to iframe/browser size (no manual lock)
 # Display: standard 100% UI scaling (96 DPI)
 # Encoder: x264enc locked, 60 FPS locked, CRF 18 (near-lossless), full 4:4:4 color

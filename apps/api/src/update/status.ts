@@ -1,5 +1,5 @@
 import { eq, sql } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@bapx/db';
 import { db } from '../shared/db';
 import { config } from '../config';
 import type { UpdateStatus, UpdatePhase } from './types';

@@ -1,5 +1,5 @@
 /**
- * TriggerYaml — Read/write .kortix/triggers.yaml ↔ DB reconciler.
+ * TriggerYaml — Read/write .bapx/triggers.yaml ↔ DB reconciler.
  *
  * YAML = declarative config (git-versionable).
  * DB = runtime state.
@@ -41,7 +41,7 @@ export class TriggerYaml {
     private readonly logger?: (level: "info" | "warn" | "error", message: string) => void,
     private readonly onSync?: () => void,
   ) {
-    this.yamlPath = path.join(directory, ".kortix", "triggers.yaml")
+    this.yamlPath = path.join(directory, ".bapx", "triggers.yaml")
     mkdirSync(path.dirname(this.yamlPath), { recursive: true })
   }
 
@@ -192,11 +192,11 @@ export class TriggerYaml {
 
   private serializeYaml(file: TriggersYamlFile): string {
     if (file.triggers.length === 0) {
-      return "# Trigger definitions — config only, no runtime state.\n# Runtime state (is_active, last_run, executions) lives in kortix.db.\n# This file is the source of truth for what triggers EXIST.\n# Safe to git commit, branch, and share.\n\ntriggers: []\n"
+      return "# Trigger definitions — config only, no runtime state.\n# Runtime state (is_active, last_run, executions) lives in bapx.db.\n# This file is the source of truth for what triggers EXIST.\n# Safe to git commit, branch, and share.\n\ntriggers: []\n"
     }
     const header = [
       "# Trigger definitions — config only, no runtime state.",
-      "# Runtime state (is_active, last_run, executions) lives in kortix.db.",
+      "# Runtime state (is_active, last_run, executions) lives in bapx.db.",
       "# This file is the source of truth for what triggers EXIST.",
       "# Safe to git commit, branch, and share.",
       "",
@@ -392,7 +392,7 @@ export class TriggerYaml {
   startWatching(): void {
     this.stopWatching()
 
-    // Watch the .kortix directory for triggers.yaml changes
+    // Watch the .bapx directory for triggers.yaml changes
     const watchDir = path.dirname(this.yamlPath)
     try {
       this.watcher = watch(watchDir, { persistent: false }, (_event, filename) => {

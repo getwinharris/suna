@@ -22,9 +22,9 @@ export type SoundEvent = 'completion' | 'error' | 'notification' | 'send';
  *
  * - `off`      – all sounds disabled
  * - `opencode` – default sound pack (OpenCode style)
- * - `kortix`   – Kortix branded sound pack
+ * - `bapx`   – Bapx branded sound pack
  */
-export type SoundPack = 'off' | 'opencode' | 'kortix';
+export type SoundPack = 'off' | 'opencode' | 'bapx';
 
 export interface SoundPreferences {
   /** Active sound pack — 'off' disables all sounds */
@@ -94,7 +94,7 @@ export const useSoundStore = create<SoundState>()(
       },
     }),
     {
-      name: 'kortix-sound-preferences',
+      name: 'bapx-sound-preferences',
       partialize: (state) => ({
         preferences: state.preferences,
       }),

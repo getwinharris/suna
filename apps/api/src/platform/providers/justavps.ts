@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@bapx/db';
 import { db } from '../../shared/db';
 import { config, SANDBOX_VERSION } from '../../config';
 import { execOnHost } from '../../update/exec';
@@ -40,7 +40,7 @@ interface JustAVPSMachine {
   price_monthly: number | null;
   backups_enabled: boolean;
   source: string;
-  kortix_sandbox_id: string | null;
+  bapx_sandbox_id: string | null;
   created_at: string;
   ready_at: string | null;
   urls: { vscode: string; pty: string; port_template: string } | null;
@@ -169,7 +169,7 @@ export async function mintProxyTokenOnJustAvps(
       method: 'POST',
       body: {
         machine_id: externalId,
-        label: `kortix-sandbox-${externalId}`,
+        label: `bapx-sandbox-${externalId}`,
         expires_in_seconds: PROXY_TOKEN_TTL_SECONDS,
       },
     });
@@ -242,8 +242,8 @@ interface JustAVPSImage {
 let cachedImageId: string | null = null;
 let cachedImageExpiry = 0;
 const IMAGE_CACHE_TTL_MS = 5 * 60 * 1000;
-const IMAGE_NAME_PREFIX = 'kortix-computer-v';
-const DEV_IMAGE_NAME_PREFIX = 'kortix-computer-vdev-';
+const IMAGE_NAME_PREFIX = 'bapx-computer-v';
+const DEV_IMAGE_NAME_PREFIX = 'bapx-computer-vdev-';
 
 function parseSemver(version: string): number[] {
   return version.split('.').map(Number).filter((n) => !isNaN(n));
@@ -298,7 +298,7 @@ async function resolveLatestImageId(): Promise<string | null> {
       return cachedImageId;
     }
 
-    console.warn('[JUSTAVPS] No images matching kortix-computer-v* found; provisioning without image_id');
+    console.warn('[JUSTAVPS] No images matching bapx-computer-v* found; provisioning without image_id');
     return null;
   } catch (err) {
     console.warn('[JUSTAVPS] Failed to resolve latest image, falling back to no image_id:', err);
@@ -412,7 +412,7 @@ async function ensureWebhookRegistered(): Promise<void> {
   const webhookUrl = config.JUSTAVPS_WEBHOOK_URL;
   const webhookSecret = config.JUSTAVPS_WEBHOOK_SECRET;
   if (!webhookUrl) {
-    console.warn('[JUSTAVPS] JUSTAVPS_WEBHOOK_URL not configured — provisioning events will not flow back to Kortix');
+    console.warn('[JUSTAVPS] JUSTAVPS_WEBHOOK_URL not configured — provisioning events will not flow back to Bapx');
     webhookRegistered = true;
     return;
   }
@@ -447,7 +447,7 @@ function shellEscape(value: string): string {
   return `'${value.replace(/'/g, `'"'"'`)}'`;
 }
 
-function resolveReachableKortixApiUrl(): string {
+function resolveReachableBapxApiUrl(): string {
   const directBase = config.KORTIX_URL.replace(/\/v1\/router\/?$/, '');
 
   try {
@@ -467,9 +467,9 @@ function resolveReachableKortixApiUrl(): string {
 
 export function buildCustomerCloudInitScript(dockerImage: string): string {
   return [
-    'curl -fsSL https://raw.githubusercontent.com/kortix-ai/suna/main/scripts/start-sandbox.sh -o /usr/local/bin/kortix-start-sandbox.sh',
-    'chmod +x /usr/local/bin/kortix-start-sandbox.sh',
-    `/usr/local/bin/kortix-start-sandbox.sh ${shellEscape(dockerImage)}`,
+    'curl -fsSL https://raw.githubusercontent.com/bapx-ai/bapX/main/scripts/start-sandbox.sh -o /usr/local/bin/bapx-start-sandbox.sh',
+    'chmod +x /usr/local/bin/bapx-start-sandbox.sh',
+    `/usr/local/bin/bapx-start-sandbox.sh ${shellEscape(dockerImage)}`,
   ].join('\n');
 }
 
@@ -495,7 +495,7 @@ export function buildJustAVPSHostRecoveryCommand(): string {
     '  sleep 2',
     'done',
     'for i in $(seq 1 60); do',
-    '  if curl -fsS http://localhost:8000/kortix/health >/dev/null 2>&1; then',
+    '  if curl -fsS http://localhost:8000/bapx/health >/dev/null 2>&1; then',
     '    echo ready',
     '    exit 0',
     '  fi',
@@ -506,7 +506,7 @@ export function buildJustAVPSHostRecoveryCommand(): string {
     'echo "docker ps:"',
     'docker ps -a --filter name="^/justavps-workload$" --format "{{.Names}}|{{.Image}}|{{.Status}}" 2>/dev/null || true',
     'echo "health:"',
-    'curl -sS -i http://localhost:8000/kortix/health 2>/dev/null || true',
+    'curl -sS -i http://localhost:8000/bapx/health 2>/dev/null || true',
     'exit 1',
   ].join('\n');
 }
@@ -573,9 +573,9 @@ export class JustAVPSProvider implements SandboxProvider {
 
     const serverType = opts.serverType || config.JUSTAVPS_DEFAULT_SERVER_TYPE;
     const location = opts.location || config.JUSTAVPS_DEFAULT_LOCATION;
-    const sandboxApiBase = resolveReachableKortixApiUrl().replace(/\/v1\/router\/?$/, '');
+    const sandboxApiBase = resolveReachableBapxApiUrl().replace(/\/v1\/router\/?$/, '');
     const routerBase = `${sandboxApiBase}/v1/router`;
-    const machineName = `kortix-sandbox-${opts.accountId.slice(0, 8)}-${Date.now().toString(36)}`;
+    const machineName = `bapx-sandbox-${opts.accountId.slice(0, 8)}-${Date.now().toString(36)}`;
 
     const serviceKey = opts.envVars?.KORTIX_TOKEN || '';
     // Inject the API's own version into the sandbox container so the sandbox
@@ -751,7 +751,7 @@ export class JustAVPSProvider implements SandboxProvider {
       headers['X-Proxy-Token'] = proxyToken;
     }
 
-    // Service key for core/kortix-master auth
+    // Service key for core/bapx-master auth
     const serviceKey = (row?.config as Record<string, unknown>)?.serviceKey as string | undefined;
     if (serviceKey) {
       headers['Authorization'] = `Bearer ${serviceKey}`;

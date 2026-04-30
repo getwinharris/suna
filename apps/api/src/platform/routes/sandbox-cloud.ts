@@ -13,10 +13,10 @@
 
 import { Hono } from 'hono';
 import { eq, and, desc, sql, inArray } from 'drizzle-orm';
-import { sandboxes, type Database } from '@kortix/db';
+import { sandboxes, type Database } from '@bapx/db';
 import { db as defaultDb } from '../../shared/db';
 import { createApiKey } from '../../repositories/api-keys';
-import { supabaseAuth as authMiddleware } from '../../middleware/auth';
+import { trailbaseAuth as authMiddleware } from '../../middleware/auth';
 import {
   getProvider as defaultGetProvider,
   getDefaultProviderName as defaultGetDefaultProviderName,
@@ -343,7 +343,7 @@ export function createCloudSandboxRouter(
           try {
             const portalSession = await stripe.billingPortal.sessions.create({
               customer: customer.id,
-              return_url: `${config.FRONTEND_URL ?? 'https://app.kortix.com'}/subscription`,
+              return_url: `${config.FRONTEND_URL ?? 'https://app.bapx.in'}/subscription`,
             });
             portalUrl = portalSession.url;
           } catch {
@@ -423,7 +423,7 @@ export function createCloudSandboxRouter(
 
       await registerCreator(db, sandbox.sandboxId, userId);
 
-      // Create a sandbox-managed API key (kortix_sb_)
+      // Create a sandbox-managed API key (bapx_sb_)
       const sandboxKey = await createApiKey({
         sandboxId: sandbox.sandboxId,
         accountId,
@@ -1144,7 +1144,7 @@ export function createCloudSandboxRouter(
     const userId = c.get('userId');
     try {
       const accountId = await resolveAccountId(userId);
-      // 1. Verify legacy paid tier from canonical kortix billing state only.
+      // 1. Verify legacy paid tier from canonical bapx billing state only.
       const { getCreditAccount } = await import('../../billing/repositories/credit-accounts');
       const { isLegacyPaidTier, getTier } = await import('../../billing/services/tiers');
 
@@ -1165,8 +1165,8 @@ export function createCloudSandboxRouter(
         return c.json({ success: false, error: 'You already have an active computer', sandbox_id: existing[0].sandboxId }, 409);
       }
 
-      // Lazy-migrate: create kortix.credit_accounts row with full credits.
-      // Supabase RPCs can't access kortix schema, so set everything via drizzle directly.
+      // Lazy-migrate: create bapx.credit_accounts row with full credits.
+      // Supabase RPCs can't access bapx schema, so set everything via drizzle directly.
       try {
         const { MACHINE_CREDIT_BONUS } = await import('../../billing/services/tiers');
         const { grantMachineBonusOnce, getLegacyClaimMachineBonusKey } = await import('../../billing/services/machine-bonus');

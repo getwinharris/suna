@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 
-import { selectLingeringBusySessionIds } from '../../opencode/plugin/kortix-system/kortix-system'
+import { selectLingeringBusySessionIds } from '../../opencode/plugin/bapx-system/bapx-system'
 
-describe('kortix-system startup busy session cleanup', () => {
+describe('bapx-system startup busy session cleanup', () => {
 	it('selects only pre-start busy sessions without active task runs', () => {
 		expect(selectLingeringBusySessionIds({
 			candidateBusySessionIds: ['stale-busy', 'fresh-busy', 'task-owned', 'missing-from-list'],

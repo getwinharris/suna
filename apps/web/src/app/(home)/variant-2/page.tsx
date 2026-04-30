@@ -14,12 +14,12 @@ import { GithubButton } from '@/components/home/github-button';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 
-const KortixBoxScene = dynamic(() => import('@/components/landing/KortixBoxScene'), {
+const BapxBoxScene = dynamic(() => import('@/components/landing/BapxBoxScene'), {
   ssr: false,
   loading: () => <div className="animate-pulse bg-foreground/5 w-full h-full rounded-full blur-3xl opacity-20" />
 });
 
-const INSTALL_CMD = 'curl -fsSL https://kortix.com/install | bash';
+const INSTALL_CMD = 'curl -fsSL https://bapx.in/install | bash';
 
 // ─── Reusable Components ────────────────────────────────
 
@@ -79,7 +79,7 @@ export default function Variant2Home() {
           className="fixed inset-0 z-10 pointer-events-none"
           style={{ opacity: sceneOpacity }}
         >
-          <KortixBoxScene
+          <BapxBoxScene
             scrollProgressRef={sceneProgressRef}
             isOn={isMachineOn}
             setIsOn={setIsMachineOn}
@@ -257,7 +257,7 @@ export default function Variant2Home() {
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground ml-1">kortix — session</span>
+                    <span className="text-[10px] font-mono text-muted-foreground ml-1">bapx — session</span>
                   </div>
                   <div className="p-5 space-y-5">
                     <div className="space-y-1">
@@ -307,7 +307,7 @@ export default function Variant2Home() {
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                       <div className="size-2.5 rounded-full bg-muted-foreground/15" />
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">root@kortix ~ kortix status</span>
+                    <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">root@bapx ~ bapx status</span>
                     <div className="size-2.5 opacity-0" />
                   </div>
                   <div className="p-5 space-y-1 text-[11px]">

@@ -20,7 +20,7 @@ function getSupabaseAnonKey() {
 function getSupabaseCookieName() {
   const baseUrl = process.env.E2E_BASE_URL || 'http://localhost:13737';
   const port = new URL(baseUrl).port;
-  return port ? `sb-kortix-auth-token-${port}` : 'sb-kortix-auth-token';
+  return port ? `sb-bapx-auth-token-${port}` : 'sb-bapx-auth-token';
 }
 
 async function bootstrapOwner(page: Page) {

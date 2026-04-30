@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { accounts, accountMembers, accountUser } from '@kortix/db';
+import { accounts, accountMembers, accountUser } from '@bapx/db';
 import { db } from './db';
 import { claimPendingInvitesOnSignup } from '../teams';
 

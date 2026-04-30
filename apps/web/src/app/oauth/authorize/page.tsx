@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/trailbase/client';
 import { getEnv } from '@/lib/env-config';
 import { Button } from '@/components/ui/button';
 import { ConnectingScreen } from '@/components/dashboard/connecting-screen';

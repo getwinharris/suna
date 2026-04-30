@@ -89,7 +89,7 @@ async function describeImage(
 
 async function enrichImages(images: EnrichedImage[]): Promise<EnrichedImage[]> {
   const replicateBaseUrl = getEnv("REPLICATE_API_URL");
-  // When routed through the Kortix proxy (REPLICATE_API_URL is set), use KORTIX_TOKEN
+  // When routed through the Bapx proxy (REPLICATE_API_URL is set), use KORTIX_TOKEN
   // for auth — the proxy validates it and injects the real Replicate API token.
   const replicateToken = replicateBaseUrl
     ? getEnv("KORTIX_TOKEN")
@@ -139,7 +139,7 @@ export default tool({
   },
   async execute(args, _context) {
     const serperUrlOverride = getEnv("SERPER_API_URL");
-    // When routed through the Kortix proxy (SERPER_API_URL is set), use KORTIX_TOKEN
+    // When routed through the Bapx proxy (SERPER_API_URL is set), use KORTIX_TOKEN
     // for auth — the proxy validates it and injects the real Serper API key.
     const apiKey = serperUrlOverride
       ? getEnv("KORTIX_TOKEN")

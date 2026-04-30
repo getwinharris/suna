@@ -1,7 +1,7 @@
 /**
- * Kortix Projects — project CRUD + session-project linking + file gating.
+ * Bapx Projects — project CRUD + session-project linking + file gating.
  *
- * SQLite (kortix.db) is the single source of truth.
+ * SQLite (bapx.db) is the single source of truth.
  * No filesystem scanning, no markers.
  */
 
@@ -31,7 +31,7 @@ const TASK_SUMMARY_START = "<!-- KORTIX:TASK-SUMMARY:START -->"
 const TASK_SUMMARY_END = "<!-- KORTIX:TASK-SUMMARY:END -->"
 
 function projectContextPath(projectPath: string): string {
-	return path.join(projectPath, ".kortix", "CONTEXT.md")
+	return path.join(projectPath, ".bapx", "CONTEXT.md")
 }
 
 function buildTaskSummary(db: Database, projectId: string): string {
@@ -255,9 +255,9 @@ export class ProjectManager {
 			return existing
 		}
 		const wm = async (f: string, c: string) => { if (!existsSync(f)) await fs.writeFile(f, c, "utf8") }
-		await fs.mkdir(path.join(pp, ".kortix"), { recursive: true })
+		await fs.mkdir(path.join(pp, ".bapx"), { recursive: true })
 		ensureGlobalMemoryFiles(import.meta.dir)
-		await wm(path.join(pp, ".kortix", "CONTEXT.md"), `# ${name}\n\n${desc || "No description."}\n`)
+		await wm(path.join(pp, ".bapx", "CONTEXT.md"), `# ${name}\n\n${desc || "No description."}\n`)
 		const id = projectId(name), now = new Date().toISOString()
 		let opencodeId: string | null = null
 		try {
@@ -304,7 +304,7 @@ export function projectTools(mgr: ProjectManager, db: Database) {
 				description: tool.schema.string().describe('Description. "" if none.'),
 				path: tool.schema.string().describe('Absolute path. "" for default.'),
 				user_handle: tool.schema.string().optional().describe('Human\'s handle for @-mentions (e.g. "vukasinkubet"). If omitted, PM onboarding is NOT auto-fired and the project just gets seeded silently.'),
-				default_model: tool.schema.string().optional().describe('Optional model override in "providerID/modelID" form to seed the PM + team with (e.g. "kortix-yolo/think", "kortix/minimax-m27"). Leave empty to auto-pick based on what the sandbox has credentials for. Pass this when the user has explicitly chosen a model for the project.'),
+				default_model: tool.schema.string().optional().describe('Optional model override in "providerID/modelID" form to seed the PM + team with (e.g. "bapx-yolo/think", "bapx/minimax-m27"). Leave empty to auto-pick based on what the sandbox has credentials for. Pass this when the user has explicitly chosen a model for the project.'),
 			},
 			async execute(args: { name: string; description: string; path: string; user_handle?: string; default_model?: string }, toolCtx: ToolContext): Promise<string> {
 				try {
@@ -329,7 +329,7 @@ export function projectTools(mgr: ProjectManager, db: Database) {
 								if (info?.role === 'assistant' && info.modelID) {
 									const provider = (info.providerID || '').trim()
 									const model = info.modelID.trim()
-									// kortix-yolo stores the full `provider/id` in
+									// bapx-yolo stores the full `provider/id` in
 									// modelID — avoid double-prefixing.
 									inheritedModel = model.includes('/') ? model : (provider ? `${provider}/${model}` : model)
 									break
@@ -355,8 +355,8 @@ export function projectTools(mgr: ProjectManager, db: Database) {
 					// the human can opt up to a larger model BEFORE the team is
 					// created (changing default_model retroactively is friction).
 					const SMALL_MODELS = [
-						'kortix-yolo/think',
-						'kortix-yolo/code',
+						'bapx-yolo/think',
+						'bapx-yolo/code',
 					]
 					const isSmallSeed = SMALL_MODELS.includes(seededModel)
 					// Always spawn the PM onboarding session so the response can hand
@@ -378,7 +378,7 @@ export function projectTools(mgr: ProjectManager, db: Database) {
 								"",
 								`Pass \`default_model: "${seededModel}"\` on every \`team_create_agent\` call. This is the model the human selected for this project (their current chat model, an explicit project_create override, or the sandbox default in that order). Do NOT substitute another model unless the human explicitly asks during onboarding — in which case use their pick verbatim.`,
 								isSmallSeed
-									? `\n**MODEL ADVISORY** — the seeded model \`${seededModel}\` is a small/cheap tier and tends to misfire on real engineering work (dropped tool calls, patchy diff edits, weak QA evidence). Inside Q2 (stack), include ONE short sentence flagging this and offer a larger option (e.g. \`kortix/minimax-m27\`, \`anthropic/claude-sonnet-4-6\` if the human's API key is loaded). If they confirm the small model anyway, ship it — don't keep asking.`
+									? `\n**MODEL ADVISORY** — the seeded model \`${seededModel}\` is a small/cheap tier and tends to misfire on real engineering work (dropped tool calls, patchy diff edits, weak QA evidence). Inside Q2 (stack), include ONE short sentence flagging this and offer a larger option (e.g. \`bapx/minimax-m27\`, \`anthropic/claude-sonnet-4-6\` if the human's API key is loaded). If they confirm the small model anyway, ship it — don't keep asking.`
 									: null,
 								"",
 								"Copy the Communication discipline block from your persona into each agent body_md verbatim.",
@@ -427,7 +427,7 @@ export function projectTools(mgr: ProjectManager, db: Database) {
 		}),
 
 		project_list: tool({
-			description: "List all projects from Kortix SQLite.",
+			description: "List all projects from Bapx SQLite.",
 			args: {},
 			async execute(): Promise<string> {
 				const ps = mgr.listProjects()
@@ -443,7 +443,7 @@ export function projectTools(mgr: ProjectManager, db: Database) {
 			async execute(args: { name: string }): Promise<string> {
 				const p = mgr.getProject(args.name)
 				if (!p) return `Project not found: "${args.name}"`
-				const contextPath = path.join(p.path, ".kortix", "CONTEXT.md")
+				const contextPath = path.join(p.path, ".bapx", "CONTEXT.md")
 				return [
 					`## ${p.name}`, ``, `**Path:** \`${p.path}\``,
 					p.description ? `**Description:** ${p.description}` : null,
@@ -640,7 +640,7 @@ export function projectStatusTransform(mgr: ProjectManager, getCurrentSessionId:
 			for (let i = messages.length - 1; i >= 0; i--) {
 				if (messages[i]?.info?.role === "user") {
 					if (!Array.isArray(messages[i].parts)) messages[i].parts = []
-					messages[i].parts.push({ type: "text", text: `<kortix_system type="project-status" source="kortix-system">${statusXml}</kortix_system>` })
+					messages[i].parts.push({ type: "text", text: `<bapx_system type="project-status" source="bapx-system">${statusXml}</bapx_system>` })
 					break
 				}
 			}

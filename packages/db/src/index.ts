@@ -5,27 +5,27 @@ export * as schema from './schema';
 // Re-export frequently used schemas and types for convenience
 export {
   // Schema namespace
-  kortixSchema,
+  bapxSchema,
   // Enums
   sandboxStatusEnum,
   deploymentStatusEnum,
   deploymentSourceEnum,
   apiKeyStatusEnum,
   apiKeyTypeEnum,
-  // Kortix tables — accounts
+  // Bapx tables — accounts
   accounts,
   accountMembers,
   accountRoleEnum,
   accountsRelations,
   accountMembersRelations,
-  // Kortix tables
+  // Bapx tables
   sandboxes,
   sandboxMembers,
   sandboxMemberScopes,
   scopeEffectEnum,
   sandboxInvites,
   deployments,
-  kortixApiKeys,
+  bapxApiKeys,
   integrationCredentials,
   integrations,
   sandboxIntegrations,
@@ -37,10 +37,10 @@ export {
   sandboxMembersRelations,
   sandboxInvitesRelations,
   deploymentsRelations,
-  kortixApiKeysRelations,
+  bapxApiKeysRelations,
   integrationsRelations,
   sandboxIntegrationsRelations,
-  // Billing / Credits (moved from public → kortix schema)
+  // Billing / Credits (moved from public → bapx schema)
   billingCustomers,
   creditAccounts,
   creditLedger,
@@ -78,7 +78,7 @@ export {
   // Pool
   poolResources,
   poolSandboxes,
-} from './schema/kortix';
+} from './schema/bapx';
 
 export type {
   TunnelMachineInfo,
@@ -86,7 +86,7 @@ export type {
   TunnelShellScope,
   TunnelNetworkScope,
   TunnelPermissionScope,
-} from './schema/kortix';
+} from './schema/bapx';
 
 // Public/basejump tables
 export {
@@ -107,8 +107,8 @@ export type {
   AccountUser,
   NewApiKey,
   SandboxSelect,
-  KortixApiKey,
-  NewKortixApiKey,
+  BapxApiKey,
+  NewBapxApiKey,
   IntegrationCredential,
   NewIntegrationCredential,
   Integration,

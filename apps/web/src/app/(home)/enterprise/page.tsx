@@ -14,10 +14,10 @@ export default function EnterprisePage() {
         <p className="text-sm text-muted-foreground">
           Interested in Bapx Media Hub for your team?{' '}
           <a
-            href="mailto:hey@kortix.ai"
+            href="mailto:hey@bapx.ai"
             className="text-foreground underline underline-offset-4 hover:no-underline"
           >
-            hey@kortix.ai
+            hey@bapx.ai
           </a>
         </p>
         <Button asChild variant="outline" size="sm">

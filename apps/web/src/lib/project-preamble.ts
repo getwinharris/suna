@@ -1,4 +1,4 @@
-import type { KortixProject } from '@/hooks/kortix/use-kortix-projects';
+import type { BapxProject } from '@/hooks/bapx/use-bapx-projects';
 
 /**
  * Structured XML ref tags for every @-mention kind in the chat pipeline.
@@ -88,7 +88,7 @@ export function buildProjectRefsBlock(
 ): string {
   if (!projects.length) return '';
   const refs = projects.map(buildProjectRef).join('\n');
-  return `Referenced projects (the user's active Kortix project context — treat the first one as "the project" unless told otherwise):\n${refs}`;
+  return `Referenced projects (the user's active Bapx project context — treat the first one as "the project" unless told otherwise):\n${refs}`;
 }
 
 export function buildFileRefsBlock(
@@ -137,12 +137,12 @@ export function appendAgentRefs(
 }
 
 /**
- * Convenience: append a single KortixProject's ref to text. Used by the
+ * Convenience: append a single BapxProject's ref to text. Used by the
  * dashboard + session empty-state ProjectSelector flow.
  */
 export function appendProjectRef(
   text: string,
-  project: KortixProject | null | undefined,
+  project: BapxProject | null | undefined,
 ): string {
   if (!project) return text;
   return appendProjectRefs(text, [

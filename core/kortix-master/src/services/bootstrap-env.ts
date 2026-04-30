@@ -7,7 +7,7 @@
  * creation and are synced to the s6 env dir on boot.
  *
  * Problem: if process.env loses them (container restart race, env cleared, etc.)
- * AND the s6 env dir is empty, the sandbox can't authenticate to kortix-api.
+ * AND the s6 env dir is empty, the sandbox can't authenticate to bapx-api.
  * The SecretStore can't help because KORTIX_TOKEN is its own encryption key.
  *
  * Solution: persist these vars in a plaintext JSON file that's always readable.

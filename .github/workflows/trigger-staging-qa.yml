@@ -52,8 +52,8 @@ jobs:
 
           curl --fail-with-body --silent --show-error \
             -X POST "$QA_STAGING_HOOK_URL" \
-            -H "X-Kortix-Token: $QA_STAGING_KORTIX_TOKEN" \
-            -H "x-kortix-trigger-secret: $QA_STAGING_TRIGGER_SECRET" \
+            -H "X-Bapx-Token: $QA_STAGING_KORTIX_TOKEN" \
+            -H "x-bapx-trigger-secret: $QA_STAGING_TRIGGER_SECRET" \
             -H "Content-Type: application/json" \
             --data @payload.json
 

@@ -11,7 +11,7 @@ export function completedTool(tool: string, input: any = {}, output: any = "ok")
 
 export function validPlan() {
 	return [
-		"<kortix_autowork_plan>",
+		"<bapx_autowork_plan>",
 		"  <status_quo>",
 		"    The current flow exists but the exact done-state is not yet locked down.",
 		"  </status_quo>",
@@ -34,7 +34,7 @@ export function validPlan() {
 		"    - command: bun test tests/auth.test.ts",
 		"    - observe: the flow behaves exactly as requested",
 		"  </verification_gates>",
-		"</kortix_autowork_plan>",
+		"</bapx_autowork_plan>",
 	].join("\n")
 }
 
@@ -42,7 +42,7 @@ export function validCompletion(requirement = "fix the bug") {
 	return [
 		"All done. Here is the completion contract:",
 		"",
-		"<kortix_autowork_complete>",
+		"<bapx_autowork_complete>",
 		"  <verification>",
 		"    $ bun test tests/auth.test.ts",
 		"    [exit 0] 12 passed",
@@ -51,13 +51,13 @@ export function validCompletion(requirement = "fix the bug") {
 		'    - [x] "the flow returns the expected response" — patched src/auth.ts:47, regression test added',
 		'    - [x] "the behavior is deterministic for the requested scenario" — the flow now behaves consistently',
 		"  </requirements_check>",
-		"</kortix_autowork_complete>",
+		"</bapx_autowork_complete>",
 	].join("\n")
 }
 
 export function validVerified() {
 	return [
-		"<kortix_autowork_verified>",
+		"<bapx_autowork_verified>",
 		"  <verification_rerun>",
 		"    $ bun test tests/auth.test.ts",
 		"    [exit 0] 12 passed",
@@ -67,7 +67,7 @@ export function validVerified() {
 		'    - [x] "the behavior is deterministic for the requested scenario" — re-audited in verifier phase',
 		'    - [x] "the flow behaves exactly as requested" — planned observe gate rechecked',
 		"  </final_check>",
-		"</kortix_autowork_verified>",
+		"</bapx_autowork_verified>",
 	].join("\n")
 }
 
@@ -77,9 +77,9 @@ export async function createAutoworkHarness(sessionId: string, importSalt: strin
 	const todos = new Map<string, any[]>()
 
 	void importSalt
-	const autoworkMod = await import("../../../opencode/plugin/kortix-system/autowork/autowork.ts")
-	const stateMod = await import("../../../opencode/plugin/kortix-system/autowork/state.ts")
-	const todoMod = await import("../../../opencode/plugin/kortix-system/todo-enforcer/todo-enforcer.ts")
+	const autoworkMod = await import("../../../opencode/plugin/bapx-system/autowork/autowork.ts")
+	const stateMod = await import("../../../opencode/plugin/bapx-system/autowork/state.ts")
+	const todoMod = await import("../../../opencode/plugin/bapx-system/todo-enforcer/todo-enforcer.ts")
 	autoworkMod.autoworkActiveSessions.clear()
 
 	const client = {

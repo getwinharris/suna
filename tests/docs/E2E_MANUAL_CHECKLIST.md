@@ -1,4 +1,4 @@
-# Kortix E2E Test — Full Install to Verify
+# Bapx E2E Test — Full Install to Verify
 
 Complete test from clean slate to every feature working.
 
@@ -7,7 +7,7 @@ Complete test from clean slate to every feature working.
 ## Prerequisites
 
 - Docker Desktop running
-- No existing `~/.kortix/` directory (or willing to reinstall)
+- No existing `~/.bapx/` directory (or willing to reinstall)
 - Pipedream Connect credentials (optional — needed for Step 14+)
 
 ---
@@ -16,12 +16,12 @@ Complete test from clean slate to every feature working.
 
 ### Step 1 — Nuke any previous install
 ```bash
-cd ~/.kortix && docker compose down -v 2>/dev/null; docker rm -f kortix-sandbox 2>/dev/null; rm -rf ~/.kortix
+cd ~/.bapx && docker compose down -v 2>/dev/null; docker rm -f bapx-sandbox 2>/dev/null; rm -rf ~/.bapx
 ```
 
 ### Step 2 — Run the installer
 ```bash
-bash scripts/get-kortix.sh
+bash scripts/get-bapx.sh
 ```
 
 ### Step 3 — Choose Local mode
@@ -31,14 +31,14 @@ bash scripts/get-kortix.sh
 - Press `N` to skip (or `Y` + enter Pipedream creds)
 
 ### Step 5 — Wait for image pull + startup
-- Installer pulls 4 images: postgres, frontend, kortix-api, computer
-- Ends with "Kortix is running!" + opens browser to `/setup`
+- Installer pulls 4 images: postgres, frontend, bapx-api, computer
+- Ends with "Bapx is running!" + opens browser to `/setup`
 
 **VERIFY:**
 ```bash
-docker ps --format "table {{.Names}}\t{{.Status}}" | grep kortix
+docker ps --format "table {{.Names}}\t{{.Status}}" | grep bapx
 ```
-- [ ] 4 containers running: `kortix-postgres-1`, `kortix-frontend-1`, `kortix-kortix-api-1`, `kortix-sandbox`
+- [ ] 4 containers running: `bapx-postgres-1`, `bapx-frontend-1`, `bapx-bapx-api-1`, `bapx-sandbox`
 
 ---
 
@@ -48,7 +48,7 @@ docker ps --format "table {{.Names}}\t{{.Status}}" | grep kortix
 ```bash
 curl -s http://localhost:13738/health | jq .
 ```
-- [ ] Returns `{"status":"ok","service":"kortix-api",...}`
+- [ ] Returns `{"status":"ok","service":"bapx-api",...}`
 
 ### Step 7 — API health (v1 prefix)
 ```bash
@@ -64,13 +64,13 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:13737
 
 ### Step 9 — Database schema created
 ```bash
-docker exec kortix-postgres-1 psql -U postgres -c "\dt kortix.*"
+docker exec bapx-postgres-1 psql -U postgres -c "\dt bapx.*"
 ```
 - [ ] 12 tables listed (api_keys, channel_configs, channel_identity_map, channel_messages, channel_sessions, deployments, executions, integrations, sandbox_integrations, sandboxes, server_entries, triggers)
 
 ### Step 10 — Sandbox healthy
 ```bash
-curl -s http://localhost:13740/kortix/health
+curl -s http://localhost:13740/bapx/health
 ```
 - [ ] Returns health response (200)
 
@@ -190,7 +190,7 @@ curl -s http://localhost:13738/v1/providers/health | jq .
 
 ### Step 32 — Sandbox preview proxy
 ```bash
-curl -s http://localhost:13738/v1/preview/kortix-sandbox/8000/kortix/health
+curl -s http://localhost:13738/v1/preview/bapx-sandbox/8000/bapx/health
 ```
 - [ ] Returns sandbox health through the API proxy
 
@@ -202,7 +202,7 @@ curl -s http://localhost:13738/v1/preview/kortix-sandbox/8000/kortix/health
 
 ### Step 34 — Verify sandbox workspace
 ```bash
-docker exec kortix-sandbox ls /workspace
+docker exec bapx-sandbox ls /workspace
 ```
 - [ ] Returns workspace contents
 
@@ -214,7 +214,7 @@ docker exec kortix-sandbox ls /workspace
 
 ### Step 35 — Verify Pipedream env vars
 ```bash
-docker exec kortix-kortix-api-1 printenv | grep PIPEDREAM
+docker exec bapx-bapx-api-1 printenv | grep PIPEDREAM
 ```
 - [ ] `PIPEDREAM_CLIENT_ID`, `PIPEDREAM_CLIENT_SECRET`, `PIPEDREAM_PROJECT_ID` are set
 
@@ -242,26 +242,26 @@ curl -s http://localhost:13738/v1/integrations/connections | jq .
 
 ### Step 39 — CLI help
 ```bash
-~/.kortix/kortix help
+~/.bapx/bapx help
 ```
 - [ ] Shows command list (start, stop, restart, logs, status, setup, update, open, etc.)
 
 ### Step 40 — CLI status
 ```bash
-~/.kortix/kortix status
+~/.bapx/bapx status
 ```
 - [ ] Shows all 4 services running
 
 ### Step 41 — CLI stop + start
 ```bash
-~/.kortix/kortix stop && ~/.kortix/kortix start
+~/.bapx/bapx stop && ~/.bapx/bapx start
 ```
 - [ ] Services stop cleanly then restart
 - [ ] All 4 containers back to running
 
 ### Step 42 — CLI logs
 ```bash
-~/.kortix/kortix logs kortix-api-1 --tail 10
+~/.bapx/bapx logs bapx-api-1 --tail 10
 ```
 - [ ] Shows recent API logs
 
@@ -271,8 +271,8 @@ curl -s http://localhost:13738/v1/integrations/connections | jq .
 
 ### Step 43 — Restart survives
 ```bash
-docker compose -f ~/.kortix/docker-compose.yml --project-name kortix down
-docker compose -f ~/.kortix/docker-compose.yml --project-name kortix up -d
+docker compose -f ~/.bapx/docker-compose.yml --project-name bapx down
+docker compose -f ~/.bapx/docker-compose.yml --project-name bapx up -d
 ```
 - Wait for healthy, then:
 ```bash
@@ -282,7 +282,7 @@ curl -s http://localhost:13738/v1/integrations/connections | jq .
 
 ### Step 44 — Schema re-push is idempotent
 ```bash
-docker logs kortix-kortix-api-1 2>&1 | grep "\[schema\]"
+docker logs bapx-bapx-api-1 2>&1 | grep "\[schema\]"
 ```
 - [ ] Shows "Schema pushed successfully" (no errors, no duplicate table errors)
 
@@ -292,7 +292,7 @@ docker logs kortix-kortix-api-1 2>&1 | grep "\[schema\]"
 
 ### Step 45 — API survives DB restart
 ```bash
-docker restart kortix-postgres-1
+docker restart bapx-postgres-1
 ```
 - Wait 10s, then:
 ```bash

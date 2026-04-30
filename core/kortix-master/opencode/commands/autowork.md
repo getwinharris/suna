@@ -16,15 +16,15 @@ You are in **autowork mode** — a persistent loop with three phases:
 ## How the loop works
 
 1. Every time your session goes idle, the autowork plugin checks which phase you are in.
-2. In **planning phase**, it waits for a well-formed `<kortix_autowork_plan>` tag that defines status quo, target end state, ambiguity resolution, work plan, and verification gates.
+2. In **planning phase**, it waits for a well-formed `<bapx_autowork_plan>` tag that defines status quo, target end state, ambiguity resolution, work plan, and verification gates.
 3. The plan must also contain an explicit end-state checklist that defines what must be true at the finish line.
 4. If the plan is malformed, stale, or still contains unresolved ambiguity → the plugin rejects it and keeps you in planning.
 5. Once a valid plan is accepted, the loop enters **execution phase** and keeps re-injecting the approved plan.
 6. During execution, the native todo list is mandatory — autowork will keep looping until real native todos exist and stay updated.
-7. In execution phase, the plugin checks for a well-formed `<kortix_autowork_complete>` tag.
+7. In execution phase, the plugin checks for a well-formed `<bapx_autowork_complete>` tag.
 8. The completion contract must explicitly cover every planned end-state checklist item.
 9. If the completion tag is accepted, the loop does **not** stop yet — it enters **verifier phase**.
-10. In verifier phase, the plugin waits for a well-formed `<kortix_autowork_verified>` tag with a final rerun of the verification commands and a final audit checklist.
+10. In verifier phase, the plugin waits for a well-formed `<bapx_autowork_verified>` tag with a final rerun of the verification commands and a final audit checklist.
 11. The verifier checklist must explicitly cover every planned end-state checklist item and every planned observe gate.
 12. If the completion or verifier tag is malformed, stale, under-verified, not backed by real bash verification, or blocked by unfinished native todos → the plugin rejects it and the loop continues.
 13. Hard ceiling: `--max-iterations` (default 50). Hitting it stops the loop with `failed`.
@@ -34,7 +34,7 @@ You are in **autowork mode** — a persistent loop with three phases:
 Before execution starts, emit on its own in a message:
 
 ```
-<kortix_autowork_plan>
+<bapx_autowork_plan>
   <status_quo>
     [What exists today. Current behavior, bug, gap, or system reality.]
   </status_quo>
@@ -58,7 +58,7 @@ Before execution starts, emit on its own in a message:
     - command: bun run typecheck
     - observe: exact success condition / UI / API response
   </verification_gates>
-</kortix_autowork_plan>
+</bapx_autowork_plan>
 ```
 
 If blocking ambiguity still remains, ask the user a focused clarifying question instead of emitting the planning tag.
@@ -68,7 +68,7 @@ If blocking ambiguity still remains, ask the user a focused clarifying question 
 When — and only when — the task is 100% done, deterministically verified, and every user requirement is satisfied with concrete proof, emit on its own in a message:
 
 ```
-<kortix_autowork_complete>
+<bapx_autowork_complete>
   <verification>
     [The exact commands you ran, with exit codes and real output that prove the task works.
      Not "should work." Reproducible.]
@@ -77,7 +77,7 @@ When — and only when — the task is 100% done, deterministically verified, an
     - [x] "planned end state 1" — how it was satisfied + proof (file path / command output / test id)
     - [x] "planned end state 2" — how it was satisfied + proof
   </requirements_check>
-</kortix_autowork_complete>
+</bapx_autowork_complete>
 ```
 
 The completion contract must explicitly cover **every item from the approved `<end_state_checklist>`**.
@@ -87,7 +87,7 @@ The completion contract must explicitly cover **every item from the approved `<e
 After the completion contract is accepted, do one final audit pass and emit on its own in a message:
 
 ```
-<kortix_autowork_verified>
+<bapx_autowork_verified>
   <verification_rerun>
     [The final rerun commands from the verifier pass, with exit codes and real output.]
   </verification_rerun>
@@ -96,16 +96,16 @@ After the completion contract is accepted, do one final audit pass and emit on i
     - [x] "planned end state 2" — verifier evidence
     - [x] "planned observe gate" — verifier evidence
   </final_check>
-</kortix_autowork_verified>
+</bapx_autowork_verified>
 ```
 
 The verifier contract must explicitly cover **every planned end-state item** and **every planned `observe:` verification gate**.
 
 **Hard rules the plugin enforces:**
-- Execution does not begin until a valid `<kortix_autowork_plan>` is accepted.
+- Execution does not begin until a valid `<bapx_autowork_plan>` is accepted.
 - `<end_state_checklist>` is required in planning phase and defines the concrete finish line.
 - `<ambiguity_check>` must show that blocking ambiguity is resolved before execution starts.
-- Clean completion does not happen until a valid `<kortix_autowork_verified>` is accepted.
+- Clean completion does not happen until a valid `<bapx_autowork_verified>` is accepted.
 - Both `<verification>` and `<requirements_check>` children are required and must be non-empty.
 - Every `<requirements_check>` item must be `- [x]` with concrete evidence.
 - `<verification_rerun>` and `<final_check>` are required in verifier phase.

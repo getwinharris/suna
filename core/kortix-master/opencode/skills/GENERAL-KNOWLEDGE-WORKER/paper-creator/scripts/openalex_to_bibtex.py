@@ -3,7 +3,7 @@
 
 Usage:
     # Pipe from curl
-    curl -s "https://api.openalex.org/works?search=topic&per_page=10&mailto=agent@kortix.ai" | python3 openalex_to_bibtex.py
+    curl -s "https://api.openalex.org/works?search=topic&per_page=10&mailto=agent@bapx.ai" | python3 openalex_to_bibtex.py
 
     # From file
     python3 openalex_to_bibtex.py < results.json

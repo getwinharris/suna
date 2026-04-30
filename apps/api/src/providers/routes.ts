@@ -75,7 +75,7 @@ async function fetchMasterJson<T>(path: string, init: RequestInit = {}, timeoutM
     const url = `${base}${path}`;
     try {
       const res = await fetchWithTimeout(url, init, timeoutMs);
-      // 503 from /kortix/health means "starting" — still return the JSON body
+      // 503 from /bapx/health means "starting" — still return the JSON body
       // so callers can inspect the status/opencode fields.
       if (!res.ok && res.status !== 503) {
         lastErr = new Error(`Master ${url} returned ${res.status}`);
@@ -324,7 +324,7 @@ providersApp.put('/:id/connect', async (c) => {
     if (existsSync(examplePath)) {
       writeFileSync(rootEnvPath, readFileSync(examplePath, 'utf-8'));
     } else {
-      writeFileSync(rootEnvPath, '# Kortix Environment Configuration\nENV_MODE=local\n');
+      writeFileSync(rootEnvPath, '# Bapx Environment Configuration\nENV_MODE=local\n');
     }
   }
 
@@ -347,13 +347,13 @@ providersApp.put('/:id/connect', async (c) => {
       if (existsSync(examplePath)) {
         writeFileSync(sandboxEnvPath, readFileSync(examplePath, 'utf-8'));
       } else {
-        writeFileSync(sandboxEnvPath, '# Kortix Sandbox Environment\nENV_MODE=local\n');
+        writeFileSync(sandboxEnvPath, '# Bapx Sandbox Environment\nENV_MODE=local\n');
       }
     }
     sandboxData.ENV_MODE = 'local';
     sandboxData.SANDBOX_ID = config.SANDBOX_CONTAINER_NAME;
     sandboxData.PROJECT_ID = 'local';
-    sandboxData.KORTIX_API_URL = 'http://kortix-api:8008';
+    sandboxData.KORTIX_API_URL = 'http://bapx-api:8008';
     writeEnvFile(sandboxEnvPath, sandboxData);
   }
 
@@ -423,7 +423,7 @@ providersApp.get('/health', async (c) => {
   if (!repoRoot) {
     // Docker mode: check sandbox via HTTP
     try {
-      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/kortix/health', {}, 5000);
+      const health = await fetchMasterJson<{ status: string; runtimeReady?: boolean }>('/bapx/health', {}, 5000);
       checks.sandbox = { ok: true };
       checks.docker = { ok: true };
       if (health.status === 'starting' || health.runtimeReady === false) {

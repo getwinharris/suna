@@ -8,7 +8,7 @@ We explicitly separate **three layers**:
 
 1. **Host layer** — the JustAVPS machine itself
 2. **Workload layer** — the `justavps-docker` systemd service + `justavps-workload` container on that host
-3. **Core runtime layer** — services *inside* the workload container (`kortix-master`, OpenCode, desktop/session, agent-browser, etc.)
+3. **Core runtime layer** — services *inside* the workload container (`bapx-master`, OpenCode, desktop/session, agent-browser, etc.)
 
 The current UX mixes these layers together. This spec defines how to split them cleanly in:
 
@@ -111,7 +111,7 @@ then wait for:
 
 ```bash
 docker inspect justavps-workload --format '{{.State.Status}}'
-curl -fsS http://localhost:8000/kortix/health
+curl -fsS http://localhost:8000/bapx/health
 ```
 
 ---
@@ -121,19 +121,19 @@ curl -fsS http://localhost:8000/kortix/health
 Represents the actual app stack inside `justavps-workload`.
 
 ### Concrete things this includes
-- `kortix-master` on port 8000
-- OpenCode on port 4096 behind Kortix master
+- `bapx-master` on port 8000
+- OpenCode on port 4096 behind Bapx master
 - desktop/session process
 - agent-browser / viewer
 - static web
 - any other managed core services exposed by ServiceManager
 
 ### Health signals
-- `/kortix/health`
+- `/bapx/health`
 - `/global/health`
 - `/session/status`
 - `/global/event`
-- `/kortix/services`
+- `/bapx/services`
 
 ### Actions
 - `restart_core_runtime`
@@ -146,7 +146,7 @@ Represents the actual app stack inside `justavps-workload`.
 This layer should use **in-container service management**, not host reboot.
 
 Preferred path:
-- expose/consume ServiceManager/Kortix core routes
+- expose/consume ServiceManager/Bapx core routes
 - restart only the failing service(s)
 
 ---
@@ -206,7 +206,7 @@ Recommended route:
     },
     "runtime": {
       "status": "degraded",
-      "kortix_health": "ok",
+      "bapx_health": "ok",
       "opencode_ready": false,
       "session_status_ok": false,
       "event_stream_ok": false,
@@ -269,7 +269,7 @@ The instance management panel should show the 3 layers directly.
   - Stop workload
 
 ### Card 3 — Core runtime
-- Kortix master status
+- Bapx master status
 - OpenCode status
 - event/session status
 - key services summary from ServiceManager
@@ -369,12 +369,12 @@ systemctl restart justavps-docker.service
 or start/stop equivalents
 
 #### Runtime actions
-- call into Kortix core routes / ServiceManager inside container
+- call into Bapx core routes / ServiceManager inside container
 
 Potentially:
 
-- `/kortix/core/restart`
-- `/kortix/services/:id/restart`
+- `/bapx/core/restart`
+- `/bapx/services/:id/restart`
 
 If these routes don’t exist yet, add them.
 
@@ -467,10 +467,10 @@ docker ps -a
 ## Layer 3 — Runtime
 
 ```bash
-curl -fsS http://localhost:8000/kortix/health
+curl -fsS http://localhost:8000/bapx/health
 curl -fsS http://localhost:8000/global/health
 curl -fsS http://localhost:8000/session/status
-curl -fsS http://localhost:8000/kortix/services
+curl -fsS http://localhost:8000/bapx/services
 docker logs -f justavps-workload
 ```
 

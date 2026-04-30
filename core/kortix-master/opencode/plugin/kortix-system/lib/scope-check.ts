@@ -22,7 +22,7 @@ async function getScopesForSession(sessionId: string): Promise<Set<string> | nul
   let scopes: Set<string> | null = null
   try {
     const res = await fetch(
-      `${KORTIX_MASTER_URL}/kortix/internal/session-scopes/${encodeURIComponent(sessionId)}`,
+      `${KORTIX_MASTER_URL}/bapx/internal/session-scopes/${encodeURIComponent(sessionId)}`,
       { signal: AbortSignal.timeout(1500) },
     )
     if (res.ok) {

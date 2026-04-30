@@ -15,10 +15,10 @@ OpenAlex is a REST API. You query it by constructing URLs and fetching them with
 
 ```bash
 # Search for papers about "transformer architecture"
-curl -s "https://api.openalex.org/works?search=transformer+architecture&per_page=5&mailto=agent@kortix.ai" | python3 -m json.tool
+curl -s "https://api.openalex.org/works?search=transformer+architecture&per_page=5&mailto=agent@bapx.ai" | python3 -m json.tool
 ```
 
-**Important:** Always include `mailto=agent@kortix.ai` (or any valid email) in every request. Without it, you're limited to 1 request/second. With it, you get 10 requests/second (the "polite pool").
+**Important:** Always include `mailto=agent@bapx.ai` (or any valid email) in every request. Without it, you're limited to 1 request/second. With it, you get 10 requests/second (the "polite pool").
 
 ## Core Concepts
 
@@ -101,10 +101,10 @@ Searches across titles, abstracts, and fulltext. Uses stemming and stop-word rem
 
 ```bash
 # Simple search
-curl -s "https://api.openalex.org/works?search=large+language+models&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=large+language+models&mailto=agent@bapx.ai"
 
 # With per_page limit
-curl -s "https://api.openalex.org/works?search=CRISPR+gene+editing&per_page=10&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=CRISPR+gene+editing&per_page=10&mailto=agent@bapx.ai"
 ```
 
 ### Boolean Search
@@ -113,26 +113,26 @@ Use uppercase `AND`, `OR`, `NOT` with parentheses and quoted phrases:
 
 ```bash
 # Complex boolean query
-curl -s "https://api.openalex.org/works?search=(reinforcement+learning+AND+%22robot+control%22)+NOT+simulation&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=(reinforcement+learning+AND+%22robot+control%22)+NOT+simulation&mailto=agent@bapx.ai"
 
 # Exact phrase match (use double quotes, URL-encoded as %22)
-curl -s "https://api.openalex.org/works?search=%22attention+is+all+you+need%22&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=%22attention+is+all+you+need%22&mailto=agent@bapx.ai"
 ```
 
 ### Search Specific Fields
 
 ```bash
 # Title only
-curl -s "https://api.openalex.org/works?filter=title.search:transformer&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=title.search:transformer&mailto=agent@bapx.ai"
 
 # Abstract only
-curl -s "https://api.openalex.org/works?filter=abstract.search:protein+folding&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=abstract.search:protein+folding&mailto=agent@bapx.ai"
 
 # Title and abstract combined
-curl -s "https://api.openalex.org/works?filter=title_and_abstract.search:neural+scaling+laws&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=title_and_abstract.search:neural+scaling+laws&mailto=agent@bapx.ai"
 
 # Fulltext search (subset of works)
-curl -s "https://api.openalex.org/works?filter=fulltext.search:climate+tipping+points&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=fulltext.search:climate+tipping+points&mailto=agent@bapx.ai"
 ```
 
 ## Filtering
@@ -200,7 +200,7 @@ Filters are the most powerful feature. Combine them with commas (AND) or pipes (
 ?filter=type:!preprint
 
 # Combined example: highly-cited OA articles from 2023-2024, not preprints
-curl -s "https://api.openalex.org/works?filter=publication_year:2023-2024,cited_by_count:>50,is_oa:true,type:!preprint&search=machine+learning&per_page=10&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=publication_year:2023-2024,cited_by_count:>50,is_oa:true,type:!preprint&search=machine+learning&per_page=10&mailto=agent@bapx.ai"
 ```
 
 ## Sorting
@@ -253,21 +253,21 @@ Reduce response size by selecting only the fields you need:
 
 ```bash
 # Get works cited BY a specific paper
-curl -s "https://api.openalex.org/works?filter=cited_by:W2741809807&per_page=25&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=cited_by:W2741809807&per_page=25&mailto=agent@bapx.ai"
 ```
 
 ### Find what cites a paper (incoming citations)
 
 ```bash
 # Get works that CITE a specific paper
-curl -s "https://api.openalex.org/works?filter=cites:W2741809807&sort=cited_by_count:desc&per_page=25&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=cites:W2741809807&sort=cited_by_count:desc&per_page=25&mailto=agent@bapx.ai"
 ```
 
 ### Find related works
 
 ```bash
 # Get related works (algorithmic, based on shared concepts)
-curl -s "https://api.openalex.org/works?filter=related_to:W2741809807&per_page=25&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=related_to:W2741809807&per_page=25&mailto=agent@bapx.ai"
 ```
 
 ### Citation chain: follow the references
@@ -283,36 +283,36 @@ This is how you build a literature graph around a topic.
 
 ```bash
 # Search for an author
-curl -s "https://api.openalex.org/authors?search=Yann+LeCun&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/authors?search=Yann+LeCun&mailto=agent@bapx.ai"
 
 # Get an author's works (by OpenAlex author ID)
-curl -s "https://api.openalex.org/works?filter=author.id:A5064850633&sort=cited_by_count:desc&per_page=10&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=author.id:A5064850633&sort=cited_by_count:desc&per_page=10&mailto=agent@bapx.ai"
 
 # Get an author by ORCID
-curl -s "https://api.openalex.org/authors/orcid:0000-0001-6187-6610?mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/authors/orcid:0000-0001-6187-6610?mailto=agent@bapx.ai"
 ```
 
 ## Lookup by External ID
 
 ```bash
 # By DOI
-curl -s "https://api.openalex.org/works/doi:10.1038/s41586-021-03819-2?mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works/doi:10.1038/s41586-021-03819-2?mailto=agent@bapx.ai"
 
 # By PubMed ID
-curl -s "https://api.openalex.org/works/pmid:14907713?mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works/pmid:14907713?mailto=agent@bapx.ai"
 
 # By arXiv ID (via DOI)
-curl -s "https://api.openalex.org/works/doi:10.48550/arXiv.2303.08774?mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works/doi:10.48550/arXiv.2303.08774?mailto=agent@bapx.ai"
 
 # Batch lookup: up to 50 IDs at once
-curl -s "https://api.openalex.org/works?filter=doi:https://doi.org/10.1234/a|https://doi.org/10.1234/b|https://doi.org/10.1234/c&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=doi:https://doi.org/10.1234/a|https://doi.org/10.1234/b|https://doi.org/10.1234/c&mailto=agent@bapx.ai"
 ```
 
 ## Open Access & PDF Access
 
 ```bash
 # Find OA papers with direct PDF links
-curl -s "https://api.openalex.org/works?search=quantum+computing&filter=is_oa:true,has_content.pdf:true&select=id,display_name,open_access,best_oa_location&per_page=5&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=quantum+computing&filter=is_oa:true,has_content.pdf:true&select=id,display_name,open_access,best_oa_location&per_page=5&mailto=agent@bapx.ai"
 ```
 
 The `best_oa_location.pdf_url` field gives a direct PDF link when available. The `open_access.oa_url` gives the best available OA landing page or PDF.
@@ -323,47 +323,47 @@ The `best_oa_location.pdf_url` field gives a direct PDF link when available. The
 
 ```bash
 # 1. Find the most-cited papers on a topic
-curl -s "https://api.openalex.org/works?search=retrieval+augmented+generation&sort=cited_by_count:desc&filter=publication_year:>2020,type:article,has_abstract:true&per_page=20&select=id,display_name,publication_year,cited_by_count,doi,authorships,abstract_inverted_index&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=retrieval+augmented+generation&sort=cited_by_count:desc&filter=publication_year:>2020,type:article,has_abstract:true&per_page=20&select=id,display_name,publication_year,cited_by_count,doi,authorships,abstract_inverted_index&mailto=agent@bapx.ai"
 
 # 2. For the top papers, explore their citation graphs
-curl -s "https://api.openalex.org/works?filter=cites:W4285719527&sort=cited_by_count:desc&per_page=10&select=id,display_name,publication_year,cited_by_count,doi&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=cites:W4285719527&sort=cited_by_count:desc&per_page=10&select=id,display_name,publication_year,cited_by_count,doi&mailto=agent@bapx.ai"
 
 # 3. Find recent papers building on this work
-curl -s "https://api.openalex.org/works?filter=cites:W4285719527,publication_year:>2023&sort=publication_date:desc&per_page=10&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=cites:W4285719527,publication_year:>2023&sort=publication_date:desc&per_page=10&mailto=agent@bapx.ai"
 ```
 
 ### Find Landmark/Seminal Papers
 
 ```bash
 # Highly cited + search term
-curl -s "https://api.openalex.org/works?search=attention+mechanism+neural+networks&filter=cited_by_count:>500,type:article&sort=cited_by_count:desc&per_page=10&select=id,display_name,publication_year,cited_by_count,doi&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=attention+mechanism+neural+networks&filter=cited_by_count:>500,type:article&sort=cited_by_count:desc&per_page=10&select=id,display_name,publication_year,cited_by_count,doi&mailto=agent@bapx.ai"
 ```
 
 ### Find Recent Preprints
 
 ```bash
 # Latest preprints on a topic
-curl -s "https://api.openalex.org/works?search=multimodal+large+language+models&filter=type:preprint,publication_year:2025&sort=publication_date:desc&per_page=15&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=multimodal+large+language+models&filter=type:preprint,publication_year:2025&sort=publication_date:desc&per_page=15&mailto=agent@bapx.ai"
 ```
 
 ### Find Review Articles
 
 ```bash
 # Review/survey papers on a topic
-curl -s "https://api.openalex.org/works?search=federated+learning&filter=type:review,cited_by_count:>20&sort=cited_by_count:desc&per_page=10&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?search=federated+learning&filter=type:review,cited_by_count:>20&sort=cited_by_count:desc&per_page=10&mailto=agent@bapx.ai"
 ```
 
 ### Author Analysis
 
 ```bash
 # 1. Find the author
-curl -s "https://api.openalex.org/authors?search=Geoffrey+Hinton&select=id,display_name,works_count,cited_by_count,last_known_institutions&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/authors?search=Geoffrey+Hinton&select=id,display_name,works_count,cited_by_count,last_known_institutions&mailto=agent@bapx.ai"
 
 # 2. Get their most influential papers
-curl -s "https://api.openalex.org/works?filter=author.id:A5068082743&sort=cited_by_count:desc&per_page=10&select=id,display_name,publication_year,cited_by_count,doi&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=author.id:A5068082743&sort=cited_by_count:desc&per_page=10&select=id,display_name,publication_year,cited_by_count,doi&mailto=agent@bapx.ai"
 
 # 3. Get their recent work
-curl -s "https://api.openalex.org/works?filter=author.id:A5068082743,publication_year:>2023&sort=publication_date:desc&per_page=10&mailto=agent@kortix.ai"
+curl -s "https://api.openalex.org/works?filter=author.id:A5068082743,publication_year:>2023&sort=publication_date:desc&per_page=10&mailto=agent@bapx.ai"
 ```
 
 ## Saving Results to Disk
@@ -372,10 +372,10 @@ When doing deep research, save paper data to disk for later processing:
 
 ```bash
 # Save search results as JSON
-curl -s "https://api.openalex.org/works?search=topic&per_page=50&mailto=agent@kortix.ai" > research/papers/topic-search.json
+curl -s "https://api.openalex.org/works?search=topic&per_page=50&mailto=agent@bapx.ai" > research/papers/topic-search.json
 
 # Extract and save a clean summary
-curl -s "https://api.openalex.org/works?search=topic&per_page=50&select=id,display_name,publication_year,cited_by_count,doi,authorships&mailto=agent@kortix.ai" | python3 -c "
+curl -s "https://api.openalex.org/works?search=topic&per_page=50&select=id,display_name,publication_year,cited_by_count,doi,authorships&mailto=agent@bapx.ai" | python3 -c "
 import json, sys
 data = json.load(sys.stdin)
 for w in data.get('results', []):
@@ -391,7 +391,7 @@ For deep research, save individual paper metadata to your `sources-index.md` and
 
 ```bash
 # Save a paper's full metadata
-curl -s "https://api.openalex.org/works/W2741809807?mailto=agent@kortix.ai" > research/sources/001-paper-title.json
+curl -s "https://api.openalex.org/works/W2741809807?mailto=agent@bapx.ai" > research/sources/001-paper-title.json
 ```
 
 ## Rate Limits
@@ -402,7 +402,7 @@ curl -s "https://api.openalex.org/works/W2741809807?mailto=agent@kortix.ai" > re
 | Polite | 10 req/sec | Add `mailto=your@email.com` to requests |
 | Premium | Higher | Paid API key via `api_key` param |
 
-**Always use the polite pool.** Add `&mailto=agent@kortix.ai` to every request.
+**Always use the polite pool.** Add `&mailto=agent@bapx.ai` to every request.
 
 ## Tips
 

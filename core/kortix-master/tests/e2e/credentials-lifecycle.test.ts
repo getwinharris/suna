@@ -44,8 +44,8 @@ interface Fixture {
 }
 
 function makeFixture(): Fixture {
-  const dir = mkdtempSync(path.join(tmpdir(), 'kortix-cred-e2e-'))
-  const dbPath = path.join(dir, 'kortix.db')
+  const dir = mkdtempSync(path.join(tmpdir(), 'bapx-cred-e2e-'))
+  const dbPath = path.join(dir, 'bapx.db')
   const keyPath = path.join(dir, '.credentials-key')
   process.env.CREDENTIAL_KEY_PATH = keyPath
   _resetCredentialKeyCache()
@@ -315,7 +315,7 @@ describe('credential-service — validation', () => {
 })
 
 describe('credential-service — raw-file confidentiality', () => {
-  test('plaintext value bytes never appear in the raw kortix.db file', async () => {
+  test('plaintext value bytes never appear in the raw bapx.db file', async () => {
     const fx = setup()
     const secret = 'ThisIsAVerySpecificStringThatMustNotLeak_42'
     await upsertCredential(fx.db, { project_id: fx.projectA, name: 'LEAK_TEST', value: secret })

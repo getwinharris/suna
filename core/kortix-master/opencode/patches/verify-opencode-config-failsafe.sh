@@ -19,7 +19,7 @@ ARCHIVE="$TMP_DIR/opencode.tar.gz"
 echo "[opencode-failsafe] Downloading OpenCode source v${VERSION} for verification..."
 curl -fsSL --retry 3 --retry-delay 1 \
   -H "Accept: application/vnd.github+json" \
-  -H "User-Agent: kortix-opencode-verify" \
+  -H "User-Agent: bapx-opencode-verify" \
   "$TARBALL_URL" \
   -o "$ARCHIVE"
 

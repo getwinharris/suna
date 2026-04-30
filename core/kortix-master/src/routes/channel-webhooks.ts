@@ -4,7 +4,7 @@
  * into normalized events, and dispatches to OpenCode sessions.
  *
  * Mounted BEFORE the generic /hooks/* proxy to port 8099 so channel
- * webhooks are handled directly by kortix-master.
+ * webhooks are handled directly by bapx-master.
  */
 import { Hono } from 'hono'
 import { getChannelByPath, updateChannel, type ChannelConfig } from '../../channels/channel-db'
@@ -70,7 +70,7 @@ async function fetchSessions(limit: number = 10): Promise<OpenCodeSession[]> {
 
 async function fetchAvailableModels(): Promise<string[]> {
   try {
-    const res = await fetch('http://localhost:8000/kortix/preferences/models', {
+    const res = await fetch('http://localhost:8000/bapx/preferences/models', {
       signal: AbortSignal.timeout(10_000),
     })
     if (!res.ok) return []
@@ -116,7 +116,7 @@ async function handleChannelCommand(
         text: [
           `${channel.name} (${channel.platform})`,
           `Bot: @${channel.bot_username || '?'}`,
-          `Agent: ${channel.default_agent || 'kortix'}`,
+          `Agent: ${channel.default_agent || 'bapx'}`,
           `Model: ${channel.default_model || '(default)'}`,
           `Session: ${state.currentId || 'none'}`,
           `Enabled: ${channel.enabled ? 'yes' : 'no'}`,
@@ -127,7 +127,7 @@ async function handleChannelCommand(
 
     case 'agent': {
       if (!arg) {
-        return { handled: true, text: `Current agent: ${channel.default_agent || 'kortix'}\nUsage: ${p}agent <name>` }
+        return { handled: true, text: `Current agent: ${channel.default_agent || 'bapx'}\nUsage: ${p}agent <name>` }
       }
       const updated = updateChannel(channel.id, { default_agent: arg })
       clearSession(event.session_key)
@@ -261,7 +261,7 @@ async function resolveChannelDirectory(channel: ChannelConfig): Promise<string |
   try {
     const { Database } = await import('bun:sqlite')
     const path = await import('path')
-    const dbPath = path.join(process.env.KORTIX_WORKSPACE || '/workspace', '.kortix', 'kortix.db')
+    const dbPath = path.join(process.env.KORTIX_WORKSPACE || '/workspace', '.bapx', 'bapx.db')
     const db = new Database(dbPath, { readonly: true })
     try {
       const row = db.prepare('SELECT path FROM projects WHERE id = ?').get(channel.project_id) as { path?: string } | undefined
@@ -286,7 +286,7 @@ async function dispatchToOpenCode(
         const parts = channel.default_model.split('/')
         return parts.length >= 2
           ? { providerID: parts[0], modelID: parts.slice(1).join('/') }
-          : { providerID: 'kortix', modelID: channel.default_model }
+          : { providerID: 'bapx', modelID: channel.default_model }
       })()
     : undefined
 
@@ -326,7 +326,7 @@ async function dispatchToOpenCode(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      agent: channel.default_agent || 'kortix',
+      agent: channel.default_agent || 'bapx',
       ...(channel.instructions ? { systemPrompt: channel.instructions } : {}),
     }),
     signal: AbortSignal.timeout(15_000),
@@ -342,7 +342,7 @@ async function dispatchToOpenCode(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       parts: [{ type: 'text', text: event.prompt }],
-      agent: channel.default_agent || 'kortix',
+      agent: channel.default_agent || 'bapx',
       ...(modelOverride ? { model: modelOverride } : {}),
     }),
     signal: AbortSignal.timeout(30_000),

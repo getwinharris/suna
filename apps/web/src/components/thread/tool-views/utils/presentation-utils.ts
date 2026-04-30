@@ -1,5 +1,5 @@
 import { backendApi } from "@/lib/api-client";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/trailbase/client";
 import { getEnv } from "@/lib/env-config";
 import { toast } from "@/lib/toast";
 

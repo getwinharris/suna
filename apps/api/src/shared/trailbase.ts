@@ -1,0 +1,59 @@
+import { initClient, type Client } from 'trailbase';
+import { config } from '../config';
+
+let client: Client | null = null;
+
+/**
+ * Get singleton TrailBase client.
+ */
+export function getTrailbase(): Client {
+  if (!client) {
+    if (!config.TRAILBASE_URL) {
+      throw new Error('Missing TRAILBASE_URL');
+    }
+
+    client = initClient(config.TRAILBASE_URL);
+  }
+
+  return client;
+}
+
+/**
+ * Check if TrailBase is configured.
+ */
+export function isTrailbaseConfigured(): boolean {
+  return !!config.TRAILBASE_URL;
+}
+
+/**
+ * Helper to convert TrailBase record to a plain object.
+ * TrailBase records often return blobs as Uint8Array, we convert to hex strings for UUIDs.
+ */
+export function fromTrailRecord<T>(record: any): T {
+  if (!record) return record;
+  const result: any = { ...record };
+  
+  // Convert Uint8Array (blobs) to hex strings if they look like UUIDs
+  for (const [key, value] of Object.entries(result)) {
+    if (value instanceof Uint8Array && value.length === 16) {
+      result[key] = Array.from(value)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+  }
+  
+  return result as T;
+}
+
+/**
+ * Helper to convert UUID hex string to Uint8Array for TrailBase blobs.
+ */
+export function toTrailBlob(uuid: string): Uint8Array {
+  if (!uuid) return new Uint8Array(0);
+  const clean = uuid.replace(/-/g, '');
+  const bytes = new Uint8Array(clean.length / 2);
+  for (let i = 0; i < clean.length; i += 2) {
+    bytes[i / 2] = parseInt(clean.substring(i, i + 2), 16);
+  }
+  return bytes;
+}

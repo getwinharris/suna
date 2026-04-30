@@ -1,9 +1,9 @@
 /**
- * Public URL sharing — /kortix/share/:port
+ * Public URL sharing — /bapx/share/:port
  *
  * Creates a short-lived, publicly-accessible URL for a port inside the sandbox.
  * Each share gets a unique token with a configurable TTL. The URL routes through
- * /s/{token}/* on kortix-master, which validates the token before proxying.
+ * /s/{token}/* on bapx-master, which validates the token before proxying.
  *
  * Defaults:
  *   TTL: 1 hour  |  Min: 5 minutes  |  Max: 7 days
@@ -13,8 +13,8 @@
  *   ?label=demo — optional human-readable label
  *
  * Also supports:
- *   GET  /kortix/share            — list all active shares
- *   DELETE /kortix/share/:token   — revoke a specific share
+ *   GET  /bapx/share            — list all active shares
+ *   DELETE /bapx/share/:token   — revoke a specific share
  *
  * Auth: inherits from global middleware (localhost bypass for agent, service key for external).
  */
@@ -55,14 +55,14 @@ const ShareErrorResponse = z.object({
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
- * Build the public base URL that reaches port 8000 (kortix-master) from outside.
+ * Build the public base URL that reaches port 8000 (bapx-master) from outside.
  * This is where /s/{token}/* lives.
  */
 export function getMasterPublicBaseUrl(): string {
   const envMode = process.env.ENV_MODE || 'local'
   const slug = process.env.JUSTAVPS_SLUG || ''
   const proxyToken = process.env.JUSTAVPS_PROXY_TOKEN || ''
-  const proxyDomain = process.env.JUSTAVPS_PROXY_DOMAIN || 'kortix.cloud'
+  const proxyDomain = process.env.JUSTAVPS_PROXY_DOMAIN || 'bapx.cloud'
   const explicitPublicBase = getEnv('PUBLIC_BASE_URL') || process.env.PUBLIC_BASE_URL || ''
 
   // Explicit public base wins. This is the authoritative external URL injected
@@ -78,11 +78,11 @@ export function getMasterPublicBaseUrl(): string {
     return `https://8000--${slug}.${proxyDomain}?__proxy_token=${proxyToken}`
   }
 
-  // Cloud without JustAVPS: via kortix-api proxy
+  // Cloud without JustAVPS: via bapx-api proxy
   const sandboxId = process.env.SANDBOX_ID || ''
-  const kortixApiUrl = (process.env.KORTIX_API_URL || '').replace(/\/v1\/router\/?$/, '')
-  if (envMode === 'cloud' && sandboxId && kortixApiUrl) {
-    return `${kortixApiUrl}/v1/p/${sandboxId}/8000`
+  const bapxApiUrl = (process.env.KORTIX_API_URL || '').replace(/\/v1\/router\/?$/, '')
+  if (envMode === 'cloud' && sandboxId && bapxApiUrl) {
+    return `${bapxApiUrl}/v1/p/${sandboxId}/8000`
   }
 
   // Local: host port mapping for port 8000, or direct
@@ -119,7 +119,7 @@ function buildShareUrl(token: string): string {
 
 const shareRouter = new Hono()
 
-// GET /kortix/share/:port — create a new share
+// GET /bapx/share/:port — create a new share
 shareRouter.get('/:port{[0-9]+}',
   describeRoute({
     tags: ['System'],
@@ -191,7 +191,7 @@ shareRouter.get('/:port{[0-9]+}',
   },
 )
 
-// GET /kortix/share — list all active shares
+// GET /bapx/share — list all active shares
 shareRouter.get('/',
   describeRoute({
     tags: ['System'],
@@ -218,7 +218,7 @@ shareRouter.get('/',
   },
 )
 
-// DELETE /kortix/share/:token — revoke a share
+// DELETE /bapx/share/:token — revoke a share
 shareRouter.delete('/:token',
   describeRoute({
     tags: ['System'],

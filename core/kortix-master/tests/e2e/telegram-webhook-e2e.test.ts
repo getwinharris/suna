@@ -108,7 +108,7 @@ describe('Telegram Webhook E2E', () => {
 
     // Register the route
     webhookServer.setRoutes([{
-      agentName: 'kortix',
+      agentName: 'bapx',
       trigger: {
         name: `telegram-${CONFIG_ID}`,
         source: { type: 'webhook', path: WEBHOOK_PATH, secret: SECRET_TOKEN },
@@ -128,7 +128,7 @@ describe('Telegram Webhook E2E', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Kortix-Trigger-Secret': SECRET_TOKEN,
+        'X-Bapx-Trigger-Secret': SECRET_TOKEN,
       },
       body: JSON.stringify(update),
     })
@@ -150,12 +150,12 @@ describe('Telegram Webhook E2E', () => {
 
     await fetch(`${baseUrl}${WEBHOOK_PATH}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Kortix-Trigger-Secret': SECRET_TOKEN },
+      headers: { 'Content-Type': 'application/json', 'X-Bapx-Trigger-Secret': SECRET_TOKEN },
       body: JSON.stringify(msg1),
     })
     await fetch(`${baseUrl}${WEBHOOK_PATH}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Kortix-Trigger-Secret': SECRET_TOKEN },
+      headers: { 'Content-Type': 'application/json', 'X-Bapx-Trigger-Secret': SECRET_TOKEN },
       body: JSON.stringify(msg2),
     })
 
@@ -184,12 +184,12 @@ describe('Telegram Webhook E2E', () => {
 
     await fetch(`${baseUrl}${WEBHOOK_PATH}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Kortix-Trigger-Secret': SECRET_TOKEN },
+      headers: { 'Content-Type': 'application/json', 'X-Bapx-Trigger-Secret': SECRET_TOKEN },
       body: JSON.stringify(msg1),
     })
     await fetch(`${baseUrl}${WEBHOOK_PATH}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Kortix-Trigger-Secret': SECRET_TOKEN },
+      headers: { 'Content-Type': 'application/json', 'X-Bapx-Trigger-Secret': SECRET_TOKEN },
       body: JSON.stringify(msg2),
     })
 
@@ -208,7 +208,7 @@ describe('Telegram Webhook E2E', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Kortix-Trigger-Secret': 'wrong-secret',
+        'X-Bapx-Trigger-Secret': 'wrong-secret',
       },
       body: JSON.stringify(update),
     })
@@ -228,7 +228,7 @@ describe('Telegram Webhook E2E', () => {
     const update = fixture('telegram-update-message.json')
     await fetch(`${baseUrl}${WEBHOOK_PATH}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Kortix-Trigger-Secret': SECRET_TOKEN },
+      headers: { 'Content-Type': 'application/json', 'X-Bapx-Trigger-Secret': SECRET_TOKEN },
       body: JSON.stringify(update),
     })
 

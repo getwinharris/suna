@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { useParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/trailbase/client';
 import { AppProviders } from '@/components/layout/app-providers';
 import { MobileAppBanner } from './MobileAppBanner';
 

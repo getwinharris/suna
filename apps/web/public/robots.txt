@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://kortix.com/sitemap.xml
+Sitemap: https://bapx.in/sitemap.xml
 
 # Disallow sensitive routes
 Disallow: /api/
@@ -11,5 +11,5 @@ Disallow: /_next/
 Disallow: /admin/
 
 # Allow crawling of public pages
-Allow: /suna/
+Allow: /bapX/
 

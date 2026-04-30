@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Kortix Sandbox — Docker Compose (single instance, fixed ports)
+# Bapx Sandbox — Docker Compose (single instance, fixed ports)
 # ─────────────────────────────────────────────────────────────────────────────
 #
 # PERSISTENCE MODEL
@@ -17,7 +17,7 @@
 #                    do not casually touch critical runtime data.
 #
 #   /ephemeral/  →  SHIPPED RUNTIME (image layer, REPLACED on every update)
-#                    Kortix server, OpenCode config, services, metadata.
+#                    Bapx server, OpenCode config, services, metadata.
 #                    Rebuilt from scratch on every `docker pull` + recreate.
 #                    NEVER store user data here. NEVER modify at runtime.
 #
@@ -29,7 +29,7 @@
 #   ✅ secrets, encryption   — preserved (/persistent/secrets/)
 #   ✅ OpenCode state/DB     — preserved (/persistent/opencode/)
 #   ✅ OpenCode shadow copy  — preserved (/persistent/opencode-shadow/)
-#   ✅ user-installed pkgs   — preserved (/workspace/.local/, .npm-global/, .kortix/packages/)
+#   ✅ user-installed pkgs   — preserved (/workspace/.local/, .npm-global/, .bapx/packages/)
 #   ✅ git repos, projects   — preserved (/workspace/)
 #   ❌ /opt/*                — replaced (new image)
 #   ❌ /run/s6/              — rebuilt from /persistent/secrets/ on boot
@@ -45,8 +45,8 @@ services:
       dockerfile: core/docker/Dockerfile
       args:
         SANDBOX_VERSION: ${SANDBOX_VERSION:-dev}
-    image: kortix/computer:${SANDBOX_VERSION:-dev}
-    container_name: kortix-sandbox
+    image: bapx/computer:${SANDBOX_VERSION:-dev}
+    container_name: bapx-sandbox
     privileged: true
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -55,8 +55,8 @@ services:
       - PGID=911
       - TZ=Etc/UTC
       - SUBFOLDER=/
-      - TITLE=Kortix Sandbox ${SANDBOX_NAME:-default}
-      - OPENCODE_CONFIG_DIR=/ephemeral/kortix-master/opencode
+      - TITLE=Bapx Sandbox ${SANDBOX_NAME:-default}
+      - OPENCODE_CONFIG_DIR=/ephemeral/bapx-master/opencode
       - OPENCODE_PERMISSION={"*":"allow"}
       - DISPLAY=:1
       - KORTIX_PERSISTENT_ROOT=/persistent
@@ -75,7 +75,7 @@ services:
       - SECRET_FILE_PATH=/persistent/secrets/.secrets.json
       - SALT_FILE_PATH=/persistent/secrets/.salt
       - ENCRYPTION_KEY_PATH=/persistent/secrets/.encryption-key
-      # ── Sandbox identity (injected by kortix-api or set manually) ─────
+      # ── Sandbox identity (injected by bapx-api or set manually) ─────
       - KORTIX_API_URL=${KORTIX_API_URL:-http://host.docker.internal:8008}
       - KORTIX_TOKEN=${KORTIX_TOKEN:-}
       - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-}
@@ -108,7 +108,7 @@ services:
       # nuked independently via `docker volume rm sandbox_docker`.
       - sandbox_docker:/var/lib/docker
     ports:
-      - "127.0.0.1:14000:8000"  # Kortix Master (proxy entry point)
+      - "127.0.0.1:14000:8000"  # Bapx Master (proxy entry point)
       - "127.0.0.1:14002:6080"  # Desktop (noVNC)
       - "127.0.0.1:14003:6081"  # Desktop (HTTPS)
       - "127.0.0.1:14004:3210"  # Presentation Viewer
@@ -119,7 +119,7 @@ services:
     shm_size: "2gb"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/kortix/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/bapx/health"]
       interval: 10s
       timeout: 5s
       retries: 3

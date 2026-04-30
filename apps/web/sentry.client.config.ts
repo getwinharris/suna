@@ -1,5 +1,5 @@
 /**
- * Sentry client-side configuration for Kortix Frontend.
+ * Sentry client-side configuration for Bapx Frontend.
  *
  * Uses @sentry/nextjs SDK pointed at Better Stack's Sentry-compatible endpoint.
  * Errors are tunneled through /monitoring route (auto-configured by

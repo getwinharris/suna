@@ -1,8 +1,8 @@
 import { type Plugin, tool } from "@opencode-ai/plugin"
 import type { Session, Todo } from "@opencode-ai/sdk"
 import { Database } from "bun:sqlite"
-import { ensureGlobalMemoryFiles, renderMergedMemoryContext, renderProjectContext, resolveKortixDir } from "./lib/paths"
-import { MEMORY_CONTEXT_MARKER, upsertMemoryContextAtPromptEnd, wrapInKortixSystemTags } from "./lib/message-transform"
+import { ensureGlobalMemoryFiles, renderMergedMemoryContext, renderProjectContext, resolveBapxDir } from "./lib/paths"
+import { MEMORY_CONTEXT_MARKER, upsertMemoryContextAtPromptEnd, wrapInBapxSystemTags } from "./lib/message-transform"
 import { DB_PATH, STORAGE_BASE, buildSessionLineage, changeSummary, formatMessages, getEnv, searchSessions, shortTs, ttcCompress } from "./lib/session"
 
 const _projectPathCache = new Map<string, string | null>()
@@ -10,7 +10,7 @@ const _projectPathCache = new Map<string, string | null>()
 function projectPathForSession(sessionID: string): string | null {
 	if (_projectPathCache.has(sessionID)) return _projectPathCache.get(sessionID)!
 	try {
-		const db = new Database(`${resolveKortixDir(import.meta.dir)}/kortix.db`, { readonly: true })
+		const db = new Database(`${resolveBapxDir(import.meta.dir)}/bapx.db`, { readonly: true })
 		try {
 			const row = db
 				.query("SELECT p.path FROM session_projects sp JOIN projects p ON sp.project_id = p.id WHERE sp.session_id = ? LIMIT 1")
@@ -26,13 +26,13 @@ function projectPathForSession(sessionID: string): string | null {
 	}
 }
 
-export const KortixSessionsPlugin: Plugin = async ({ client, directory }) => {
+export const BapxSessionsPlugin: Plugin = async ({ client, directory }) => {
 	let currentSessionId: string | null = null
 
 	try {
 		ensureGlobalMemoryFiles(import.meta.dir)
 	} catch (err) {
-		console.error(`[kortix-sessions] memory file init failed (non-fatal): ${err}`)
+		console.error(`[bapx-sessions] memory file init failed (non-fatal): ${err}`)
 	}
 
 	return {
@@ -43,22 +43,22 @@ export const KortixSessionsPlugin: Plugin = async ({ client, directory }) => {
 						currentSessionId = (event as any).properties?.sessionID ?? currentSessionId
 					}
 				} catch (err) {
-					console.error(`[kortix-sessions] event hook failed: ${err}`)
+					console.error(`[bapx-sessions] event hook failed: ${err}`)
 				}
 			},
 			"experimental.chat.messages.transform": async (_input: any, output: { messages: any[] }) => {
 				try {
 					const parts: string[] = []
 					if (currentSessionId) {
-						// Wrap session context in kortix_system tags so frontend strips it from UI
+						// Wrap session context in bapx_system tags so frontend strips it from UI
 						const sessionCtx = `<session_context>\nSession ID: ${currentSessionId}\n</session_context>`
-						parts.push(wrapInKortixSystemTags(sessionCtx, { type: "session-context", source: "kortix-sessions" }))
+						parts.push(wrapInBapxSystemTags(sessionCtx, { type: "session-context", source: "bapx-sessions" }))
 					}
 					const mergedMemory = renderMergedMemoryContext(import.meta.dir)
 					if (mergedMemory) {
-						// Wrap memory context in kortix_system tags so frontend strips it from UI
+						// Wrap memory context in bapx_system tags so frontend strips it from UI
 						const memCtx = `<memory>\n${mergedMemory}\n</memory>`
-						parts.push(wrapInKortixSystemTags(memCtx, { type: "memory-context", source: "kortix-sessions" }))
+						parts.push(wrapInBapxSystemTags(memCtx, { type: "memory-context", source: "bapx-sessions" }))
 					}
 					if (currentSessionId) {
 						const projectPath = projectPathForSession(currentSessionId)
@@ -66,7 +66,7 @@ export const KortixSessionsPlugin: Plugin = async ({ client, directory }) => {
 							const projectCtx = renderProjectContext(projectPath)
 							if (projectCtx) {
 								const ctx = `<project_context>\nPath: ${projectPath}\n\n${projectCtx}\n</project_context>`
-								parts.push(wrapInKortixSystemTags(ctx, { type: "project-context", source: "kortix-sessions" }))
+								parts.push(wrapInBapxSystemTags(ctx, { type: "project-context", source: "bapx-sessions" }))
 							}
 						}
 					}
@@ -77,7 +77,7 @@ export const KortixSessionsPlugin: Plugin = async ({ client, directory }) => {
 						currentSessionId ?? undefined,
 					)
 				} catch (err) {
-					console.error(`[kortix-sessions] messages.transform failed: ${err}`)
+					console.error(`[bapx-sessions] messages.transform failed: ${err}`)
 				}
 			},
 		},
@@ -279,4 +279,4 @@ export const KortixSessionsPlugin: Plugin = async ({ client, directory }) => {
 	}
 }
 
-export default KortixSessionsPlugin
+export default BapxSessionsPlugin

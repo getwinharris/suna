@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import { sandboxMembers, type Database } from '@kortix/db';
+import { sandboxMembers, type Database } from '@bapx/db';
 
 export interface SandboxMemberRow {
   sandboxId: string;

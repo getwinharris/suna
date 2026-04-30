@@ -4,12 +4,12 @@ import { useState, useEffect, FormEvent } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { BapxLoader } from '@/components/ui/bapx-loader';
 import { selfHostedSignIn, installOwner } from '@/app/auth/actions';
 import { resetClient } from '@/lib/opencode-sdk';
 import { invalidateTokenCache } from '@/lib/auth-token';
 import { setBootstrapAuthToken } from '@/lib/auth-token';
-import { createClient as createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { createClient as createBrowserTrailbaseClient } from '@/lib/trailbase/client';
 import { getEnv } from '@/lib/env-config';
 import { sanitizeAuthReturnUrl } from '@/lib/auth/return-url';
 
@@ -214,7 +214,7 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
   const [pending, setPending] = useState(false);
 
   if (installed === null) {
-    return <KortixLoader size="medium" />;
+    return <BapxLoader size="medium" />;
   }
 
   const isInstaller = !installed;
@@ -244,17 +244,17 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
       if (!isInstaller) {
         let signedInJwt: string | null = null;
         try {
-          const supabase = createBrowserSupabaseClient();
-          await supabase.auth.signOut({ scope: 'local' });
-          const { data: clientSignInData, error: clientSignInError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
+          const trailbase = createBrowserTrailbaseClient();
+          // Trailbase signOut doesn't need scope
+          await trailbase.auth.signOut();
+          
+          await trailbase.auth.signIn(email, password);
+          const token = trailbase.auth.getToken();
 
-          if (!clientSignInError && clientSignInData.session) {
+          if (token) {
             invalidateTokenCache();
-            setBootstrapAuthToken(clientSignInData.session.access_token);
-            signedInJwt = clientSignInData.session.access_token;
+            setBootstrapAuthToken(token);
+            signedInJwt = token;
           }
         } catch {
           // Best-effort cleanup of stale local auth state.
@@ -281,13 +281,10 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
             signedInJwt = result.accessToken;
           }
 
-          if (result.accessToken && result.refreshToken) {
+          if (result.accessToken) {
             try {
-              const supabase = createBrowserSupabaseClient();
-              await supabase.auth.setSession({
-                access_token: result.accessToken,
-                refresh_token: result.refreshToken,
-              });
+              const trailbase = createBrowserTrailbaseClient();
+              trailbase.auth.setToken(result.accessToken);
             } catch {
               // Fallback to server cookies + full reload below.
             }
@@ -305,7 +302,7 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
         window.location.href = safeReturnUrl;
         return;
       } else {
-        setErrorMessage('This instance still needs its initial owner account. Run the Kortix installer/CLI bootstrap first.');
+        setErrorMessage('This instance still needs its initial owner account. Run the Bapx installer/CLI bootstrap first.');
         setPending(false);
       }
     } catch (err: any) {
@@ -351,7 +348,7 @@ export function SelfHostedForm({ returnUrl, installed }: SelfHostedFormProps) {
     <div className="w-full max-w-sm">
       <div className="flex flex-col items-center mb-6">
         <h1 className="text-[17px] font-medium text-foreground/90 tracking-tight">
-          Sign in to Kortix
+          Sign in to Bapx
         </h1>
         <p className="text-[13px] text-foreground/40 mt-0.5">
           Your AI Computer

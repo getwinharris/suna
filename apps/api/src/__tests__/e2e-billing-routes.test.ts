@@ -41,11 +41,11 @@ let mockDeletionError: Error | null = null;
 
 // ─── Register mocks ──────────────────────────────────────────────────────────
 
-// Auth mock — bypass supabaseAuth, inject test user
+// Auth mock — bypass trailbaseAuth, inject test user
 mock.module('../middleware/auth', () => ({
-  supabaseAuth: async (c: any, next: any) => {
+  trailbaseAuth: async (c: any, next: any) => {
     c.set('userId', TEST_USER_ID);
-    c.set('userEmail', 'test@kortix.dev');
+    c.set('userEmail', 'test@bapx.dev');
     await next();
   },
   apiKeyAuth: async (c: any, next: any) => { await next(); },
@@ -173,7 +173,7 @@ mock.module('../config', () => ({
 
 // Customers repository mock
 mock.module('../billing/repositories/customers', () => ({
-  getCustomerByAccountId: async () => ({ id: 'cus_test_123', accountId: TEST_USER_ID, email: 'test@kortix.dev', provider: 'stripe', active: true }),
+  getCustomerByAccountId: async () => ({ id: 'cus_test_123', accountId: TEST_USER_ID, email: 'test@bapx.dev', provider: 'stripe', active: true }),
   getCustomerByStripeId: async () => null,
   upsertCustomer: async () => {},
 }));

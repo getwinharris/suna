@@ -1,10 +1,10 @@
 /**
- * Test helpers for kortix-api E2E tests.
+ * Test helpers for bapx-api E2E tests.
  *
  * Provides:
  * - createTestApp() — Hono app mimicking the monolith with auth bypassed + injectable mock providers
  * - getTestDb()     — shared Drizzle DB instance for assertions
- * - cleanupTestData() — deletes all test rows from the shared kortix schema
+ * - cleanupTestData() — deletes all test rows from the shared bapx schema
  * - Mock provider factories
  * - Request helpers (jsonPost, jsonGet, jsonPatch, jsonDelete)
  *
@@ -20,11 +20,11 @@ import {
   type Database,
   sandboxes,
   deployments,
-  kortixApiKeys,
+  bapxApiKeys,
   accounts,
   accountMembers,
   integrationCredentials,
-} from '@kortix/db';
+} from '@bapx/db';
 import { sql, inArray } from 'drizzle-orm';
 import { BillingError } from '../errors';
 import type { AuthVariables } from '../types';
@@ -62,9 +62,9 @@ export interface SandboxProvider {
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 export const TEST_USER_ID = '00000000-0000-4000-a000-000000000001';
-export const TEST_USER_EMAIL = 'test@kortix.dev';
+export const TEST_USER_EMAIL = 'test@bapx.dev';
 export const OTHER_USER_ID = '00000000-0000-4000-a000-000000000002';
-export const OTHER_USER_EMAIL = 'other@kortix.dev';
+export const OTHER_USER_EMAIL = 'other@bapx.dev';
 
 // ─── DB ──────────────────────────────────────────────────────────────────────
 
@@ -154,9 +154,9 @@ export function createMockProvider(
     externalId: `mock-${name}-${Date.now()}`,
     baseUrl:
       name === 'daytona'
-        ? `https://kortix.cloud/mock-daytona-id/8000`
+        ? `https://bapx.cloud/mock-daytona-id/8000`
         : name === 'justavps'
-          ? 'https://mock-justavps.kortix.cloud'
+          ? 'https://mock-justavps.bapx.cloud'
         : `http://localhost:${30000 + Math.floor(Math.random() * 1000)}`,
     metadata: {
       provisionedBy: 'test',
@@ -233,7 +233,7 @@ export function createTestApp(opts: TestAppOptions = {}) {
   app.get('/health', (c) =>
     c.json({
       status: 'ok',
-      service: 'kortix-api',
+      service: 'bapx-api',
       timestamp: new Date().toISOString(),
     }),
   );
@@ -241,7 +241,7 @@ export function createTestApp(opts: TestAppOptions = {}) {
   app.get('/v1/health', (c) =>
     c.json({
       status: 'ok',
-      service: 'kortix',
+      service: 'bapx',
       timestamp: new Date().toISOString(),
     }),
   );
@@ -378,7 +378,7 @@ export function createTestApp(opts: TestAppOptions = {}) {
 // ─── Cleanup ─────────────────────────────────────────────────────────────────
 
 /**
- * Delete only test-scoped data from kortix schema tables.
+ * Delete only test-scoped data from bapx schema tables.
  * Never performs whole-table deletes.
  */
 export async function cleanupTestData(): Promise<void> {
@@ -386,7 +386,7 @@ export async function cleanupTestData(): Promise<void> {
   const accountIds = await getTestAccountIds();
   if (accountIds.length === 0) return;
 
-  await db.delete(kortixApiKeys).where(inArray(kortixApiKeys.accountId, accountIds));
+  await db.delete(bapxApiKeys).where(inArray(bapxApiKeys.accountId, accountIds));
   await db.delete(deployments).where(inArray(deployments.accountId, accountIds));
   await db.delete(sandboxes).where(inArray(sandboxes.accountId, accountIds));
   await db.delete(integrationCredentials).where(inArray(integrationCredentials.accountId, accountIds));

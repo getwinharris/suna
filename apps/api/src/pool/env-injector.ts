@@ -1,7 +1,7 @@
 import { config, SANDBOX_VERSION } from '../config';
 import type { PoolSandbox } from './types';
 
-function buildKortixMasterUrl(baseUrl: string): string {
+function buildBapxMasterUrl(baseUrl: string): string {
   const parsed = new URL(baseUrl);
   return `${parsed.protocol}//8000--${parsed.hostname}/env`;
 }
@@ -47,7 +47,7 @@ function buildEnvPayload(serviceKey: string, metadata?: Record<string, unknown>)
   if (metadata) {
     const slug = metadata.justavpsSlug as string | undefined;
     const proxyToken = metadata.justavpsProxyToken as string | undefined;
-    const proxyDomain = config.JUSTAVPS_PROXY_DOMAIN || 'kortix.cloud';
+    const proxyDomain = config.JUSTAVPS_PROXY_DOMAIN || 'bapx.cloud';
     if (slug && proxyToken) {
       payload.PUBLIC_BASE_URL = `https://8000--${slug}.${proxyDomain}?__proxy_token=${proxyToken}`;
     }
@@ -64,7 +64,7 @@ function buildEnvPayload(serviceKey: string, metadata?: Record<string, unknown>)
  */
 export async function inject(poolSandbox: Pick<PoolSandbox, 'baseUrl' | 'metadata' | 'externalId'>, serviceKey: string): Promise<void> {
   const meta = (poolSandbox.metadata as Record<string, unknown>) ?? {};
-  const url = buildKortixMasterUrl(poolSandbox.baseUrl);
+  const url = buildBapxMasterUrl(poolSandbox.baseUrl);
   const headers = buildHeaders(meta, serviceKey);
   const keys = buildEnvPayload(serviceKey, meta);
 

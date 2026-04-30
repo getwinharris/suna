@@ -437,7 +437,7 @@ export function InstanceSettingsModal({
   const isMobile = useIsMobile();
   const { data: adminRole } = useAdminRole();
   const isAdmin = !!adminRole?.isAdmin;
-  // Live version from /kortix/health for the currently-viewed instance.
+  // Live version from /bapx/health for the currently-viewed instance.
   // The DB's metadata.version is a cache written once at create time and only
   // refreshed on successful updates — it can be null for older sandboxes and
   // drifts after an update landed inside the image without a DB write. The
@@ -572,7 +572,7 @@ export function InstanceSettingsModal({
     queryKey: ['sandbox', 'config-status-projects', sandbox?.sandbox_id, sandboxUrl],
     enabled: open && !!sandboxUrl && !!configStatusQuery.data && !configStatusQuery.data.valid,
     queryFn: async () => {
-      const data = await requestSandboxJson<unknown>(sandboxUrl!, '/kortix/projects');
+      const data = await requestSandboxJson<unknown>(sandboxUrl!, '/bapx/projects');
       return Array.isArray(data) ? data as SandboxProjectSummary[] : [];
     },
     staleTime: 30_000,
@@ -595,7 +595,7 @@ export function InstanceSettingsModal({
       if (!configStatusQuery.data || configStatusQuery.data.valid) {
         throw new Error('No invalid config source is currently being skipped.');
       }
-      const targetProject = configFixProject ?? await requestSandboxJson<SandboxProjectSummary>(sandboxUrl, '/kortix/projects', {
+      const targetProject = configFixProject ?? await requestSandboxJson<SandboxProjectSummary>(sandboxUrl, '/bapx/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -605,7 +605,7 @@ export function InstanceSettingsModal({
         }),
       });
 
-      const task = await requestSandboxJson<{ id: string }>(sandboxUrl, '/kortix/tasks', {
+      const task = await requestSandboxJson<{ id: string }>(sandboxUrl, '/bapx/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -617,7 +617,7 @@ export function InstanceSettingsModal({
         }),
       });
 
-      await requestSandboxJson(sandboxUrl, `/kortix/tasks/${encodeURIComponent(task.id)}/start`, {
+      await requestSandboxJson(sandboxUrl, `/bapx/tasks/${encodeURIComponent(task.id)}/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -1413,7 +1413,7 @@ export function InstanceSettingsModal({
               <div className="rounded-xl border border-border/60 bg-muted/10 p-4 space-y-3">
                 <div className="text-sm font-medium">Deep debugging</div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  If you SSH into the host machine itself, you can inspect the running Bapx Media Hub container directly. Typical flow: run <span className="font-mono text-foreground">docker ps</span>, identify the <span className="font-mono text-foreground">kortix/computer</span> container or <span className="font-mono text-foreground">justavps-workload</span> name, then exec into it for full root access inside the container.
+                  If you SSH into the host machine itself, you can inspect the running Bapx Media Hub container directly. Typical flow: run <span className="font-mono text-foreground">docker ps</span>, identify the <span className="font-mono text-foreground">bapx/computer</span> container or <span className="font-mono text-foreground">justavps-workload</span> name, then exec into it for full root access inside the container.
                 </p>
                 <div className="grid gap-3 md:grid-cols-2">
                   <CopyField label="List running containers" value="docker ps" />

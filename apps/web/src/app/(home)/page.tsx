@@ -11,7 +11,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useAuth } from '@/components/AuthProvider';
 import { Reveal } from '@/components/home/reveal';
 
-const INSTALL_CMD = 'curl -fsSL https://kortix.com/install | bash';
+const INSTALL_CMD = 'curl -fsSL https://bapx.in/install | bash';
 
 /* ─── Google Favicon helper ─── */
 const favicon = (domain: string) =>
@@ -332,7 +332,7 @@ export default function Home() {
             className="group hidden sm:flex items-center gap-2 h-8 px-3 rounded-full hover:bg-foreground/[0.08] transition-colors cursor-pointer"
           >
             <span className="font-mono text-[11px] text-muted-foreground select-none">$</span>
-            <code className="text-[11px] font-mono text-foreground tracking-tight">curl -fsSL kortix.com/install</code>
+            <code className="text-[11px] font-mono text-foreground tracking-tight">curl -fsSL bapx.in/install</code>
             {copied
               ? <Check className="size-3 text-emerald-500" />
               : <Copy className="size-3 text-muted-foreground group-hover:text-foreground transition-colors" />
@@ -340,7 +340,7 @@ export default function Home() {
           </button>
           <span className="hidden sm:block w-px h-5 bg-border" />
           <a
-            href="https://github.com/kortix-ai/suna"
+            href="https://github.com/bapx-ai/bapX"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center size-8 rounded-full hover:bg-foreground/[0.08] transition-colors"

@@ -1,14 +1,14 @@
-# kortix-opencode
+# bapx-opencode
 
-Kortix OpenCode config directory — agents, tools, skills, commands, and plugins.
+Bapx OpenCode config directory — agents, tools, skills, commands, and plugins.
 
-This directory lives inside `core/kortix-master/opencode/` and is the OpenCode config dir. In the container it's at `/ephemeral/kortix-master/opencode/` (set via `OPENCODE_CONFIG_DIR`).
+This directory lives inside `core/bapx-master/opencode/` and is the OpenCode config dir. In the container it's at `/ephemeral/bapx-master/opencode/` (set via `OPENCODE_CONFIG_DIR`).
 
 ## Structure
 
 ```
 opencode.jsonc          <- OpenCode config (plugins, model, MCP servers)
-package.json            <- minimal (deps managed by parent kortix-master/package.json)
+package.json            <- minimal (deps managed by parent bapx-master/package.json)
 agents/general.md       <- default generalist agent
 agents/orchestrator.md  <- project CEO / orchestrator agent
 agents/worker.md        <- task-run worker agent
@@ -16,7 +16,7 @@ commands/*.md           <- slash commands (natively discovered)
 tools/*.ts              <- custom tools (natively discovered)
 skills/                 <- built-in skills (natively discovered)
   plugin/                 <- plugins loaded individually via opencode.jsonc
-    kortix-system/        <- unified Kortix plugin (projects, tasks, sessions, connectors, autowork, triggers, worktree)
+    bapx-system/        <- unified Bapx plugin (projects, tasks, sessions, connectors, autowork, triggers, worktree)
     opencode-pty/         <- PTY spawn/read/write tools
     worktree/             <- git worktree plugin
     connectors/           <- connector CRUD tools
@@ -33,7 +33,7 @@ patches/                <- post-install patches for opencode binary + deps
 Symlink to `.opencode` in your project root:
 
 ```bash
-ln -s computer/core/kortix-master/opencode .opencode
+ln -s computer/core/bapx-master/opencode .opencode
 ```
 
 ## Sandbox

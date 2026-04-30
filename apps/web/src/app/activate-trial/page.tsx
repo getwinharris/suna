@@ -3,15 +3,15 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CreditCard, Zap, Shield, ArrowRight, CheckCircle, LogOut } from 'lucide-react';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { BapxLoader } from '@/components/ui/bapx-loader';
 import { ConnectingScreen } from '@/components/dashboard/connecting-screen';
 import { toast } from '@/lib/toast';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { useTrialStatus, useStartTrial, useAccountState } from '@/hooks/billing';
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { BapxLogo } from '@/components/sidebar/bapx-logo';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/trailbase/client';
 import { clearUserLocalStorage } from '@/lib/utils/clear-local-storage';
 import { useMaintenanceNoticeQuery } from '@/hooks/edge-flags';
 import { useAuth } from '@/components/AuthProvider';
@@ -108,7 +108,7 @@ export default function ActivateTrialPage() {
         <CardHeader className="text-center space-y-4">
           <div>
             <CardTitle className="text-2xl font-medium flex items-center justify-center gap-2">
-              <KortixLogo />
+              <BapxLogo />
               <span>Welcome to Bapx Media Hub</span>
             </CardTitle>
             <CardDescription className="mt-2">
@@ -162,7 +162,7 @@ export default function ActivateTrialPage() {
             >
               {startTrialMutation.isPending ? (
                 <>
-                  <KortixLoader size="small" />
+                  <BapxLoader size="small" />
                   Starting trial...
                 </>
               ) : (

@@ -16,8 +16,8 @@ describe('TriggerYaml', () => {
 
   beforeEach(() => {
     tempDir = mkdtempSync(join(tmpdir(), 'trigger-yaml-test-'))
-    mkdirSync(join(tempDir, '.kortix'), { recursive: true })
-    store = new TriggerStore(join(tempDir, '.kortix', 'test.db'))
+    mkdirSync(join(tempDir, '.bapx'), { recursive: true })
+    store = new TriggerStore(join(tempDir, '.bapx', 'test.db'))
     yamlSync = new TriggerYaml(store, tempDir)
   })
 
@@ -35,7 +35,7 @@ describe('TriggerYaml', () => {
     })
 
     it('parses a valid YAML file', () => {
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), `
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), `
 triggers:
   - name: "Daily Report"
     source:
@@ -45,7 +45,7 @@ triggers:
     action:
       type: prompt
       prompt: "Generate the daily report"
-      agent: kortix
+      agent: bapx
 
   - name: "Deploy Hook"
     source:
@@ -67,7 +67,7 @@ triggers:
       expect(result.triggers[0].source.cron_expr).toBe('0 0 9 * * *')
       expect(result.triggers[0].action.type).toBe('prompt')
       expect(result.triggers[0].action.prompt).toBe('Generate the daily report')
-      expect(result.triggers[0].action.agent).toBe('kortix')
+      expect(result.triggers[0].action.agent).toBe('bapx')
 
       expect(result.triggers[1].name).toBe('Deploy Hook')
       expect(result.triggers[1].source.type).toBe('webhook')
@@ -78,7 +78,7 @@ triggers:
     })
 
     it('skips invalid entries (missing name)', () => {
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), `
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), `
 triggers:
   - source:
       type: cron
@@ -101,7 +101,7 @@ triggers:
     })
 
     it('handles malformed YAML gracefully', () => {
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), '{{{{invalid yaml')
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), '{{{{invalid yaml')
       const result = yamlSync.read()
       expect(result.triggers).toHaveLength(0)
     })
@@ -121,7 +121,7 @@ triggers:
         ],
       })
 
-      const content = readFileSync(join(tempDir, '.kortix', 'triggers.yaml'), 'utf8')
+      const content = readFileSync(join(tempDir, '.bapx', 'triggers.yaml'), 'utf8')
       expect(content).toContain('Test')
       expect(content).toContain('cron_expr')
       expect(content).toContain('test prompt')
@@ -129,7 +129,7 @@ triggers:
 
     it('writes header comments', () => {
       yamlSync.write({ triggers: [] })
-      const content = readFileSync(join(tempDir, '.kortix', 'triggers.yaml'), 'utf8')
+      const content = readFileSync(join(tempDir, '.bapx', 'triggers.yaml'), 'utf8')
       expect(content).toContain('source of truth')
       expect(content).toContain('git commit')
     })
@@ -139,7 +139,7 @@ triggers:
 
   describe('syncFromYaml', () => {
     it('creates DB entries from YAML', () => {
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), `
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), `
 triggers:
   - name: "From YAML"
     source:
@@ -170,7 +170,7 @@ triggers:
       })
 
       // Write YAML with updated prompt
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), `
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), `
 triggers:
   - name: "Existing"
     source:
@@ -201,7 +201,7 @@ triggers:
       store.update(created.id, { is_active: false, last_run_at: '2026-01-01T00:00:00Z' })
 
       // Sync from YAML (config change only)
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), `
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), `
 triggers:
   - name: "Runtime"
     source:
@@ -231,7 +231,7 @@ triggers:
         action_config: { prompt: 'test' },
       })
 
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), `triggers: []`)
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), `triggers: []`)
 
       const result = yamlSync.syncFromYaml()
       expect(result.removed).toBe(1)
@@ -239,7 +239,7 @@ triggers:
     })
 
     it('handles multiple triggers in one sync', () => {
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), `
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), `
 triggers:
   - name: "A"
     source: { type: cron, cron_expr: "0 0 9 * * *" }
@@ -275,12 +275,12 @@ triggers:
         source_config: { cron_expr: '0 0 9 * * *', timezone: 'UTC' },
         action_type: 'prompt',
         action_config: { prompt: 'from DB' },
-        agent_name: 'kortix',
+        agent_name: 'bapx',
       })
 
       yamlSync.flushToYaml()
 
-      const content = readFileSync(join(tempDir, '.kortix', 'triggers.yaml'), 'utf8')
+      const content = readFileSync(join(tempDir, '.bapx', 'triggers.yaml'), 'utf8')
       expect(content).toContain('DB Trigger')
       expect(content).toContain('from DB')
     })
@@ -322,7 +322,7 @@ triggers:
 
   describe('self-trigger suppression', () => {
     it('skips sync when hash matches (our own write)', () => {
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), `
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), `
 triggers:
   - name: "First"
     source: { type: cron, cron_expr: "0 0 9 * * *" }
@@ -341,7 +341,7 @@ triggers:
     })
 
     it('syncs when file actually changes', () => {
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), `
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), `
 triggers:
   - name: "Original"
     source: { type: cron, cron_expr: "0 0 9 * * *" }
@@ -351,7 +351,7 @@ triggers:
       yamlSync.syncFromYaml()
 
       // Change the file
-      writeFileSync(join(tempDir, '.kortix', 'triggers.yaml'), `
+      writeFileSync(join(tempDir, '.bapx', 'triggers.yaml'), `
 triggers:
   - name: "Changed"
     source: { type: cron, cron_expr: "0 0 10 * * *" }

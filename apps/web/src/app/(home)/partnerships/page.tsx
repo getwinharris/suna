@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: 'Partnerships – Bapx Media Hub',
     description:
       'A handful of selected companies. $20k/month retainer. We come in and build autonomous operations with you — the same way we run our own.',
-    url: 'https://www.kortix.com/partnerships',
+    url: 'https://www.bapx.in/partnerships',
   },
   twitter: {
     card: 'summary_large_image',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
       'A handful of selected companies. $20k/month retainer. We come in and build autonomous operations with you — the same way we run our own.',
   },
   alternates: {
-    canonical: 'https://www.kortix.com/partnerships',
+    canonical: 'https://www.bapx.in/partnerships',
   },
 };
 

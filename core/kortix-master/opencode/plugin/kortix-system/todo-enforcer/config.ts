@@ -1,6 +1,6 @@
 export const TODO_ENFORCER_INTERNAL_MARKER = "<!-- KORTIX_TODO_ENFORCER_INTERNAL -->"
-export const TODO_ENFORCER_SYSTEM_TAG = "kortix_todo_enforcer_system"
-export const TODO_ENFORCER_TODOS_TAG = "kortix_todo_enforcer_todos"
+export const TODO_ENFORCER_SYSTEM_TAG = "bapx_todo_enforcer_system"
+export const TODO_ENFORCER_TODOS_TAG = "bapx_todo_enforcer_todos"
 
 export interface ContinuationFeatures {
 	continuation: boolean

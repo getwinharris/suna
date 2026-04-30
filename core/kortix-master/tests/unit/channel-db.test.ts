@@ -167,7 +167,7 @@ describe('channel-db', () => {
     `)
     db.prepare(`
       INSERT INTO connectors (id, name, description, source, notes, auto_generated, created_at, updated_at)
-      VALUES ('1', 'telegram-kortix-old', 'old shadow row', 'channel', 'Channel ID: abc', 1, 'now', 'now')
+      VALUES ('1', 'telegram-bapx-old', 'old shadow row', 'channel', 'Channel ID: abc', 1, 'now', 'now')
     `).run()
 
     const removed = cleanupLegacyChannelConnectors()

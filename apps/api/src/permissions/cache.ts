@@ -1,4 +1,4 @@
-import type { Database } from '@kortix/db';
+import type { Database } from '@bapx/db';
 
 import { listOverrides, type MemberScopeOverrides } from './overrides';
 

@@ -20,12 +20,12 @@ set -euo pipefail
 DOMAIN="${1:-}"
 ADMIN_USER="${2:-admin}"
 ADMIN_PASSWORD="${3:-}"
-INSTALL_DIR="${KORTIX_HOME:-$HOME/.kortix}"
+INSTALL_DIR="${KORTIX_HOME:-$HOME/.bapx}"
 
 if [ -z "$DOMAIN" ]; then
   echo "Usage: $0 <domain-or-ip> [admin-user] [admin-password]"
   echo ""
-  echo "  If admin-password is not provided, reads from ~/.kortix/.credentials"
+  echo "  If admin-password is not provided, reads from ~/.bapx/.credentials"
   exit 1
 fi
 
@@ -117,10 +117,10 @@ if [ -n "$ADMIN_PASSWORD" ]; then
 fi
 
 FRONTEND_BODY=$(curl -s -k $AUTH_ARGS "${BASE_URL}" 2>/dev/null)
-if echo "$FRONTEND_BODY" | grep -qi 'kortix\|next\|__next'; then
-  pass "frontend serves HTML with Kortix/Next.js content"
+if echo "$FRONTEND_BODY" | grep -qi 'bapx\|next\|__next'; then
+  pass "frontend serves HTML with Bapx/Next.js content"
 else
-  fail "frontend serves HTML with Kortix/Next.js content"
+  fail "frontend serves HTML with Bapx/Next.js content"
 fi
 
 echo ""
@@ -168,7 +168,7 @@ echo "  Container Health"
 echo ""
 
 if command -v docker &>/dev/null; then
-  for svc in caddy frontend kortix-api postgres kortix-sandbox; do
+  for svc in caddy frontend bapx-api postgres bapx-sandbox; do
     CONTAINER_STATUS=$(docker ps --filter "name=${svc}" --format "{{.Status}}" 2>/dev/null | head -1)
     if echo "$CONTAINER_STATUS" | grep -qi 'up'; then
       pass "container '${svc}' is running"

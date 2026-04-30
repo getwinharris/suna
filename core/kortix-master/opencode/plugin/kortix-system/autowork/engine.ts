@@ -127,7 +127,7 @@ function verifiedTemplate(): string {
 
 function buildPlanningPrompt(state: AutoworkState): string {
 	const body = [
-		`You are in the Kortix autowork planning phase. Iteration ${state.iteration + 1}/${state.maxIterations}.`,
+		`You are in the Bapx autowork planning phase. Iteration ${state.iteration + 1}/${state.maxIterations}.`,
 		"",
 		"Before execution starts, eliminate ambiguity and define what done means.",
 		"",
@@ -170,8 +170,8 @@ function buildPlanRejectionPrompt(state: AutoworkState, reason: string, details:
 function buildExecutionPrompt(state: AutoworkState, approvedPlanOverride?: string | null, planningJustFinished = false): string {
 	const body = [
 		planningJustFinished
-			? `Planning is complete. You are now entering the Kortix autowork execution phase at iteration ${state.iteration + 1}/${state.maxIterations}.`
-			: `You are in the Kortix autowork execution phase. Iteration ${state.iteration + 1}/${state.maxIterations}.`,
+			? `Planning is complete. You are now entering the Bapx autowork execution phase at iteration ${state.iteration + 1}/${state.maxIterations}.`
+			: `You are in the Bapx autowork execution phase. Iteration ${state.iteration + 1}/${state.maxIterations}.`,
 		"",
 		"Keep working until the task is truly complete, deterministically verified, and every user requirement has concrete proof.",
 		"",
@@ -242,7 +242,7 @@ function buildCompletionRejectionPrompt(state: AutoworkState, reason: string, de
 
 function buildVerifierPrompt(state: AutoworkState, approvedCompletionOverride?: string | null): string {
 	const body = [
-		`You are in the Kortix autowork verifier phase. Iteration ${state.iteration + 1}/${state.maxIterations}.`,
+		`You are in the Bapx autowork verifier phase. Iteration ${state.iteration + 1}/${state.maxIterations}.`,
 		"",
 		"Do a final audit before clean completion. Assume the work may still be wrong until you prove otherwise.",
 		"",

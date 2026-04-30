@@ -1,5 +1,5 @@
 {
-  "name": "@kortix/sandbox-master",
+  "name": "@bapx/sandbox-master",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -33,7 +33,7 @@
     "@openauthjs/openauth": "^0.4.3",
     "@opencode-ai/plugin": "1.14.28",
     "@opencode-ai/sdk": "^1.14.28",
-    "agent-tunnel": "npm:@kortix/agent-tunnel@*",
+    "agent-tunnel": "npm:@bapx/agent-tunnel@*",
     "jsonc-parser": "^3.3.1",
     "bun-pty": "^0.4.8",
     "opencode-pty": "^0.3.4",

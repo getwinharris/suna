@@ -384,7 +384,7 @@ function ChannelRow({ channel, isDark, onPress }: { channel: ChannelConfig; isDa
           <Text style={{ fontSize: 12, fontFamily: 'Roobert', color: muted, marginTop: 2 }} numberOfLines={1}>
             @{channel.bot_username || '?'}
             {modelShort ? ` · ${modelShort}` : ''}
-            {channel.default_agent && channel.default_agent !== 'kortix' ? ` · ${channel.default_agent}` : ''}
+            {channel.default_agent && channel.default_agent !== 'bapx' ? ` · ${channel.default_agent}` : ''}
           </Text>
         </View>
         <ChevronRight size={16} color={muted} />
@@ -414,7 +414,7 @@ function ChannelDetailSheet({
   const updateChannel = useUpdateChannel();
 
   const [editName, setEditName] = useState('');
-  const [agentName, setAgentName] = useState('kortix');
+  const [agentName, setAgentName] = useState('bapx');
   const [selectedModelIdx, setSelectedModelIdx] = useState(0);
   const [bridgeInstructions, setBridgeInstructions] = useState('');
   const [instructions, setInstructions] = useState('');
@@ -437,7 +437,7 @@ function ChannelDetailSheet({
   useEffect(() => {
     if (channel) {
       setEditName(channel.name);
-      setAgentName(channel.default_agent || channel.agentName || 'kortix');
+      setAgentName(channel.default_agent || channel.agentName || 'bapx');
       setBridgeInstructions((channel as any).bridge_instructions || '');
       setInstructions(channel.instructions || '');
       setDirty(false);
@@ -876,7 +876,7 @@ function TelegramWizard({
 }) {
   const [botToken, setBotToken] = useState('');
   const [botInfo, setBotInfo] = useState<{ username: string; firstName: string } | null>(null);
-  const [agentName, setAgentName] = useState('kortix');
+  const [agentName, setAgentName] = useState('bapx');
   const [selectedModelIdx, setSelectedModelIdx] = useState(0);
 
   const verifyMutation = useTelegramVerifyToken();
@@ -1100,7 +1100,7 @@ function SlackWizard({
 
   // Step 1: Configure
   const [botName, setBotName] = useState(() => randomBotName());
-  const [agentName, setAgentName] = useState('kortix');
+  const [agentName, setAgentName] = useState('bapx');
   const [selectedModelIdx, setSelectedModelIdx] = useState(0);
 
   // Step 2: Manifest

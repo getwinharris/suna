@@ -19,7 +19,7 @@
 #
 # The s6 init scripts then:
 #   - Restore secrets → s6 env dir (97-secrets-to-s6-env.sh)
-#   - Set up git, tool deps, env guards (98-kortix-env.sh)
+#   - Set up git, tool deps, env guards (98-bapx-env.sh)
 #   - Restore user-installed apt/pip/npm packages (99-restore-packages.sh)
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -30,7 +30,7 @@ set -e
 WORKSPACE_UID="$(id -u abc 2>/dev/null || echo 911)"
 WORKSPACE_GID="$(id -g abc 2>/dev/null || echo 911)"
 
-echo "[startup] Preparing Kortix sandbox..."
+echo "[startup] Preparing Bapx sandbox..."
 
 export KORTIX_PERSISTENT_ROOT=/persistent
 export OPENCODE_STORAGE_BASE="${OPENCODE_STORAGE_BASE:-${KORTIX_PERSISTENT_ROOT}/opencode}"
@@ -44,7 +44,7 @@ export AUTH_JSON_PATH="${AUTH_JSON_PATH:-${OPENCODE_STORAGE_BASE}/auth.json}"
 export LSS_DIR="${LSS_DIR:-${KORTIX_PERSISTENT_ROOT}/lss}"
 export KORTIX_BROWSER_PROFILE_DIR="${KORTIX_BROWSER_PROFILE_DIR:-${KORTIX_PERSISTENT_ROOT}/browser-profile}"
 export KORTIX_AGENT_BROWSER_DIR="${KORTIX_AGENT_BROWSER_DIR:-${KORTIX_PERSISTENT_ROOT}/agent-browser}"
-export KORTIX_KORTIX_STATE_DIR="${KORTIX_KORTIX_STATE_DIR:-${KORTIX_PERSISTENT_ROOT}/kortix-state}"
+export KORTIX_KORTIX_STATE_DIR="${KORTIX_KORTIX_STATE_DIR:-${KORTIX_PERSISTENT_ROOT}/bapx-state}"
 export KORTIX_XDG_DIR="${KORTIX_XDG_DIR:-${KORTIX_PERSISTENT_ROOT}/xdg}"
 
 PERSIST_BACKING_DIR="/workspace/.persistent-system"
@@ -98,8 +98,8 @@ mkdir -p \
   /workspace/.cache \
   /workspace/.npm-global/bin \
   /workspace/.npm-global/lib \
-  /workspace/.kortix \
-  /workspace/.kortix/packages \
+  /workspace/.bapx \
+  /workspace/.bapx/packages \
   /workspace/.config \
   /workspace/.opencode \
   /workspace/.opencode/skills \
@@ -130,11 +130,11 @@ migrate_dir_to_persistent /workspace/.secrets "$(dirname "$SECRET_FILE_PATH")"
 migrate_dir_to_persistent /workspace/.lss "$LSS_DIR"
 migrate_dir_to_persistent /workspace/.browser-profile "$KORTIX_BROWSER_PROFILE_DIR"
 migrate_dir_to_persistent /workspace/.agent-browser "$KORTIX_AGENT_BROWSER_DIR"
-migrate_dir_to_persistent /workspace/.kortix-state "$KORTIX_KORTIX_STATE_DIR"
+migrate_dir_to_persistent /workspace/.bapx-state "$KORTIX_KORTIX_STATE_DIR"
 migrate_dir_to_persistent /workspace/.XDG "$KORTIX_XDG_DIR"
 
 # ── Migrate legacy symlinks to real dirs ────────────────────────────────────
-# Old images created /workspace/.opencode as a symlink to /workspace/.kortix/.opencode.
+# Old images created /workspace/.opencode as a symlink to /workspace/.bapx/.opencode.
 # New model: /workspace/.opencode IS the real dir. Migrate data if needed.
 if [ -L /workspace/.opencode ]; then
   LINK_TARGET=$(readlink /workspace/.opencode 2>/dev/null || true)
@@ -161,7 +161,7 @@ fi
 
 # ── Exclude opencode internal dirs from git (prevents 16K+ snapshot diffs) ──
 # Only refresh info/exclude when the git repo already exists (container restart).
-# For fresh workspaces, kortix-env-setup.sh writes info/exclude AFTER git init
+# For fresh workspaces, bapx-env-setup.sh writes info/exclude AFTER git init
 # (git init overwrites info/exclude with its default template, so writing it here
 # on fresh repos is pointless — it gets clobbered).
 if [ -f /workspace/.git/HEAD ]; then
@@ -173,8 +173,8 @@ if [ -f /workspace/.git/HEAD ]; then
 .cache/
 .config/
 .opencode/
-.kortix/
-.kortix-state/
+.bapx/
+.bapx-state/
 .secrets/
 .browser-profile/
 .agent-browser/
@@ -266,7 +266,7 @@ PY
     fi
   fi
   # Always ensure registry aliases exist (idempotent)
-  su -s /bin/sh abc -c 'ocx registry add https://master.kortix-registry.pages.dev --name kortix --cwd /workspace -q' 2>/dev/null || true
+  su -s /bin/sh abc -c 'ocx registry add https://master.bapx-registry.pages.dev --name bapx --cwd /workspace -q' 2>/dev/null || true
   su -s /bin/sh abc -c 'ocx registry add https://registry.kdco.dev --name kdco --cwd /workspace -q' 2>/dev/null || true
 fi
 
@@ -278,9 +278,9 @@ find "$OPENCODE_STORAGE_BASE" -name "*.db-wal" -o -name "*.db-shm" 2>/dev/null |
   rm -f "$f"
 done
 
-if command -v kortix-opencode-state >/dev/null 2>&1; then
-  kortix-opencode-state guard >/dev/null 2>&1 || true
-  kortix-opencode-state sync >/dev/null 2>&1 || true
+if command -v bapx-opencode-state >/dev/null 2>&1; then
+  bapx-opencode-state guard >/dev/null 2>&1 || true
+  bapx-opencode-state sync >/dev/null 2>&1 || true
 fi
 
 # ── Stale LSS database cleanup ───────────────────────────────────────────────
@@ -298,21 +298,21 @@ if [ ! -L /config ] && [ ! -d /config ]; then
 fi
 
 # ── Verify runtime exists ───────────────────────────────────────────────────
-if [ ! -e /ephemeral/kortix-master ]; then
-  echo "[startup] WARNING: /ephemeral/kortix-master not found! Rebuild the Docker image."
+if [ ! -e /ephemeral/bapx-master ]; then
+  echo "[startup] WARNING: /ephemeral/bapx-master not found! Rebuild the Docker image."
 fi
 
-# ── Self-heal kortix.db schema ──────────────────────────────────────────────
+# ── Self-heal bapx.db schema ──────────────────────────────────────────────
 # Older images shipped a `projects` table without `structure_version` /
 # `user_handle`. Without the column, every project an old master inserts is
 # implicitly v1 (no default) and every read defaults to v1, so newly created
 # projects act like the legacy task layout. Add the columns here BEFORE s6
-# starts kortix-master, so the master always sees a v2-capable schema even
+# starts bapx-master, so the master always sees a v2-capable schema even
 # if its own bundled code is stale. NOT NULL DEFAULT 2 means every insert
 # the master does — even one that doesn't list the column — gets v2.
-KORTIX_DB="/workspace/.kortix/kortix.db"
+KORTIX_DB="/workspace/.bapx/bapx.db"
 if [ -f "$KORTIX_DB" ] && command -v python3 >/dev/null 2>&1; then
-  python3 - "$KORTIX_DB" <<'PYEOF' || echo "[startup] kortix.db migration skipped (best-effort)"
+  python3 - "$KORTIX_DB" <<'PYEOF' || echo "[startup] bapx.db migration skipped (best-effort)"
 import sqlite3, sys
 db = sqlite3.connect(sys.argv[1])
 def add(sql):
@@ -326,18 +326,18 @@ try:
     ).rowcount
     db.commit()
     if upgraded:
-        print(f"[startup] kortix.db: upgraded {upgraded} legacy v1 project(s) to v2")
+        print(f"[startup] bapx.db: upgraded {upgraded} legacy v1 project(s) to v2")
 except sqlite3.OperationalError:
     pass
 db.close()
 PYEOF
 fi
 
-# ── Install Kortix CLI wrappers ─────────────────────────────────────────────
+# ── Install Bapx CLI wrappers ─────────────────────────────────────────────
 # Runtime-facing commands (ktelegram/kslack/kchannel/kconnectors/kpipedream)
 # should always resolve from immutable /ephemeral code, never /workspace.
-if [ -x /ephemeral/kortix-master/scripts/install-channel-clis.sh ]; then
-  /ephemeral/kortix-master/scripts/install-channel-clis.sh || echo "[startup] WARNING: channel CLI install failed"
+if [ -x /ephemeral/bapx-master/scripts/install-channel-clis.sh ]; then
+  /ephemeral/bapx-master/scripts/install-channel-clis.sh || echo "[startup] WARNING: channel CLI install failed"
 fi
 
 echo "[startup] Starting s6-overlay directly..."

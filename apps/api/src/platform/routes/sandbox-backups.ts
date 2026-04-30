@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
-import { type Database } from '@kortix/db';
+import { type Database } from '@bapx/db';
 import { db as defaultDb } from '../../shared/db';
-import { supabaseAuth as authMiddleware } from '../../middleware/auth';
+import { trailbaseAuth as authMiddleware } from '../../middleware/auth';
 import { resolveAccountId as defaultResolveAccountId } from '../../shared/resolve-account';
 import { JustAVPSProvider } from '../providers/justavps';
 import { getProvider as defaultGetProvider, type ProviderName, type SandboxProvider } from '../providers';

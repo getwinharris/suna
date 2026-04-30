@@ -1,4 +1,4 @@
-# Kortix Frontend
+# Bapx Frontend
 
 ## Quick Setup
 

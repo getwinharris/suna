@@ -6,8 +6,8 @@
  * Works both locally (reads .env) and in CI (env vars set by GitHub secrets).
  *
  * Usage:
- *   bun run scripts/build-snapshot.ts --image kortix/computer:0.8.26
- *   bun run scripts/build-snapshot.ts --image kortix/computer:0.8.26 --name kortix-computer-v0.8.26
+ *   bun run scripts/build-snapshot.ts --image bapx/computer:0.8.26
+ *   bun run scripts/build-snapshot.ts --image bapx/computer:0.8.26 --name bapx-computer-v0.8.26
  *   bun run scripts/build-snapshot.ts --server-type cx23 --location nbg1
  *   bun run scripts/build-snapshot.ts --keep-machine
  *
@@ -45,7 +45,7 @@ const defaultVersion = 'latest';
 
 const { values } = parseArgs({
   options: {
-    image: { type: 'string', default: `kortix/computer:${defaultVersion}` },
+    image: { type: 'string', default: `bapx/computer:${defaultVersion}` },
     name: { type: 'string' },
     'server-type': { type: 'string', default: 'cx23' },
     location: { type: 'string', default: 'nbg1' },
@@ -55,7 +55,7 @@ const { values } = parseArgs({
 
 const dockerImage = values.image!;
 const version = dockerImage.includes(':') ? dockerImage.split(':').pop()! : defaultVersion;
-const snapshotName = values.name || `kortix-computer-v${version}`;
+const snapshotName = values.name || `bapx-computer-v${version}`;
 const serverType = values['server-type']!;
 const location = values.location!;
 
@@ -84,9 +84,9 @@ function shellEscape(s: string): string {
 }
 
 const cloudInitScript = [
-  'curl -fsSL https://raw.githubusercontent.com/kortix-ai/suna/main/scripts/start-sandbox.sh -o /usr/local/bin/kortix-start-sandbox.sh',
-  'chmod +x /usr/local/bin/kortix-start-sandbox.sh',
-  `/usr/local/bin/kortix-start-sandbox.sh ${shellEscape(dockerImage)}`,
+  'curl -fsSL https://raw.githubusercontent.com/bapx-ai/bapX/main/scripts/start-sandbox.sh -o /usr/local/bin/bapx-start-sandbox.sh',
+  'chmod +x /usr/local/bin/bapx-start-sandbox.sh',
+  `/usr/local/bin/bapx-start-sandbox.sh ${shellEscape(dockerImage)}`,
 ].join('\n');
 
 console.log(`\n=== Building snapshot: ${snapshotName} ===`);

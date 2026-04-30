@@ -1,16 +1,16 @@
-# @kortix/triggers
+# @bapx/triggers
 
 Unified trigger system: cron schedules and webhooks with prompt, command, or HTTP actions.
 
 ```
-.kortix/triggers.yaml → TriggerStore (DB) → CronScheduler / WebhookServer → ActionDispatcher → prompt | command | http
+.bapx/triggers.yaml → TriggerStore (DB) → CronScheduler / WebhookServer → ActionDispatcher → prompt | command | http
 ```
 
 ## Architecture
 
-- **Config** lives in `.kortix/triggers.yaml` (git-versionable)
-- **Runtime state** lives in `kortix.db` (is_active, last_run, executions)
-- **API** at `/kortix/triggers/*` — full CRUD
+- **Config** lives in `.bapx/triggers.yaml` (git-versionable)
+- **Runtime state** lives in `bapx.db` (is_active, last_run, executions)
+- **API** at `/bapx/triggers/*` — full CRUD
 - **Agent tool** `triggers` — unified CLI for all trigger management
 
 ## Source types
@@ -40,7 +40,7 @@ triggers:
     action:
       type: prompt
       prompt: "Generate the daily report"
-      agent: kortix
+      agent: bapx
 
   - name: "Nightly Backup"
     source:

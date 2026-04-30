@@ -173,10 +173,10 @@ describe('slack.ts CLI', () => {
 
   describe('me', () => {
     it('calls auth.test', async () => {
-      fetchResponse = { ok: true, user_id: 'U0LAN0Z89', team: 'T1', user: 'kortix-bot' }
+      fetchResponse = { ok: true, user_id: 'U0LAN0Z89', team: 'T1', user: 'bapx-bot' }
       const result = await slackMe()
       expect(result.ok).toBe(true)
-      expect(result.user).toBe('kortix-bot')
+      expect(result.user).toBe('bapx-bot')
 
       expect(fetchCalls[0].url).toContain('auth.test')
     })

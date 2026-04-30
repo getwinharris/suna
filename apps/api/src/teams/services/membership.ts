@@ -1,4 +1,4 @@
-import type { Database } from '@kortix/db';
+import type { Database } from '@bapx/db';
 import { getSupabase } from '../../shared/supabase';
 import { invalidatePreviewCacheForUser } from '../../shared/preview-ownership';
 

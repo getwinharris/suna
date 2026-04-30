@@ -9,14 +9,14 @@ import { useState, useEffect, Suspense, lazy, useRef, useCallback, useActionStat
 import { signUp, verifyOtp, requestAccess, signInWithPassword, sendOtpCode } from './actions';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Mail, MailCheck, Clock, ExternalLink, ChevronRight } from 'lucide-react';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { BapxLoader } from '@/components/ui/bapx-loader';
 import { ConnectingScreen } from '@/components/dashboard/connecting-screen';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useAuth } from '@/components/AuthProvider';
 import { useAuthMethodTracking } from '@/stores/auth-tracking';
 import { toast } from '@/lib/toast';
 import { useTranslations } from 'next-intl';
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { BapxLogo } from '@/components/sidebar/bapx-logo';
 import { ReferralCodeDialog } from '@/components/referrals/referral-code-dialog';
 import { isElectron, getAuthOrigin } from '@/lib/utils/is-electron';
 import { trackSendAuthLink } from '@/lib/analytics/gtm';
@@ -367,7 +367,7 @@ function LoginContent() {
   if (isLoading || user) {
     return (
       <div className="fixed inset-0 bg-background flex items-center justify-center">
-        <KortixLoader size="medium" />
+        <BapxLoader size="medium" />
       </div>
     );
   }
@@ -379,7 +379,7 @@ function LoginContent() {
       <div className="fixed inset-0">
         <WallpaperBackground wallpaperId="brandmark" />
         <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 gap-6">
-          <KortixLogo size={28} />
+          <BapxLogo size={28} />
           <h1 className="text-[36px] font-extralight tracking-tight text-foreground/80 leading-none">
             {t('checkYourEmail')}
           </h1>
@@ -512,13 +512,13 @@ function LoginContent() {
         <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 gap-6">
           {autoSendingCode ? (
             <div className="flex flex-col items-center gap-4">
-              <KortixLogo size={28} />
-              <KortixLoader size="medium" />
+              <BapxLogo size={28} />
+              <BapxLoader size="medium" />
               <p className="text-[15px] text-foreground/50">Sending a fresh code…</p>
             </div>
           ) : newCodeSent ? (
             <div className="flex flex-col items-center gap-6 w-full max-w-[340px]">
-              <KortixLogo size={28} />
+              <BapxLogo size={28} />
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
                 <MailCheck className="h-6 w-6 text-emerald-500" />
               </div>
@@ -584,7 +584,7 @@ function LoginContent() {
             </div>
           ) : (
             <div className="flex flex-col items-center gap-6 w-full max-w-[340px]">
-              <KortixLogo size={28} />
+              <BapxLogo size={28} />
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/10 border border-amber-500/20">
                 <Clock className="h-6 w-6 text-amber-500" />
               </div>
@@ -779,11 +779,11 @@ function LoginContent() {
                         />
                         <label htmlFor="gdprConsent" className="text-[11px] leading-[1.6] text-foreground/30 cursor-pointer select-none">
                           I agree to the{' '}
-                          <a href="https://www.kortix.com/legal?tab=privacy" target="_blank" rel="noopener noreferrer" className="text-foreground/45 hover:text-foreground/65 transition-colors">
+                          <a href="https://www.bapx.in/legal?tab=privacy" target="_blank" rel="noopener noreferrer" className="text-foreground/45 hover:text-foreground/65 transition-colors">
                             Privacy Policy
                           </a>
                           {' & '}
-                          <a href="https://www.kortix.com/legal?tab=terms" target="_blank" rel="noopener noreferrer" className="text-foreground/45 hover:text-foreground/65 transition-colors">
+                          <a href="https://www.bapx.in/legal?tab=terms" target="_blank" rel="noopener noreferrer" className="text-foreground/45 hover:text-foreground/65 transition-colors">
                             Terms
                           </a>
                         </label>

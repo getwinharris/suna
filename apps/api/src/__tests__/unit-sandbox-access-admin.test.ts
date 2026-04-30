@@ -64,7 +64,7 @@ function resolveAccountId(userId: string) {
   return Promise.resolve('viewer-account');
 }
 
-mock.module('@kortix/db', () => ({
+mock.module('@bapx/db', () => ({
   sandboxes: {
     sandboxId: 'sandboxId',
     accountId: 'accountId',
@@ -84,7 +84,7 @@ mock.module('drizzle-orm', () => ({
 
 mock.module('../shared/db', () => ({ db: fakeDb }));
 mock.module('../middleware/auth', () => ({
-  supabaseAuth: async (_c: any, next: any) => next(),
+  trailbaseAuth: async (_c: any, next: any) => next(),
 }));
 mock.module('../shared/resolve-account', () => ({
   resolveAccountId,
@@ -101,7 +101,7 @@ mock.module('../config', () => ({
   },
 }));
 mock.module('../repositories/api-keys', () => ({
-  createApiKey: async () => ({ secretKey: 'kortix_sb_test' }),
+  createApiKey: async () => ({ secretKey: 'bapx_sb_test' }),
 }));
 mock.module('../pool', () => ({}));
 mock.module('../platform/providers/justavps', () => ({
@@ -138,7 +138,7 @@ function createApp(userId: string) {
   const app = new Hono<{ Variables: { userId: string; userEmail: string } }>();
   app.use('*', async (c, next) => {
     c.set('userId', userId);
-    c.set('userEmail', `${userId}@kortix.dev`);
+    c.set('userEmail', `${userId}@bapx.dev`);
     await next();
   });
   app.route('/v1/platform/sandbox', createBackupRouter({

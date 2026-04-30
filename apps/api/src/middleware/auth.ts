@@ -1,10 +1,10 @@
 import { Context, Next } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { validateSecretKey } from '../repositories/api-keys';
-import { isKortixToken } from '../shared/crypto';
+import { isBapxToken } from '../shared/crypto';
 import { canAccessPreviewSandbox } from '../shared/preview-ownership';
-import { getSupabase } from '../shared/supabase';
-import { verifySupabaseJwt } from '../shared/jwt-verify';
+import { getTrailbase } from '../shared/trailbase';
+import { verifyTrailbaseJwt } from '../shared/jwt-verify';
 import { config } from '../config';
 import { setSentryUser } from '../lib/sentry';
 import { setContextField } from '../lib/request-context';
@@ -27,9 +27,9 @@ function isLocalPreviewBypassRequest(c: Context, previewSandboxId: string | null
 // ═══════════════════════════════════════════════════════════════════════════════
 // Auth Middleware (3 middlewares — one per auth strategy)
 //
-//   1. apiKeyAuth      — Kortix API keys only (header)
-//   2. supabaseAuth    — Supabase JWT only (header)
-//   3. combinedAuth    — Kortix OR Supabase (header + cookie fallback)
+//   1. apiKeyAuth      — Bapx API keys only (header)
+//   2. trailbaseAuth    — Supabase JWT only (header)
+//   3. combinedAuth    — Bapx OR Supabase (header + cookie fallback)
 //
 // Token is read from query parameters ONLY as a last resort for preview proxy
 // routes (/v1/p/*) — browser WebSocket API can't set custom headers, so PTY
@@ -39,7 +39,7 @@ function isLocalPreviewBypassRequest(c: Context, previewSandboxId: string | null
 
 /**
  * API key auth for search, LLM, and router routes.
- * Always validates Kortix tokens (kortix_, kortix_sb_) via validateSecretKey()
+ * Always validates Bapx tokens (bapx_, bapx_sb_) via validateSecretKey()
  * against the api_keys table.
  */
 export async function apiKeyAuth(c: Context, next: Next) {
@@ -59,9 +59,9 @@ export async function apiKeyAuth(c: Context, next: Next) {
     });
   }
 
-  if (!isKortixToken(token)) {
+  if (!isBapxToken(token)) {
     throw new HTTPException(401, {
-      message: 'Invalid token format — expected kortix_ prefix',
+      message: 'Invalid token format — expected bapx_ prefix',
     });
   }
 
@@ -83,10 +83,10 @@ export async function apiKeyAuth(c: Context, next: Next) {
 }
 
 /**
- * Supabase JWT auth (for billing, platform, admin routes).
+ * TrailBase JWT auth (for billing, platform, admin routes).
  * Header-only — sets userId and userEmail in context on success.
  */
-export async function supabaseAuth(c: Context, next: Next) {
+export async function trailbaseAuth(c: Context, next: Next) {
   const authHeader = c.req.header('Authorization');
 
   if (!authHeader?.startsWith('Bearer ')) {
@@ -99,7 +99,7 @@ export async function supabaseAuth(c: Context, next: Next) {
   }
 
   // Fast path: verify JWT locally (no network roundtrip)
-  const local = await verifySupabaseJwt(token);
+  const local = await verifyTrailbaseJwt(token);
   if (local.ok) {
     c.set('userId', local.userId);
     c.set('userEmail', local.email);
@@ -117,13 +117,10 @@ export async function supabaseAuth(c: Context, next: Next) {
   }
 
   try {
-    const supabase = getSupabase();
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser(token);
+    const trailbase = getTrailbase();
+    const user = await trailbase.auth.getUser(token);
 
-    if (error || !user) {
+    if (!user) {
       throw new HTTPException(401, { message: 'Invalid or expired token' });
     }
 
@@ -141,7 +138,7 @@ export async function supabaseAuth(c: Context, next: Next) {
 }
 
 /**
- * Combined auth — accepts Kortix tokens OR Supabase JWTs.
+ * Combined auth — accepts Bapx tokens OR TrailBase JWTs.
  *
  * Token resolution order:
  *   1. Authorization: Bearer <token> header
@@ -169,17 +166,17 @@ export async function combinedAuth(c: Context, next: Next) {
     return;
   }
 
-  // Extract token: header → X-Kortix-Token (preview only) → cookie → query param
+  // Extract token: header → X-Bapx-Token (preview only) → cookie → query param
   const authHeader = c.req.header('Authorization');
-  const kortixTokenHeader = previewSandboxId ? c.req.header('X-Kortix-Token') : undefined;
+  const bapxTokenHeader = previewSandboxId ? c.req.header('X-Bapx-Token') : undefined;
   let token: string | undefined;
 
   if (authHeader?.startsWith('Bearer ')) {
     token = authHeader.slice(7);
   }
 
-  if (!token && kortixTokenHeader && isKortixToken(kortixTokenHeader)) {
-    token = kortixTokenHeader;
+  if (!token && bapxTokenHeader && isBapxToken(bapxTokenHeader)) {
+    token = bapxTokenHeader;
   }
 
   if (!token) {
@@ -213,11 +210,11 @@ export async function combinedAuth(c: Context, next: Next) {
   // Determine if this is a preview proxy route (for cookie management)
   const isPreviewRoute = c.req.path.startsWith('/v1/p/') || c.req.path === '/v1/p';
 
-  // 1. Try Kortix token (kortix_ or kortix_sb_) — used by agents inside the sandbox
-  if (isKortixToken(token)) {
+  // 1. Try Bapx token (bapx_ or bapx_sb_) — used by agents inside the sandbox
+  if (isBapxToken(token)) {
     const result = await validateSecretKey(token);
     if (!result.isValid) {
-      throw new HTTPException(401, { message: result.error || 'Invalid Kortix token' });
+      throw new HTTPException(401, { message: result.error || 'Invalid Bapx token' });
     }
     if (previewSandboxId && !(await canAccessPreviewSandbox({
       previewSandboxId,
@@ -236,8 +233,8 @@ export async function combinedAuth(c: Context, next: Next) {
     return;
   }
 
-  // 2. Try Supabase JWT — fast path: local verification (no network roundtrip)
-  const local = await verifySupabaseJwt(token);
+  // 2. Try TrailBase JWT — fast path: local verification (no network roundtrip)
+  const local = await verifyTrailbaseJwt(token);
   if (local.ok) {
     if (previewSandboxId && !(await canAccessPreviewSandbox({
       previewSandboxId,
@@ -262,10 +259,10 @@ export async function combinedAuth(c: Context, next: Next) {
 
   // JWKS not yet loaded — fall back to network getUser() call
   try {
-    const supabase = getSupabase();
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    const trailbase = getTrailbase();
+    const user = await trailbase.auth.getUser(token);
 
-    if (error || !user) {
+    if (!user) {
       throw new HTTPException(401, { message: 'Invalid or expired token' });
     }
 

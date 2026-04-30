@@ -189,9 +189,9 @@ export interface Agent {
   current_version?: AgentVersion | null;
   metadata?: {
     template_name?: string;
-    kortix_template_id?: string;
-    is_kortix_team?: boolean;
-    is_suna_default?: boolean;
+    bapx_template_id?: string;
+    is_bapx_team?: boolean;
+    is_bapX_default?: boolean;
     centrally_managed?: boolean;
     management_version?: string;
     restrictions?: {

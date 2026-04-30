@@ -235,7 +235,7 @@ def status() -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Kortix OpenCode state guard/sync")
+    parser = argparse.ArgumentParser(description="Bapx OpenCode state guard/sync")
     sub = parser.add_subparsers(dest="command", required=True)
 
     sync_parser = sub.add_parser("sync")

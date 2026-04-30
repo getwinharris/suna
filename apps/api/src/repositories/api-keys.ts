@@ -1,12 +1,12 @@
 import { eq, and } from 'drizzle-orm';
-import { kortixApiKeys } from '@kortix/db';
+import { bapxApiKeys } from '@bapx/db';
 import { db } from '../shared/db';
 import {
   hashSecretKey,
   generateApiKeyPair,
   generateSandboxKeyPair,
   isApiKeySecretConfigured,
-  isKortixToken,
+  isBapxToken,
 } from '../shared/crypto';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -55,8 +55,8 @@ const lastUsedCache = new Map<string, number>();
  * Create a new API key scoped to a sandbox.
  * Returns the secret key in plaintext ONCE — only the hash is stored.
  *
- * type='user'    → kortix_<32> secret key (user-created, external access)
- * type='sandbox' → kortix_sb_<32> secret key (auto-managed, injected into sandbox)
+ * type='user'    → bapx_<32> secret key (user-created, external access)
+ * type='sandbox' → bapx_sb_<32> secret key (auto-managed, injected into sandbox)
  */
 export async function createApiKey(params: CreateApiKeyParams): Promise<CreateApiKeyResult> {
   if (!isApiKeySecretConfigured()) {
@@ -70,8 +70,9 @@ export async function createApiKey(params: CreateApiKeyParams): Promise<CreateAp
   const secretKeyHash = hashSecretKey(secretKey);
 
   const [row] = await db
-    .insert(kortixApiKeys)
+    .insert(bapxApiKeys)
     .values({
+      keyId: crypto.randomUUID(),
       sandboxId: params.sandboxId,
       accountId: params.accountId,
       publicKey,
@@ -107,19 +108,19 @@ export async function createApiKey(params: CreateApiKeyParams): Promise<CreateAp
 export async function listApiKeys(sandboxId: string) {
   return db
     .select({
-      keyId: kortixApiKeys.keyId,
-      publicKey: kortixApiKeys.publicKey,
-      title: kortixApiKeys.title,
-      description: kortixApiKeys.description,
-      type: kortixApiKeys.type,
-      status: kortixApiKeys.status,
-      sandboxId: kortixApiKeys.sandboxId,
-      expiresAt: kortixApiKeys.expiresAt,
-      lastUsedAt: kortixApiKeys.lastUsedAt,
-      createdAt: kortixApiKeys.createdAt,
+      keyId: bapxApiKeys.keyId,
+      publicKey: bapxApiKeys.publicKey,
+      title: bapxApiKeys.title,
+      description: bapxApiKeys.description,
+      type: bapxApiKeys.type,
+      status: bapxApiKeys.status,
+      sandboxId: bapxApiKeys.sandboxId,
+      expiresAt: bapxApiKeys.expiresAt,
+      lastUsedAt: bapxApiKeys.lastUsedAt,
+      createdAt: bapxApiKeys.createdAt,
     })
-    .from(kortixApiKeys)
-    .where(eq(kortixApiKeys.sandboxId, sandboxId));
+    .from(bapxApiKeys)
+    .where(eq(bapxApiKeys.sandboxId, sandboxId));
 }
 
 /**
@@ -127,16 +128,16 @@ export async function listApiKeys(sandboxId: string) {
  */
 export async function revokeApiKey(keyId: string, accountId: string): Promise<boolean> {
   const result = await db
-    .update(kortixApiKeys)
+    .update(bapxApiKeys)
     .set({ status: 'revoked' })
     .where(
       and(
-        eq(kortixApiKeys.keyId, keyId),
-        eq(kortixApiKeys.accountId, accountId),
-        eq(kortixApiKeys.status, 'active'),
+        eq(bapxApiKeys.keyId, keyId),
+        eq(bapxApiKeys.accountId, accountId),
+        eq(bapxApiKeys.status, 'active'),
       ),
     )
-    .returning({ keyId: kortixApiKeys.keyId });
+    .returning({ keyId: bapxApiKeys.keyId });
 
   return result.length > 0;
 }
@@ -146,14 +147,14 @@ export async function revokeApiKey(keyId: string, accountId: string): Promise<bo
  */
 export async function deleteApiKey(keyId: string, accountId: string): Promise<boolean> {
   const result = await db
-    .delete(kortixApiKeys)
+    .delete(bapxApiKeys)
     .where(
       and(
-        eq(kortixApiKeys.keyId, keyId),
-        eq(kortixApiKeys.accountId, accountId),
+        eq(bapxApiKeys.keyId, keyId),
+        eq(bapxApiKeys.accountId, accountId),
       ),
     )
-    .returning({ keyId: kortixApiKeys.keyId });
+    .returning({ keyId: bapxApiKeys.keyId });
 
   return result.length > 0;
 }
@@ -161,7 +162,7 @@ export async function deleteApiKey(keyId: string, accountId: string): Promise<bo
 // ─── Validation ──────────────────────────────────────────────────────────────
 
 /**
- * Validate a Kortix API key (kortix_ or kortix_sb_ prefix).
+ * Validate a Bapx API key (bapx_ or bapx_sb_ prefix).
  * Single validation path for all key types — returns account_id, sandbox_id, and key type.
  */
 export async function validateSecretKey(secretKey: string): Promise<ApiKeyValidationResult> {
@@ -169,8 +170,8 @@ export async function validateSecretKey(secretKey: string): Promise<ApiKeyValida
     return { isValid: false, error: 'API_KEY_SECRET not configured' };
   }
 
-  if (!isKortixToken(secretKey)) {
-    return { isValid: false, error: 'Invalid API key format — expected kortix_ prefix' };
+  if (!isBapxToken(secretKey)) {
+    return { isValid: false, error: 'Invalid API key format — expected bapx_ prefix' };
   }
 
   try {
@@ -178,75 +179,53 @@ export async function validateSecretKey(secretKey: string): Promise<ApiKeyValida
 
     const [row] = await db
       .select({
-        keyId: kortixApiKeys.keyId,
-        accountId: kortixApiKeys.accountId,
-        sandboxId: kortixApiKeys.sandboxId,
-        type: kortixApiKeys.type,
-        status: kortixApiKeys.status,
-        expiresAt: kortixApiKeys.expiresAt,
+        keyId: bapxApiKeys.keyId,
+        accountId: bapxApiKeys.accountId,
+        sandboxId: bapxApiKeys.sandboxId,
+        type: bapxApiKeys.type,
+        status: bapxApiKeys.status,
+        expiresAt: bapxApiKeys.expiresAt,
       })
-      .from(kortixApiKeys)
+      .from(bapxApiKeys)
       .where(
         and(
-          eq(kortixApiKeys.secretKeyHash, secretKeyHash),
-          eq(kortixApiKeys.status, 'active'),
+          eq(bapxApiKeys.secretKeyHash, secretKeyHash),
+          eq(bapxApiKeys.status, 'active'),
         ),
       )
-      .limit(1);
+      .limit(1)
+      .execute();
 
     if (!row) {
-      const hasAnyKeys = await db.select({ keyId: kortixApiKeys.keyId }).from(kortixApiKeys).limit(1);
-      console.warn(`[validateSecretKey] Token not found in DB. hash=${secretKeyHash.slice(0, 8)}... prefix="${secretKey.slice(0, 20)}..." anyKeysInDb=${hasAnyKeys.length > 0}`);
       return { isValid: false, error: 'API key not found or invalid' };
     }
 
-    if (row.expiresAt && row.expiresAt < new Date()) {
-      return { isValid: false, error: 'API key expired' };
+    // Check expiration
+    if (row.expiresAt && new Date(row.expiresAt) < new Date()) {
+      return { isValid: false, error: 'API key has expired' };
     }
 
-    // Fire-and-forget: update last_used_at (throttled)
-    updateLastUsedThrottled(row.keyId).catch(() => {});
+    // Update last_used_at (throttled)
+    const now = Date.now();
+    const lastUsed = lastUsedCache.get(row.keyId) || 0;
+    if (now - lastUsed > THROTTLE_MS) {
+      lastUsedCache.set(row.keyId, now);
+      db.update(bapxApiKeys)
+        .set({ lastUsedAt: new Date() })
+        .where(eq(bapxApiKeys.keyId, row.keyId))
+        .returning()
+        .then(() => {}); // fire and forget
+    }
 
     return {
       isValid: true,
+      keyId: row.keyId,
       accountId: row.accountId,
       sandboxId: row.sandboxId,
-      keyId: row.keyId,
       type: row.type as ApiKeyType,
     };
   } catch (err) {
-    console.error('API key validation error:', err);
-    return { isValid: false, error: 'Validation error' };
-  }
-}
-
-// ─── Internal ────────────────────────────────────────────────────────────────
-
-async function updateLastUsedThrottled(keyId: string): Promise<void> {
-  const now = Date.now();
-  const lastUpdate = lastUsedCache.get(keyId) || 0;
-
-  if (now - lastUpdate < THROTTLE_MS) {
-    return;
-  }
-
-  lastUsedCache.set(keyId, now);
-
-  if (lastUsedCache.size > 1000) {
-    const cutoff = now - THROTTLE_MS * 2;
-    for (const [k, v] of lastUsedCache.entries()) {
-      if (v < cutoff) {
-        lastUsedCache.delete(k);
-      }
-    }
-  }
-
-  try {
-    await db
-      .update(kortixApiKeys)
-      .set({ lastUsedAt: new Date() })
-      .where(eq(kortixApiKeys.keyId, keyId));
-  } catch (err) {
-    console.warn('Failed to update last_used_at:', err);
+    console.error('[validateSecretKey] Error:', err);
+    return { isValid: false, error: 'Internal validation error' };
   }
 }

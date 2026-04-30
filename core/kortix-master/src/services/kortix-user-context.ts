@@ -1,7 +1,7 @@
 /**
- * Verifies the `X-Kortix-User-Context` header the preview proxy attaches
+ * Verifies the `X-Bapx-User-Context` header the preview proxy attaches
  * to every authenticated request. Same serialization format as the signer
- * in apps/api — kept as a separate module here so kortix-master has zero
+ * in apps/api — kept as a separate module here so bapx-master has zero
  * runtime deps on the API package.
  *
  * Format: `<base64url(json payload)>.<base64url(HMAC-SHA256)>`
@@ -10,9 +10,9 @@
 
 import { createHmac, timingSafeEqual } from 'crypto'
 
-export const KORTIX_USER_CONTEXT_HEADER = 'X-Kortix-User-Context'
+export const KORTIX_USER_CONTEXT_HEADER = 'X-Bapx-User-Context'
 
-export interface KortixUserContext {
+export interface BapxUserContext {
   userId: string
   sandboxId: string
   sandboxRole: 'owner' | 'admin' | 'member' | 'platform_admin'
@@ -41,10 +41,10 @@ function sign(payloadB64: string, secret: string): string {
 }
 
 export type VerifyResult =
-  | { ok: true; context: KortixUserContext }
+  | { ok: true; context: BapxUserContext }
   | { ok: false; reason: 'malformed' | 'bad_signature' | 'expired' | 'invalid_json' }
 
-export function verifyKortixUserContext(
+export function verifyBapxUserContext(
   token: string | undefined | null,
   secret: string,
 ): VerifyResult {
@@ -61,9 +61,9 @@ export function verifyKortixUserContext(
     return { ok: false, reason: 'bad_signature' }
   }
 
-  let payload: KortixUserContext
+  let payload: BapxUserContext
   try {
-    payload = JSON.parse(base64urlDecode(payloadB64).toString('utf8')) as KortixUserContext
+    payload = JSON.parse(base64urlDecode(payloadB64).toString('utf8')) as BapxUserContext
   } catch {
     return { ok: false, reason: 'invalid_json' }
   }

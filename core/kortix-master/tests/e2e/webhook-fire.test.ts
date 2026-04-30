@@ -37,9 +37,9 @@ describe('Webhook Fire E2E', () => {
 
   beforeEach(async () => {
     tempDir = mkdtempSync(join(tmpdir(), 'webhook-e2e-'))
-    mkdirSync(join(tempDir, '.kortix'), { recursive: true })
+    mkdirSync(join(tempDir, '.bapx'), { recursive: true })
 
-    store = new TriggerStore(join(tempDir, '.kortix', 'test.db'))
+    store = new TriggerStore(join(tempDir, '.bapx', 'test.db'))
     yamlSync = new TriggerYaml(store, tempDir)
     const client = createMockClient()
     dispatcher = new ActionDispatcher(store, client, tempDir)
@@ -111,7 +111,7 @@ describe('Webhook Fire E2E', () => {
     const response = await fetch(`http://127.0.0.1:${webhookPort}/hooks/deploy`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ repository: 'kortix-ai/suna', branch: 'main' }),
+      body: JSON.stringify({ repository: 'bapx-ai/bapX', branch: 'main' }),
     })
 
     expect(response.status).toBe(202)
@@ -139,15 +139,15 @@ describe('Webhook Fire E2E', () => {
       source_config: { path: '/hooks/pr', method: 'POST' },
       action_type: 'prompt',
       action_config: { prompt: 'Review PR #{{ number }}: {{ title }}' },
-      agent_name: 'kortix',
+      agent_name: 'bapx',
     })
 
     webhookServer.setRoutes([{
-      agentName: 'kortix',
+      agentName: 'bapx',
       trigger: {
         name: trigger.name,
         source: { type: 'webhook', path: '/hooks/pr', method: 'POST' },
-        execution: { prompt: 'Review PR', agentName: 'kortix', sessionMode: 'new' },
+        execution: { prompt: 'Review PR', agentName: 'bapx', sessionMode: 'new' },
       },
     }])
 
@@ -205,7 +205,7 @@ describe('Webhook Fire E2E', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Kortix-Trigger-Secret': 'wrong-secret',
+        'X-Bapx-Trigger-Secret': 'wrong-secret',
       },
       body: JSON.stringify({ data: 'test' }),
     })
@@ -216,7 +216,7 @@ describe('Webhook Fire E2E', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Kortix-Trigger-Secret': 'my-secret-123',
+        'X-Bapx-Trigger-Secret': 'my-secret-123',
       },
       body: JSON.stringify({ data: 'test' }),
     })
@@ -326,7 +326,7 @@ describe('Webhook Fire E2E', () => {
     yamlSync.flushToYaml()
 
     // Verify YAML file exists and contains the trigger
-    const yamlPath = join(tempDir, '.kortix', 'triggers.yaml')
+    const yamlPath = join(tempDir, '.bapx', 'triggers.yaml')
     expect(existsSync(yamlPath)).toBe(true)
 
     const content = readFileSync(yamlPath, 'utf8')

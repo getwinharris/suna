@@ -6,7 +6,7 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@bapx/db';
 import { getDaytona } from '../../shared/daytona';
 import { db } from '../../shared/db';
 import { config, SANDBOX_VERSION } from '../../config';
@@ -38,7 +38,7 @@ export class DaytonaProvider implements SandboxProvider {
   async create(opts: CreateSandboxOpts): Promise<ProvisionResult> {
     const snapshot = config.DAYTONA_SNAPSHOT;
     if (!snapshot) {
-      throw new Error('DAYTONA_SNAPSHOT is not configured — set it to the snapshot name (e.g. kortix-sandbox-v0.4.1)');
+      throw new Error('DAYTONA_SNAPSHOT is not configured — set it to the snapshot name (e.g. bapx-sandbox-v0.4.1)');
     }
 
     const daytona = getDaytona();
@@ -49,8 +49,8 @@ export class DaytonaProvider implements SandboxProvider {
     const serviceKey = opts.envVars?.KORTIX_TOKEN || '';
 
     // Strip /v1/router suffix — opencode.jsonc appends it already.
-    // KORTIX_URL may be "https://new-api.kortix.com/v1/router" but the
-    // sandbox expects the base: "https://new-api.kortix.com".
+    // KORTIX_URL may be "https://new-api.bapx.in/v1/router" but the
+    // sandbox expects the base: "https://new-api.bapx.in".
     const sandboxApiBase = config.KORTIX_URL.replace(/\/v1\/router\/?$/, '');
     const routerBase = `${sandboxApiBase}/v1/router`;
 
@@ -63,7 +63,7 @@ export class DaytonaProvider implements SandboxProvider {
           INTERNAL_SERVICE_KEY: serviceKey,
           TUNNEL_API_URL: sandboxApiBase,
           TUNNEL_TOKEN: serviceKey,
-          // Route tool SDK traffic through the Kortix router proxy for billing/key injection.
+          // Route tool SDK traffic through the Bapx router proxy for billing/key injection.
           // If not set, sandbox tools fall back to hitting the real upstream APIs directly.
           TAVILY_API_URL: `${routerBase}/tavily`,
           REPLICATE_API_URL: `${routerBase}/replicate`,

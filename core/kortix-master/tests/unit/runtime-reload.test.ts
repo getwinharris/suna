@@ -3,7 +3,7 @@ import { getBusySessionIds, getSafeFullReloadFallback } from '../../src/services
 
 describe('runtime reload safeguards', () => {
   it('downgrades full reloads from an unprivileged local sandbox process', () => {
-    expect(getSafeFullReloadFallback({ envMode: 'local', uid: 1000 })).toContain('avoid a kortix-master restart loop')
+    expect(getSafeFullReloadFallback({ envMode: 'local', uid: 1000 })).toContain('avoid a bapx-master restart loop')
   })
 
   it('allows full reloads when the local process is privileged', () => {

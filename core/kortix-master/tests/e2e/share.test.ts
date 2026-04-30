@@ -45,7 +45,7 @@ describe('Share system E2E', () => {
 
   function buildApp() {
     const app = new Hono()
-    app.route('/kortix/share', shareRouter)
+    app.route('/bapx/share', shareRouter)
     app.route('/s', shareProxyRouter)
     return app
   }
@@ -54,7 +54,7 @@ describe('Share system E2E', () => {
 
   test('creates share with all required fields', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000')
+    const res = await app.request('/bapx/share/3000')
 
     expect(res.status).toBe(200)
     const body = await res.json() as any
@@ -68,8 +68,8 @@ describe('Share system E2E', () => {
 
   test('each share gets a unique token', async () => {
     const app = buildApp()
-    const a = await (await app.request('/kortix/share/3000')).json() as any
-    const b = await (await app.request('/kortix/share/3000')).json() as any
+    const a = await (await app.request('/bapx/share/3000')).json() as any
+    const b = await (await app.request('/bapx/share/3000')).json() as any
     expect(a.token).not.toBe(b.token)
   })
 
@@ -86,7 +86,7 @@ describe('Share system E2E', () => {
   test('share proxy returns 502 when nothing listens on the port', async () => {
     const app = buildApp()
     // Create a share for a port where nothing is running
-    const createRes = await app.request('/kortix/share/19999')
+    const createRes = await app.request('/bapx/share/19999')
     const { token } = await createRes.json() as any
 
     const res = await app.request(`/s/${token}/`)
@@ -100,7 +100,7 @@ describe('Share system E2E', () => {
 
   test('custom TTL works: 30m', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000?ttl=30m')
+    const res = await app.request('/bapx/share/3000?ttl=30m')
     const body = await res.json() as any
 
     expect(body.ttl).toBe('30m')
@@ -112,13 +112,13 @@ describe('Share system E2E', () => {
 
   test('rejects TTL below 5m', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000?ttl=1m')
+    const res = await app.request('/bapx/share/3000?ttl=1m')
     expect(res.status).toBe(400)
   })
 
   test('rejects TTL above 7d', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000?ttl=8d')
+    const res = await app.request('/bapx/share/3000?ttl=8d')
     expect(res.status).toBe(400)
   })
 
@@ -126,19 +126,19 @@ describe('Share system E2E', () => {
 
   test('list shows created shares', async () => {
     const app = buildApp()
-    const { token } = await (await app.request('/kortix/share/4444')).json() as any
+    const { token } = await (await app.request('/bapx/share/4444')).json() as any
 
-    const listRes = await app.request('/kortix/share')
+    const listRes = await app.request('/bapx/share')
     const { shares } = await listRes.json() as any
     expect(shares.some((s: any) => s.token === token)).toBe(true)
   })
 
   test('revoke makes token invalid', async () => {
     const app = buildApp()
-    const { token } = await (await app.request('/kortix/share/5555')).json() as any
+    const { token } = await (await app.request('/bapx/share/5555')).json() as any
 
     // Revoke
-    const delRes = await app.request(`/kortix/share/${token}`, { method: 'DELETE' })
+    const delRes = await app.request(`/bapx/share/${token}`, { method: 'DELETE' })
     expect(delRes.status).toBe(200)
 
     // Token should now be invalid at the proxy
@@ -150,7 +150,7 @@ describe('Share system E2E', () => {
 
   test('share proxy OPTIONS returns CORS headers', async () => {
     const app = buildApp()
-    const { token } = await (await app.request('/kortix/share/3000')).json() as any
+    const { token } = await (await app.request('/bapx/share/3000')).json() as any
 
     const res = await app.request(`/s/${token}/`, { method: 'OPTIONS' })
     expect(res.status).toBe(204)
@@ -161,12 +161,12 @@ describe('Share system E2E', () => {
 
   test('port 0 rejected', async () => {
     const app = buildApp()
-    expect((await app.request('/kortix/share/0')).status).toBe(400)
+    expect((await app.request('/bapx/share/0')).status).toBe(400)
   })
 
   test('port 65535 accepted', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/65535')
+    const res = await app.request('/bapx/share/65535')
     expect(res.status).toBe(200)
     const body = await res.json() as any
     expect(body.port).toBe(65535)
@@ -176,7 +176,7 @@ describe('Share system E2E', () => {
 
   test('URL contains /s/{token}/', async () => {
     const app = buildApp()
-    const body = await (await app.request('/kortix/share/3000')).json() as any
+    const body = await (await app.request('/bapx/share/3000')).json() as any
     expect(body.url).toMatch(/\/s\/[A-Za-z0-9_-]+\//)
   })
 
@@ -186,7 +186,7 @@ describe('Share system E2E', () => {
     process.env.JUSTAVPS_PROXY_TOKEN = 'cloud_tok'
 
     const app = buildApp()
-    const body = await (await app.request('/kortix/share/3000')).json() as any
+    const body = await (await app.request('/bapx/share/3000')).json() as any
     expect(body.url).toContain('__proxy_token=cloud_tok')
     expect(body.url).toContain('8000--test-slug')
 
@@ -197,12 +197,12 @@ describe('Share system E2E', () => {
   test('explicit PUBLIC_BASE_URL wins over cloud fallback URLs', async () => {
     process.env.ENV_MODE = 'cloud'
     process.env.SANDBOX_ID = 'sb_123'
-    process.env.KORTIX_API_URL = 'https://api.kortix.test/v1/router'
-    process.env.PUBLIC_BASE_URL = 'https://8000--real-slug.kortix.cloud?__proxy_token=pt_real'
+    process.env.KORTIX_API_URL = 'https://api.bapx.test/v1/router'
+    process.env.PUBLIC_BASE_URL = 'https://8000--real-slug.bapx.cloud?__proxy_token=pt_real'
 
     const app = buildApp()
-    const body = await (await app.request('/kortix/share/3000')).json() as any
-    expect(body.url).toContain('https://8000--real-slug.kortix.cloud')
+    const body = await (await app.request('/bapx/share/3000')).json() as any
+    expect(body.url).toContain('https://8000--real-slug.bapx.cloud')
     expect(body.url).toContain('__proxy_token=pt_real')
     expect(body.url).not.toContain('/v1/p/sb_123/8000')
 

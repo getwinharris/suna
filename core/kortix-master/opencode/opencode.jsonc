@@ -9,7 +9,7 @@
   "default_agent": "general",
   // Shared system prompt base — always injected into every agent session.
   // Agent-specific persona/loop/rules live in ./agents/<name>.md.
-  "instructions": ["./kortix-system.md"],
+  "instructions": ["./bapx-system.md"],
   "agent": {
     "build": { "disable": true },
     "plan": { "disable": true },
@@ -30,7 +30,7 @@
         }
       }
     },
-    "kortix-yolo": {
+    "bapx-yolo": {
       "npm": "@ai-sdk/anthropic",
       "env": ["KORTIX_YOLO_API_KEY", "KORTIX_YOLO_URL"],
       "options": {
@@ -38,19 +38,19 @@
         "apiKey": "{env:KORTIX_YOLO_API_KEY}"
       },
       "models": {
-        "kortix-yolo/fast": {
+        "bapx-yolo/fast": {
           "name": "Fast",
-          "id": "kortix-yolo/fast",
-          "family": "kortix-yolo"
+          "id": "bapx-yolo/fast",
+          "family": "bapx-yolo"
         },
-        "kortix-yolo/think": {
+        "bapx-yolo/think": {
           "name": "Think",
-          "id": "kortix-yolo/think",
-          "family": "kortix-yolo"
+          "id": "bapx-yolo/think",
+          "family": "bapx-yolo"
         }
       }
     },
-    "kortix": {
+    "bapx": {
       "npm": "@ai-sdk/openai-compatible",
       "env": ["KORTIX_TOKEN", "KORTIX_API_URL"],
       "options": {
@@ -61,28 +61,28 @@
         "minimax-m27": {
           "name": "MiniMax M2.7",
           "id": "minimax/minimax-m2.7",
-          "family": "kortix",
+          "family": "bapx",
           "cost": { "input": 0.30, "output": 1.20 },
           "limit": { "context": 204800, "output": 131072 }
         },
         "glm-turbo": {
           "name": "GLM-5 Turbo",
           "id": "z-ai/glm-5-turbo",
-          "family": "kortix",
+          "family": "bapx",
           "cost": { "input": 1.20, "output": 4.00 },
           "limit": { "context": 202752, "output": 131072 }
         },
         "kimi": {
           "name": "Kimi K2.5",
           "id": "moonshotai/kimi-k2.5",
-          "family": "kortix",
+          "family": "bapx",
           "cost": { "input": 0.45, "output": 2.20 },
           "limit": { "context": 262144, "output": 65535 }
         },
         "minimax": {
           "name": "MiniMax M2.5",
           "id": "minimax/minimax-m2.5",
-          "family": "kortix",
+          "family": "bapx",
           "cost": { "input": 0.20, "output": 1.17 },
           "limit": { "context": 196608, "output": 65536 }
         }
@@ -90,7 +90,7 @@
     }
   },
   "plugin": [
-    "./plugin/kortix-system/kortix-system.ts",
+    "./plugin/bapx-system/bapx-system.ts",
     "./plugin/opencode-caveman-plugin/opencode-caveman-plugin.ts"
   ],
   "mcp": {

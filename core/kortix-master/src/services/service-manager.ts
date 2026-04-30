@@ -168,7 +168,7 @@ export interface ServiceTemplate {
 
 const REGISTRY_VERSION = 1;
 const WORKSPACE_ROOT = process.env.KORTIX_WORKSPACE || "/workspace";
-const SERVICE_STATE_DIR = join(WORKSPACE_ROOT, ".kortix", "services");
+const SERVICE_STATE_DIR = join(WORKSPACE_ROOT, ".bapx", "services");
 const REGISTRY_FILE = join(SERVICE_STATE_DIR, "registry.json");
 const LOG_DIR = join(SERVICE_STATE_DIR, "logs");
 
@@ -184,7 +184,7 @@ const RECOVERY_THROTTLE_MS = Number(
 const PORT_MIN = 10_000;
 const PORT_MAX = 60_000;
 const PERSISTED_SOURCE_ROOT = WORKSPACE_ROOT;
-const ECONNRESET_GUARD_PATH = "/ephemeral/kortix-master/econnreset-guard.cjs";
+const ECONNRESET_GUARD_PATH = "/ephemeral/bapx-master/econnreset-guard.cjs";
 const INNER_DOCKER_ENABLED = process.env.KORTIX_ENABLE_INNER_DOCKER !== "0";
 
 function s6svc(
@@ -235,7 +235,7 @@ function s6svc(
 }
 
 const BUILTIN_SERVICES: RegisteredServiceSpec[] = [
-  // opencode-serve is spawn — managed directly by Kortix Master (not s6)
+  // opencode-serve is spawn — managed directly by Bapx Master (not s6)
   {
     id: "opencode-serve",
     name: "Agent Runtime API",
@@ -250,7 +250,7 @@ const BUILTIN_SERVICES: RegisteredServiceSpec[] = [
     sourcePath: WORKSPACE_ROOT,
     sourceType: "files",
     sourceRef: null,
-    startCommand: "bash /ephemeral/kortix-master/scripts/run-opencode-serve.sh",
+    startCommand: "bash /ephemeral/bapx-master/scripts/run-opencode-serve.sh",
     installCommand: null,
     buildCommand: null,
     envVarKeys: [],
@@ -1501,7 +1501,7 @@ export class ServiceManager {
     const patterns = [
       "/usr/local/bin/opencode serve --port 4096 --hostname 0.0.0.0",
       "/usr/bin/opencode serve --port 4096 --hostname 0.0.0.0",
-      "bash /ephemeral/kortix-master/scripts/run-opencode-serve.sh",
+      "bash /ephemeral/bapx-master/scripts/run-opencode-serve.sh",
       "/tmp/static-web-server.js",
     ];
     for (const pattern of patterns) {

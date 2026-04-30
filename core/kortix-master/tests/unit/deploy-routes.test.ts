@@ -38,7 +38,7 @@ const storageDir = makeTempDir('deploy-routes-store-')
 const manager = createManager(storageDir)
 const app = new Hono()
 
-app.post('/kortix/deploy', async (c) => {
+app.post('/bapx/deploy', async (c) => {
   const body = await c.req.json<any>()
   if (!body.deploymentId) return c.json({ error: 'deploymentId is required' }, 400)
   const result = await manager.deployLegacyService({
@@ -61,19 +61,19 @@ app.post('/kortix/deploy', async (c) => {
   }, result.success ? 200 : 500)
 })
 
-app.post('/kortix/deploy/:id/stop', async (c) => {
+app.post('/bapx/deploy/:id/stop', async (c) => {
   const result = await manager.stopService(c.req.param('id'))
   if (!result.ok) return c.json({ success: false, error: result.output }, 404)
   return c.json({ success: true, output: result.output })
 })
 
-app.get('/kortix/deploy/:id/logs', async (c) => {
+app.get('/bapx/deploy/:id/logs', async (c) => {
   const result = await manager.getLogs(c.req.param('id'))
   if (result.error) return c.json({ logs: [], error: result.error }, 404)
   return c.json({ logs: result.logs })
 })
 
-app.get('/kortix/deploy/:id/status', async (c) => {
+app.get('/bapx/deploy/:id/status', async (c) => {
   const service = await manager.getService(c.req.param('id'))
   if (!service) return c.json({ status: 'not_found' }, 404)
   return c.json({
@@ -84,7 +84,7 @@ app.get('/kortix/deploy/:id/status', async (c) => {
   })
 })
 
-app.get('/kortix/deploy', async (c) => {
+app.get('/bapx/deploy', async (c) => {
   const services = await manager.listServices({ includeSystem: true, includeStopped: true })
   return c.json({
     deployments: services.filter((service) => service.scope === 'project').map((service) => ({
@@ -111,7 +111,7 @@ function jsonGet(path: string) {
 
 describe('Deploy Routes — compatibility over ServiceManager', () => {
   it('returns 400 when deploymentId is missing', async () => {
-    const res = await jsonPost('/kortix/deploy', { sourceType: 'files' })
+    const res = await jsonPost('/bapx/deploy', { sourceType: 'files' })
     expect(res.status).toBe(400)
   })
 
@@ -124,7 +124,7 @@ describe('Deploy Routes — compatibility over ServiceManager', () => {
       })
     `)
 
-    const res = await jsonPost('/kortix/deploy', {
+    const res = await jsonPost('/bapx/deploy', {
       deploymentId: `route-test-${Date.now()}`,
       sourceType: 'files',
       sourcePath: appDir,
@@ -142,7 +142,7 @@ describe('Deploy Routes — compatibility over ServiceManager', () => {
   }, 30000)
 
   it('lists managed deployments', async () => {
-    const res = await jsonGet('/kortix/deploy')
+    const res = await jsonGet('/bapx/deploy')
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.deployments).toBeArray()
@@ -150,31 +150,31 @@ describe('Deploy Routes — compatibility over ServiceManager', () => {
   })
 
   it('returns status and logs for a running deployment', async () => {
-    const list = await jsonGet('/kortix/deploy')
+    const list = await jsonGet('/bapx/deploy')
     const deployments = (await list.json()).deployments as Array<{ id: string }>
     const id = deployments[0].id
 
-    const statusRes = await jsonGet(`/kortix/deploy/${id}/status`)
+    const statusRes = await jsonGet(`/bapx/deploy/${id}/status`)
     expect(statusRes.status).toBe(200)
     const statusBody = await statusRes.json()
     expect(statusBody.status).toBe('running')
 
     await Bun.sleep(200)
-    const logsRes = await jsonGet(`/kortix/deploy/${id}/logs`)
+    const logsRes = await jsonGet(`/bapx/deploy/${id}/logs`)
     expect(logsRes.status).toBe(200)
     const logsBody = await logsRes.json()
     expect(logsBody.logs).toBeArray()
   })
 
   it('stops a managed deployment and reports stopped status', async () => {
-    const list = await jsonGet('/kortix/deploy')
+    const list = await jsonGet('/bapx/deploy')
     const deployments = (await list.json()).deployments as Array<{ id: string }>
     const id = deployments[0].id
 
-    const stopRes = await jsonPost(`/kortix/deploy/${id}/stop`, {})
+    const stopRes = await jsonPost(`/bapx/deploy/${id}/stop`, {})
     expect(stopRes.status).toBe(200)
 
-    const statusRes = await jsonGet(`/kortix/deploy/${id}/status`)
+    const statusRes = await jsonGet(`/bapx/deploy/${id}/status`)
     expect(statusRes.status).toBe(200)
     const statusBody = await statusRes.json()
     expect(statusBody.status).toBe('stopped')

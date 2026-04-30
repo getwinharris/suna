@@ -47,7 +47,7 @@ const stackStudies = [
 const filesystemProof = [
   '/workspace/.local/share/opencode/storage/session',
   '/workspace/.local/share/opencode/storage/message',
-  '/workspace/.local/share/opencode/storage/kortix-memory.db',
+  '/workspace/.local/share/opencode/storage/bapx-memory.db',
   '/workspace/.opencode/agents',
   '/workspace/.opencode/skills',
   '/workspace/.secrets',

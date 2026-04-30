@@ -52,7 +52,7 @@ describe('ActionDispatcher', () => {
         source_config: { cron_expr: '0 0 9 * * *' },
         action_type: 'prompt',
         action_config: { prompt: 'Generate the report' },
-        agent_name: 'kortix',
+        agent_name: 'bapx',
       })
 
       const result = await dispatcher.dispatch(trigger.id, {
@@ -116,7 +116,7 @@ describe('ActionDispatcher', () => {
         manual: false,
         timestamp: new Date().toISOString(),
         data: {
-          body: { repository: 'kortix-ai/suna', ref: 'refs/heads/main' },
+          body: { repository: 'bapx-ai/bapX', ref: 'refs/heads/main' },
         },
       })
 

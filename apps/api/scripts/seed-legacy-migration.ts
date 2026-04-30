@@ -4,7 +4,7 @@
  *
  * What it does:
  *   1. Creates a legacy project + thread + messages in the DB
- *   2. Spins up a Daytona sandbox with the OLD suna snapshot
+ *   2. Spins up a Daytona sandbox with the OLD bapX snapshot
  *   3. Creates dummy files in /workspace/uploads/ on that sandbox
  *   4. Links the sandbox to the project via the resources table
  *
@@ -15,7 +15,7 @@
  *   bun run scripts/seed-legacy-migration.ts --account-id <uuid>
  *
  * Requires:
- *   - DATABASE_URL (legacy suna DB with projects/threads/messages/resources tables)
+ *   - DATABASE_URL (legacy bapX DB with projects/threads/messages/resources tables)
  *   - DAYTONA_API_KEY, DAYTONA_SERVER_URL, DAYTONA_TARGET
  */
 
@@ -24,7 +24,7 @@ import { Daytona } from '@daytonaio/sdk';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
-const OLD_SUNA_SNAPSHOT = 'kortix/suna:0.1.3.30';
+const OLD_SUNA_SNAPSHOT = 'bapx/bapX:0.1.3.30';
 
 const DUMMY_FILES = [
   { path: '/workspace/uploads/report.pdf', content: 'fake-pdf-content-here' },
@@ -141,7 +141,7 @@ async function main() {
   console.log(`   Created ${msgs.length} messages`);
 
   // 4. Spin up Daytona sandbox with old snapshot
-  console.log('4. Creating Daytona sandbox with old suna snapshot...');
+  console.log('4. Creating Daytona sandbox with old bapX snapshot...');
   const daytona = new Daytona({
     apiKey: daytonaKey,
     apiUrl: daytonaUrl || undefined,

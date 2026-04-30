@@ -9,12 +9,12 @@ import { AppDownloadQR, APP_DOWNLOAD_URL } from '@/components/common/app-downloa
 // This page only renders for desktop users
 
 const STORE_LINKS = {
-  ios: 'https://apps.apple.com/ie/app/kortix/id6754448524',
-  android: 'https://play.google.com/store/apps/details?id=com.kortix.app',
+  ios: 'https://apps.apple.com/ie/app/bapx/id6754448524',
+  android: 'https://play.google.com/store/apps/details?id=com.bapx.app',
 };
 
 // Bapx Media Hub symbol SVG (inline to avoid loading issues)
-function KortixSymbol({ size = 24, className }: { size?: number; className?: string }) {
+function BapxSymbol({ size = 24, className }: { size?: number; className?: string }) {
   return (
     <svg 
       width={size} 
@@ -78,7 +78,7 @@ export default function AppDownloadPage() {
             {/* App icon */}
             <div className="relative mb-6 z-10">
               <div className="relative w-20 h-20 bg-foreground rounded-[20px] flex items-center justify-center">
-                <KortixSymbol size={40} className="text-background" />
+                <BapxSymbol size={40} className="text-background" />
               </div>
             </div>
             

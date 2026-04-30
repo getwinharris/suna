@@ -1,6 +1,6 @@
 /**
  * Unified Triggers Router — Full CRUD for all trigger types.
- * Replaces both the old /kortix/triggers (read-only list) and /kortix/cron/* routes.
+ * Replaces both the old /bapx/triggers (read-only list) and /bapx/cron/* routes.
  *
  * Writes go through TriggerManager which handles YAML + DB write-through.
  */
@@ -25,7 +25,7 @@ function getWorkspaceRoot(): string {
 
 function getStore(): TriggerStore {
   if (!store) {
-    store = new TriggerStore(join(getWorkspaceRoot(), '.kortix', 'kortix.db'))
+    store = new TriggerStore(join(getWorkspaceRoot(), '.bapx', 'bapx.db'))
     // Additive columns the engine ignores but the UI + dispatch read:
     //   project_id — scope a trigger to a project's Triggers tab
     //   ticket_id  — bind a trigger to a ticket (persistent per-ticket session)
@@ -44,7 +44,7 @@ function getYamlSync(): TriggerYaml {
 
 /**
  * Tell the in-plugin trigger manager to re-read the DB and re-register
- * runtime (cron jobs + webhook routes). kortix-master's HTTP CRUD path
+ * runtime (cron jobs + webhook routes). bapx-master's HTTP CRUD path
  * bypasses manager.createTrigger (we hit the store directly so the
  * transaction stays in-process), so without this ping the new cron
  * schedule + webhook route never register until an opencode restart.
@@ -265,7 +265,7 @@ triggersRouter.post('/',
     const db = getStore()
     const ys = getYamlSync()
 
-    // Handle legacy flat format (from old /kortix/cron API)
+    // Handle legacy flat format (from old /bapx/cron API)
     if (body.cron_expr && !body.source) {
       body.source = { type: 'cron', cron_expr: body.cron_expr, timezone: body.timezone ?? 'UTC' }
       body.action = { type: 'prompt', prompt: body.prompt }

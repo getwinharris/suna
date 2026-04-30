@@ -1,11 +1,11 @@
 /**
  * Project-scoped credentials API.
  *
- * Routes are mounted under /kortix/projects/:projectId/credentials. List
+ * Routes are mounted under /bapx/projects/:projectId/credentials. List
  * returns names + metadata only (no values). Reveal is its own endpoint so
  * a curious page-load doesn't spray plaintext across every card render.
  *
- * Actor attribution comes from X-Kortix-Actor-Type + X-Kortix-Actor-Id
+ * Actor attribution comes from X-Bapx-Actor-Type + X-Bapx-Actor-Id
  * headers — same pattern as milestones + tickets routes.
  */
 
@@ -25,8 +25,8 @@ import {
 
 function getDb(): Database {
   const workspace = process.env.WORKSPACE_DIR || process.env.KORTIX_WORKSPACE || '/workspace'
-  const dbPath = join(workspace, '.kortix', 'kortix.db')
-  if (!existsSync(dbPath)) throw new Error('kortix.db not found')
+  const dbPath = join(workspace, '.bapx', 'bapx.db')
+  if (!existsSync(dbPath)) throw new Error('bapx.db not found')
   const db = new Database(dbPath)
   db.exec('PRAGMA busy_timeout=5000')
   ensureTicketTables(db)
@@ -42,15 +42,15 @@ function resolveProject(db: Database, id: string): ProjectRow | null {
 }
 
 function actorFromHeaders(c: { req: { header: (k: string) => string | undefined } }): { type: ActorType; id: string | null } {
-  const rawType = c.req.header('x-kortix-actor-type') ?? c.req.header('X-Kortix-Actor-Type')
-  const rawId = c.req.header('x-kortix-actor-id') ?? c.req.header('X-Kortix-Actor-Id')
+  const rawType = c.req.header('x-bapx-actor-type') ?? c.req.header('X-Bapx-Actor-Type')
+  const rawId = c.req.header('x-bapx-actor-id') ?? c.req.header('X-Bapx-Actor-Id')
   const type: ActorType = rawType === 'agent' || rawType === 'system' ? rawType : 'user'
   return { type, id: rawId ? String(rawId) : null }
 }
 
 const router = new Hono()
 
-// GET /kortix/projects/:projectId/credentials — list (no values)
+// GET /bapx/projects/:projectId/credentials — list (no values)
 router.get('/:projectId/credentials', (c) => {
   try {
     const db = getDb()
@@ -62,7 +62,7 @@ router.get('/:projectId/credentials', (c) => {
   }
 })
 
-// POST /kortix/projects/:projectId/credentials — upsert {name, value, description?}
+// POST /bapx/projects/:projectId/credentials — upsert {name, value, description?}
 router.post('/:projectId/credentials', async (c) => {
   try {
     const db = getDb()
@@ -98,7 +98,7 @@ router.post('/:projectId/credentials', async (c) => {
   }
 })
 
-// GET /kortix/projects/:projectId/credentials/:name — reveal decrypted value
+// GET /bapx/projects/:projectId/credentials/:name — reveal decrypted value
 router.get('/:projectId/credentials/:name', async (c) => {
   try {
     const db = getDb()
@@ -127,7 +127,7 @@ router.get('/:projectId/credentials/:name', async (c) => {
   }
 })
 
-// DELETE /kortix/projects/:projectId/credentials/:name
+// DELETE /bapx/projects/:projectId/credentials/:name
 router.delete('/:projectId/credentials/:name', (c) => {
   try {
     const db = getDb()
@@ -148,7 +148,7 @@ router.delete('/:projectId/credentials/:name', (c) => {
   }
 })
 
-// GET /kortix/projects/:projectId/credentials/:name/events — per-credential audit
+// GET /bapx/projects/:projectId/credentials/:name/events — per-credential audit
 router.get('/:projectId/credentials/:name/events', (c) => {
   try {
     const db = getDb()
@@ -162,7 +162,7 @@ router.get('/:projectId/credentials/:name/events', (c) => {
   }
 })
 
-// HEAD /kortix/projects/:projectId/credentials/:name — existence check without reveal
+// HEAD /bapx/projects/:projectId/credentials/:name — existence check without reveal
 router.get('/:projectId/credentials/:name/exists', (c) => {
   try {
     const db = getDb()

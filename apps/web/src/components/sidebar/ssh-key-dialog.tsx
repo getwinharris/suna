@@ -33,7 +33,7 @@ interface SSHKeyDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const SSH_META_STORAGE_KEY = 'kortix:ssh-access-meta:v1';
+const SSH_META_STORAGE_KEY = 'bapx:ssh-access-meta:v1';
 
 type SSHAccessMeta = {
   ssh_command: string;

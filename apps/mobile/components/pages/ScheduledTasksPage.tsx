@@ -902,7 +902,7 @@ function WebhookUrlBlock({
   const path = trigger.webhook?.path || '/hooks/...';
   const fullUrl = `${baseUrl.replace(/\/+$/, '')}${path}`;
   const secretHeader = trigger.webhook?.secretProtected
-    ? ` \\\n  -H "X-Kortix-Trigger-Secret: <secret>"`
+    ? ` \\\n  -H "X-Bapx-Trigger-Secret: <secret>"`
     : '';
   const curlExample = `curl -X POST "${fullUrl}"${secretHeader} \\\n  -H "Content-Type: application/json" \\\n  -d '{"key": "value"}'`;
 
@@ -1529,7 +1529,7 @@ function CreateTaskSheet({
               style={{ ...inputStyle, marginBottom: 8 }}
             />
             <Text style={{ fontSize: 11, fontFamily: 'Roobert', color: muted, lineHeight: 16 }}>
-              If set, requests must include the header{'\n'}X-Kortix-Trigger-Secret with this value.
+              If set, requests must include the header{'\n'}X-Bapx-Trigger-Secret with this value.
             </Text>
           </>)}
 

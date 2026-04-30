@@ -355,7 +355,7 @@ export function FeedbackDrawer() {
             )}
           </View>
           <Text className="text-sm font-roobert text-foreground flex-1">
-            {t('chat.helpKortixImprove', { defaultValue: 'Help Bapx Media Hub improve with this feedback' })}
+            {t('chat.helpBapxImprove', { defaultValue: 'Help Bapx Media Hub improve with this feedback' })}
           </Text>
         </BottomSheetTouchable>
 

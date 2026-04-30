@@ -16,7 +16,7 @@ afterEach(() => {
 })
 
 function makeStorage(): string {
-	const root = mkdtempSync(path.join(tmpdir(), "kortix-autowork-test-"))
+	const root = mkdtempSync(path.join(tmpdir(), "bapx-autowork-test-"))
 	tempRoots.push(root)
 	const storageBase = path.join(root, ".local", "share", "opencode")
 	mkdirSync(storageBase, { recursive: true })

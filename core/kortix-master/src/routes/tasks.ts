@@ -1,5 +1,5 @@
 /**
- * Kortix Tasks API — task-centric project execution.
+ * Bapx Tasks API — task-centric project execution.
  *
  * Statuses: todo, in_progress, input_needed, awaiting_review, completed, cancelled
  *
@@ -42,8 +42,8 @@ const tasksRouter = new Hono()
 
 function getDb(): Database {
   const workspace = process.env.WORKSPACE_DIR || process.env.KORTIX_WORKSPACE || '/workspace'
-  const dbPath = join(workspace, '.kortix', 'kortix.db')
-  if (!existsSync(dbPath)) throw new Error('kortix.db not found')
+  const dbPath = join(workspace, '.bapx', 'bapx.db')
+  if (!existsSync(dbPath)) throw new Error('bapx.db not found')
   const db = new Database(dbPath)
   db.exec('PRAGMA busy_timeout=5000')
   return db
@@ -64,7 +64,7 @@ function getOpenCodeClient() {
 }
 
 // ---------------------------------------------------------------------------
-// GET /kortix/tasks?project_id=xxx&status=yyy
+// GET /bapx/tasks?project_id=xxx&status=yyy
 // ---------------------------------------------------------------------------
 tasksRouter.get('/', async (c) => {
   try {
@@ -81,7 +81,7 @@ tasksRouter.get('/', async (c) => {
 })
 
 // ---------------------------------------------------------------------------
-// GET /kortix/tasks/:id
+// GET /bapx/tasks/:id
 // ---------------------------------------------------------------------------
 tasksRouter.get('/:id', async (c) => {
   try {
@@ -96,7 +96,7 @@ tasksRouter.get('/:id', async (c) => {
 })
 
 // ---------------------------------------------------------------------------
-// GET /kortix/tasks/:id/status
+// GET /bapx/tasks/:id/status
 // ---------------------------------------------------------------------------
 tasksRouter.get('/:id/status', async (c) => {
   try {
@@ -111,7 +111,7 @@ tasksRouter.get('/:id/status', async (c) => {
 })
 
 // ---------------------------------------------------------------------------
-// GET /kortix/tasks/:id/events
+// GET /bapx/tasks/:id/events
 // ---------------------------------------------------------------------------
 tasksRouter.get('/:id/events', async (c) => {
   try {
@@ -126,7 +126,7 @@ tasksRouter.get('/:id/events', async (c) => {
 })
 
 // ---------------------------------------------------------------------------
-// POST /kortix/tasks  — create a new task
+// POST /bapx/tasks  — create a new task
 // ---------------------------------------------------------------------------
 tasksRouter.post('/', async (c) => {
   try {
@@ -148,7 +148,7 @@ tasksRouter.post('/', async (c) => {
 })
 
 // ---------------------------------------------------------------------------
-// POST /kortix/tasks/:id/start — start execution (creates worker session)
+// POST /bapx/tasks/:id/start — start execution (creates worker session)
 // ---------------------------------------------------------------------------
 tasksRouter.post('/:id/start', async (c) => {
   try {
@@ -169,7 +169,7 @@ tasksRouter.post('/:id/start', async (c) => {
 })
 
 // ---------------------------------------------------------------------------
-// POST /kortix/tasks/:id/approve  — HUMAN review approval → completed
+// POST /bapx/tasks/:id/approve  — HUMAN review approval → completed
 // ---------------------------------------------------------------------------
 tasksRouter.post('/:id/approve', async (c) => {
   try {
@@ -180,7 +180,7 @@ tasksRouter.post('/:id/approve', async (c) => {
 })
 
 // ---------------------------------------------------------------------------
-// PATCH /kortix/tasks/:id
+// PATCH /bapx/tasks/:id
 // ---------------------------------------------------------------------------
 tasksRouter.patch('/:id', async (c) => {
   try {
@@ -193,7 +193,7 @@ tasksRouter.patch('/:id', async (c) => {
 })
 
 // ---------------------------------------------------------------------------
-// DELETE /kortix/tasks/:id
+// DELETE /bapx/tasks/:id
 // ---------------------------------------------------------------------------
 tasksRouter.delete('/:id', (c) => {
   try {

@@ -4,12 +4,12 @@
  * `/autowork [--max-iterations N] <task>` activates the loop on a session.
  * Every `session.idle` the plugin first enforces a planning phase, then an
  * execution phase. The session must produce an approved
- * `<kortix_autowork_plan>` before execution begins. Later, completion is only
- * accepted when the latest `<kortix_autowork_complete>` is backed by real,
+ * `<bapx_autowork_plan>` before execution begins. Later, completion is only
+ * accepted when the latest `<bapx_autowork_complete>` is backed by real,
  * transcript-visible verification after the last code change.
  *
  * The continuation prompt re-anchors the original user request via
- * `<kortix_autowork_request>` so the worker cannot drift across long loops.
+ * `<bapx_autowork_request>` so the worker cannot drift across long loops.
  */
 
 import type { Plugin } from "@opencode-ai/plugin"
@@ -59,8 +59,8 @@ function extractMessageText(input: any): string {
 
 /**
  * Detect plugin-injected messages so they never re-trigger the loop.
- * The wrapper tag `<kortix_autowork_system>` surrounds every injected prompt,
- * and `<kortix_autowork_complete>` is the worker's completion signal — both
+ * The wrapper tag `<bapx_autowork_system>` surrounds every injected prompt,
+ * and `<bapx_autowork_complete>` is the worker's completion signal — both
  * are internal and should not be interpreted as user input.
  */
 function isInternalMessage(text: string): boolean {
@@ -156,7 +156,7 @@ const AutoworkPlugin: Plugin = async ({ client }) => {
 
 	const log = (level: "info" | "warn" | "error", message: string) => {
 		try {
-			client.app.log({ body: { service: "kortix-autowork", level, message } }).catch(() => {})
+			client.app.log({ body: { service: "bapx-autowork", level, message } }).catch(() => {})
 		} catch {
 			// ignore
 		}

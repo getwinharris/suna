@@ -8,7 +8,7 @@ coreRouter.get('/status',
   describeRoute({
     tags: ['System'],
     summary: 'Central service manager status',
-    description: 'Returns Kortix Master service-manager state for core and bootstrap services.',
+    description: 'Returns Bapx Master service-manager state for core and bootstrap services.',
     responses: { 200: { description: 'Core service status' } },
   }),
   async (c) => {
@@ -41,7 +41,7 @@ coreRouter.post('/restart/:service',
   describeRoute({
     tags: ['System'],
     summary: 'Restart a managed service',
-    description: 'Restarts a single service managed by Kortix Master.',
+    description: 'Restarts a single service managed by Bapx Master.',
     responses: { 200: { description: 'Restart result' }, 404: { description: 'Service not found' }, 500: { description: 'Restart failed' } },
   }),
   async (c) => {

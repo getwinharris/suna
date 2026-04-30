@@ -1,5 +1,5 @@
 /**
- * Runtime Reload — Nuclear restart for the entire Kortix stack.
+ * Runtime Reload — Nuclear restart for the entire Bapx stack.
  *
  * Two modes:
  *   - "dispose-only": Hot-reload OpenCode config (agents, skills, commands, opencode.jsonc).
@@ -13,7 +13,7 @@
  *   svc-opencode-serve     — OpenCode runtime (port 4096, plugins, agents, tools, web UI)
  *   svc-static-web         — Static file server (port 3211)
  *   svc-lss-sync           — Local semantic search indexer
- *   svc-kortix-master      — This process (port 8000)
+ *   svc-bapx-master      — This process (port 8000)
  */
 
 import { config } from '../config'
@@ -100,7 +100,7 @@ export function getSafeFullReloadFallback(options?: {
   const uid = options?.uid ?? (typeof process.getuid === 'function' ? process.getuid() : undefined)
 
   if (envMode === 'local' && uid !== 0) {
-    return 'Full restart is not supported from the local sandbox app process; performed a safe OpenCode dispose instead to avoid a kortix-master restart loop'
+    return 'Full restart is not supported from the local sandbox app process; performed a safe OpenCode dispose instead to avoid a bapx-master restart loop'
   }
 
   return null
@@ -237,16 +237,16 @@ export async function initiateRuntimeReload(mode: ReloadMode): Promise<ReloadRes
   restartS6('svc-static-web', result)         // port 3211 — static file server
   restartS6('svc-lss-sync', result)           // semantic search indexer
 
-  result.steps.push('Restarting kortix-master last — s6 will respawn with fresh state')
+  result.steps.push('Restarting bapx-master last — s6 will respawn with fresh state')
   result.success = true
 
   // Self-restart — deferred so HTTP response goes out first
   setTimeout(() => {
-    console.log('[runtime-reload] Full restart: killing kortix-master — s6 will respawn')
+    console.log('[runtime-reload] Full restart: killing bapx-master — s6 will respawn')
 
-    const restart = runS6Svc(['-r', '/run/service/svc-kortix-master'])
+    const restart = runS6Svc(['-r', '/run/service/svc-bapx-master'])
     if (!restart.ok) {
-      console.warn(`[runtime-reload] Failed to restart svc-kortix-master via '${restart.command}': ${restart.stderr || `exit ${restart.exitCode}`}`)
+      console.warn(`[runtime-reload] Failed to restart svc-bapx-master via '${restart.command}': ${restart.stderr || `exit ${restart.exitCode}`}`)
       // Fallback hard exit so s6 still respawns us even if the privileged helper
       // is unavailable in this environment.
       setTimeout(() => process.exit(0), 3000)

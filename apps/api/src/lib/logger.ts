@@ -1,5 +1,5 @@
 /**
- * Structured logger for Kortix API.
+ * Structured logger for Bapx API.
  *
  * Uses @logtail/node to ship structured logs to Better Stack Telemetry.
  * Automatically enriches every log with request context (userId, accountId,
@@ -45,7 +45,7 @@ if (LOG_TOKEN) {
 // ─── Static enrichment (same for every log) ─────────────────────────────────
 
 const BASE_CONTEXT = {
-  service: 'kortix-api',
+  service: 'bapx-api',
   env: process.env.INTERNAL_KORTIX_ENV || 'dev',
   version: process.env.SANDBOX_VERSION || 'dev',
 };

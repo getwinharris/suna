@@ -18,7 +18,7 @@ describe('normalizeBootstrapAuthAliases', () => {
   test('forces KORTIX_YOLO_API_KEY, INTERNAL_SERVICE_KEY, and TUNNEL_TOKEN to match KORTIX_TOKEN', async () => {
     const { normalizeBootstrapAuthAliases } = await import('../../src/services/bootstrap-env')
 
-    process.env.KORTIX_TOKEN = 'kortix_sb_canonical'
+    process.env.KORTIX_TOKEN = 'bapx_sb_canonical'
     process.env.KORTIX_YOLO_API_KEY = 'stale-yolo-key'
     process.env.INTERNAL_SERVICE_KEY = 'stale-inbound-key'
     process.env.TUNNEL_TOKEN = 'stale-tunnel-key'
@@ -26,8 +26,8 @@ describe('normalizeBootstrapAuthAliases', () => {
     const updated = normalizeBootstrapAuthAliases()
 
     expect(updated).toBe(3)
-    expect(process.env.KORTIX_YOLO_API_KEY).toBe('kortix_sb_canonical')
-    expect(process.env.INTERNAL_SERVICE_KEY).toBe('kortix_sb_canonical')
-    expect(process.env.TUNNEL_TOKEN).toBe('kortix_sb_canonical')
+    expect(process.env.KORTIX_YOLO_API_KEY).toBe('bapx_sb_canonical')
+    expect(process.env.INTERNAL_SERVICE_KEY).toBe('bapx_sb_canonical')
+    expect(process.env.TUNNEL_TOKEN).toBe('bapx_sb_canonical')
   })
 })

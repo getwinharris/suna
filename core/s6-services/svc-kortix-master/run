@@ -1,7 +1,7 @@
 #!/usr/bin/with-contenv bash
-# Kortix Master — reverse proxy on port 8000, proxying to OpenCode at localhost:4096
+# Bapx Master — reverse proxy on port 8000, proxying to OpenCode at localhost:4096
 
-echo "[kortix-master] Starting on port 8000, proxying to OpenCode at localhost:4096"
+echo "[bapx-master] Starting on port 8000, proxying to OpenCode at localhost:4096"
 
 exec s6-setuidgid abc \
   env HOME=/workspace \
@@ -9,4 +9,4 @@ exec s6-setuidgid abc \
       OPENCODE_HOST=localhost \
       OPENCODE_PORT=4096 \
       PATH="/opt/bun/bin:/usr/local/bin:/usr/bin:/bin" \
-  /opt/bun/bin/bun run /ephemeral/kortix-master/src/index.ts
+  /opt/bun/bin/bun run /ephemeral/bapx-master/src/index.ts

@@ -39,12 +39,12 @@ export function getComputeDisplayPriceCents(serverType: string): number | null {
 
 /**
  * Human-readable line for Stripe checkout / invoice descriptions.
- * Example: "Kortix Computer · Pro — 8 vCPU, 16 GB RAM, 320 GB SSD"
+ * Example: "Bapx Computer · Pro — 8 vCPU, 16 GB RAM, 320 GB SSD"
  */
 export function getComputeDescription(serverType: string): string {
   const t = COMPUTE_TIERS[serverType];
-  if (!t) return 'Kortix Computer';
-  return `Kortix Computer · ${t.label} — ${t.cores} vCPU, ${t.memoryGb} GB RAM, ${t.diskGb} GB SSD`;
+  if (!t) return 'Bapx Computer';
+  return `Bapx Computer · ${t.label} — ${t.cores} vCPU, ${t.memoryGb} GB RAM, ${t.diskGb} GB SSD`;
 }
 
 // ─── Tiers ──────────────────────────────────────────────────────────────────
@@ -295,16 +295,16 @@ export function isDowngrade(fromTier: string, toTier: string): boolean {
 // ─── RevenueCat (mobile billing — untouched) ─────────────────────────────────
 
 const REVENUECAT_PRODUCT_MAPPING: Record<string, string> = {
-  'kortix_plus_monthly': 'tier_2_20',
-  'kortix_plus_yearly': 'tier_2_20',
+  'bapx_plus_monthly': 'tier_2_20',
+  'bapx_plus_yearly': 'tier_2_20',
   'plus:plus-monthly': 'tier_2_20',
 
-  'kortix_pro_monthly': 'pro',
-  'kortix_pro_yearly': 'pro',
+  'bapx_pro_monthly': 'pro',
+  'bapx_pro_yearly': 'pro',
   'pro:pro-monthly': 'pro',
 
-  'kortix_ultra_monthly': 'tier_25_200',
-  'kortix_ultra_yearly': 'tier_25_200',
+  'bapx_ultra_monthly': 'tier_25_200',
+  'bapx_ultra_yearly': 'tier_25_200',
   'ultra:ultra-monthly': 'tier_25_200',
 };
 

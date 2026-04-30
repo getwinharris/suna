@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Kortix — One-Click Install                                               ║
+# ║  Bapx — One-Click Install                                               ║
 # ║                                                                            ║
-# ║  curl -fsSL https://kortix.com/install | bash                              ║
+# ║  curl -fsSL https://bapx.in/install | bash                              ║
 # ║                                                                            ║
 # ║  Supports two modes (same stack, different bind address):                  ║
 # ║    1. Local (laptop/desktop) — binds to 127.0.0.1                          ║
@@ -65,14 +65,14 @@ dots_done() { printf "${GREEN}done${NC}\n"; }
 dots_ok()   { printf "${GREEN}✓${NC}\n"; }
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${KORTIX_HOME:-$HOME/.kortix}"
+INSTALL_DIR="${KORTIX_HOME:-$HOME/.bapx}"
 
 # Resolve the latest released version from GitHub Releases API.
 # Falls back to the 'latest' Docker tag if the API is unreachable.
 resolve_latest_version() {
   local gh_version
   gh_version=$(curl -sf --connect-timeout 5 \
-    "https://api.github.com/repos/kortix-ai/suna/releases/latest" 2>/dev/null \
+    "https://api.github.com/repos/bapx-ai/bapX/releases/latest" 2>/dev/null \
     | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"].lstrip("v"))' 2>/dev/null) || true
   if [ -n "$gh_version" ]; then
     printf '%s' "$gh_version"
@@ -123,7 +123,7 @@ compute_compose_project_name() {
   local raw
   raw="$(basename "$INSTALL_DIR")"
   raw="$(printf '%s' "$raw" | tr '[:upper:]' '[:lower:]' | sed 's/^[._-]*//; s/[^a-z0-9_-]//g')"
-  [ -n "$raw" ] || raw="kortix"
+  [ -n "$raw" ] || raw="bapx"
   printf '%s' "$raw"
 }
 
@@ -192,7 +192,7 @@ parse_args() {
         ;;
       -h|--help)
         cat <<'EOF'
-Usage: get-kortix.sh [options]
+Usage: get-bapx.sh [options]
 
 Options:
   --local             Use local Docker images instead of pulling from registry
@@ -205,13 +205,13 @@ Options:
   --query "version=<tag>"
 
 Examples:
-  bash get-kortix.sh
-  bash get-kortix.sh --local
-  bash get-kortix.sh --local --build-local
-  bash get-kortix.sh --local --local-tag latest
-  bash get-kortix.sh --version 0.7.14
-  bash get-kortix.sh --query "v=0.7.14"
-  KORTIX_VERSION=0.7.15 bash get-kortix.sh
+  bash get-bapx.sh
+  bash get-bapx.sh --local
+  bash get-bapx.sh --local --build-local
+  bash get-bapx.sh --local --local-tag latest
+  bash get-bapx.sh --version 0.7.14
+  bash get-bapx.sh --query "v=0.7.14"
+  KORTIX_VERSION=0.7.15 bash get-bapx.sh
 EOF
         exit 0
         ;;
@@ -232,14 +232,14 @@ fi
 KORTIX_VERSION="${KORTIX_VERSION:-latest}"
 
 IMAGE_TAG="$KORTIX_VERSION"
-SANDBOX_IMAGE_REPO="kortix/computer"
+SANDBOX_IMAGE_REPO="bapx/computer"
 if [ "$KORTIX_LOCAL_IMAGES" = "1" ]; then
   IMAGE_TAG="$KORTIX_LOCAL_TAG"
-  SANDBOX_IMAGE_REPO="kortix/computer"
+  SANDBOX_IMAGE_REPO="bapx/computer"
 fi
 
-FRONTEND_IMAGE="${KORTIX_FRONTEND_IMAGE:-kortix/kortix-frontend:${IMAGE_TAG}}"
-API_IMAGE="${KORTIX_API_IMAGE:-kortix/kortix-api:${IMAGE_TAG}}"
+FRONTEND_IMAGE="${KORTIX_FRONTEND_IMAGE:-bapx/bapx-frontend:${IMAGE_TAG}}"
+API_IMAGE="${KORTIX_API_IMAGE:-bapx/bapx-api:${IMAGE_TAG}}"
 SANDBOX_IMAGE="${KORTIX_SANDBOX_IMAGE:-${SANDBOX_IMAGE_REPO}:${IMAGE_TAG}}"
 FRONTEND_IMAGE_OVERRIDDEN="0"
 API_IMAGE_OVERRIDDEN="0"
@@ -253,9 +253,9 @@ SUPABASE_KONG_IMAGE="kong:2.8.1"
 SUPABASE_REST_IMAGE="postgrest/postgrest:v14.5"
 
 # ─── Self-hosted sandbox isolation ────────────────────────────────────────────
-# Different name + port range from dev (kortix-sandbox / 14000) so both can
+# Different name + port range from dev (bapx-sandbox / 14000) so both can
 # run simultaneously on the same Docker daemon.
-SANDBOX_CONTAINER_NAME="${SANDBOX_CONTAINER_NAME:-kortix-hosted-sandbox}"
+SANDBOX_CONTAINER_NAME="${SANDBOX_CONTAINER_NAME:-bapx-hosted-sandbox}"
 SANDBOX_PORT_BASE="${SANDBOX_PORT_BASE:-15000}"
 
 # Installer state
@@ -416,7 +416,7 @@ resolve_release_images() {
     if [ "$FRONTEND_IMAGE_OVERRIDDEN" = "1" ]; then
       fatal "Configured frontend image not found: ${FRONTEND_IMAGE}"
     fi
-    local fallback_frontend="kortix/kortix-frontend:latest"
+    local fallback_frontend="bapx/bapx-frontend:latest"
     if docker_manifest_exists "$fallback_frontend"; then
       warn "Frontend image ${FRONTEND_IMAGE} not found; falling back to ${fallback_frontend}"
       FRONTEND_IMAGE="$fallback_frontend"
@@ -429,7 +429,7 @@ resolve_release_images() {
     if [ "$API_IMAGE_OVERRIDDEN" = "1" ]; then
       fatal "Configured API image not found: ${API_IMAGE}"
     fi
-    local fallback_api="kortix/kortix-api:latest"
+    local fallback_api="bapx/bapx-api:latest"
     if docker_manifest_exists "$fallback_api"; then
       warn "API image ${API_IMAGE} not found; falling back to ${fallback_api}"
       API_IMAGE="$fallback_api"
@@ -462,10 +462,10 @@ pull_images_parallel() {
     | xargs -r -n1 -P "$KORTIX_PULL_PARALLELISM" docker pull
 }
 
-# Free ports used by Kortix (local mode)
-# Usage: free_kortix_ports [project_name]
+# Free ports used by Bapx (local mode)
+# Usage: free_bapx_ports [project_name]
 # If project_name is provided, only cleans containers from that project
-free_kortix_ports() {
+free_bapx_ports() {
   local project_name="${1:-}"
   local is_local=0
   
@@ -486,12 +486,12 @@ free_kortix_ports() {
   # First, clean up any lingering containers that might hold ports
   # Use project-specific pattern if project_name is provided
   if [ -n "$project_name" ]; then
-    # Clean up containers from this compose project (e.g. kortix-frontend-1).
-    # EXCLUDES standalone sandbox containers (kortix-sandbox, kortix-hosted-sandbox)
+    # Clean up containers from this compose project (e.g. bapx-frontend-1).
+    # EXCLUDES standalone sandbox containers (bapx-sandbox, bapx-hosted-sandbox)
     # which are managed by the API, not compose — killing them breaks dev mode.
     docker ps -a --format '{{.Names}}' 2>/dev/null \
       | grep -E "^${project_name}-" \
-      | grep -v -E "^(kortix-sandbox|kortix-hosted-sandbox)$" \
+      | grep -v -E "^(bapx-sandbox|bapx-hosted-sandbox)$" \
       | xargs -r docker rm -f 2>/dev/null || true
   fi
   
@@ -505,7 +505,7 @@ free_kortix_ports() {
     fi
   done
   
-  [ $freed -eq 1 ] && info "Freed Kortix ports" || true
+  [ $freed -eq 1 ] && info "Freed Bapx ports" || true
 }
 
 # Generate a Supabase JWT (anon or service_role)
@@ -563,7 +563,7 @@ preflight() {
 
 # ─── Mode Selection ──────────────────────────────────────────────────────────
 prompt_mode() {
-  section "Where are you running Kortix?"
+  section "Where are you running Bapx?"
 
   printf "\n"
   printf "    ${WHITE}1)${NC}  Local machine   ${FADED}laptop / desktop — binds to localhost${NC}\n"
@@ -829,22 +829,22 @@ ALTER ROLE authenticator WITH PASSWORD 'POSTGRES_PASSWORD_PLACEHOLDER';
 ALTER ROLE supabase_admin WITH PASSWORD 'POSTGRES_PASSWORD_PLACEHOLDER';
 ROLESEOF
 
-  # Kortix extensions and schemas
-  cat > "$INSTALL_DIR/volumes/db/kortix.sql" << 'KORTIXEOF'
--- Kortix bootstrap: extensions and schemas
+  # Bapx extensions and schemas
+  cat > "$INSTALL_DIR/volumes/db/bapx.sql" << 'KORTIXEOF'
+-- Bapx bootstrap: extensions and schemas
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 CREATE EXTENSION IF NOT EXISTS pg_net;
-CREATE SCHEMA IF NOT EXISTS kortix;
+CREATE SCHEMA IF NOT EXISTS bapx;
 CREATE SCHEMA IF NOT EXISTS basejump;
 
 -- Scheduler helper (pg_cron → tick endpoint)
-CREATE OR REPLACE FUNCTION kortix.configure_scheduler(api_url TEXT, tick_secret TEXT)
+CREATE OR REPLACE FUNCTION bapx.configure_scheduler(api_url TEXT, tick_secret TEXT)
 RETURNS void AS $$
 BEGIN
-  PERFORM cron.unschedule('kortix_global_tick')
-    WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'kortix_global_tick');
+  PERFORM cron.unschedule('bapx_global_tick')
+    WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'bapx_global_tick');
   PERFORM cron.schedule(
-    'kortix_global_tick',
+    'bapx_global_tick',
     '* * * * *',
     format(
       'SELECT net.http_post(url := %L, headers := ''{"Content-Type": "application/json", "x-cron-secret": "%s"}''::jsonb, body := ''{"source": "pg_cron"}''::jsonb, timeout_milliseconds := 30000)',
@@ -897,7 +897,7 @@ ${db_ports}
     volumes:
       - supabase-db-data:/var/lib/postgresql/data
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
-      - ./volumes/db/kortix.sql:/docker-entrypoint-initdb.d/init-scripts/99-kortix.sql:Z
+      - ./volumes/db/bapx.sql:/docker-entrypoint-initdb.d/init-scripts/99-bapx.sql:Z
     environment:
       POSTGRES_HOST: /var/run/postgresql
       POSTGRES_PORT: \"5432\"
@@ -946,7 +946,7 @@ ${db_ports}
       GOTRUE_SMTP_PORT: \"587\"
       GOTRUE_SMTP_USER: unused
       GOTRUE_SMTP_PASS: unused
-      GOTRUE_SMTP_SENDER_NAME: Kortix
+      GOTRUE_SMTP_SENDER_NAME: Bapx
       GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
       GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
       GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
@@ -1044,7 +1044,7 @@ ${supabase_ports}
   fi
 
   cat > "$INSTALL_DIR/docker-compose.yml" << COMPOSE
-# Kortix — auto-generated by get-kortix.sh
+# Bapx — auto-generated by get-bapx.sh
 # Mode: ${DEPLOY_MODE} | Database: ${DB_MODE}
 services:
 ${supabase_services}
@@ -1056,11 +1056,11 @@ ${frontend_ports}
     environment:
 ${frontend_supabase_env}
     depends_on:
-      kortix-api:
+      bapx-api:
         condition: service_started
     restart: unless-stopped
 
-  kortix-api:
+  bapx-api:
     image: \${API_IMAGE}
     user: "0:0"
 ${api_ports}
@@ -1072,7 +1072,7 @@ ${supabase_db_env}
       - ALLOWED_SANDBOX_PROVIDERS=local_docker
       - KORTIX_LOCAL_IMAGES=\${KORTIX_LOCAL_IMAGES}
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - KORTIX_URL=http://kortix-api:8008/v1/router
+      - KORTIX_URL=http://bapx-api:8008/v1/router
       - SANDBOX_NETWORK=${SANDBOX_NETWORK}
       - INTERNAL_SERVICE_KEY=\${INTERNAL_SERVICE_KEY}
       - FRONTEND_URL=\${PUBLIC_URL}
@@ -1101,8 +1101,8 @@ COMPOSE
 write_env() {
   cat > "$INSTALL_DIR/.env" << ENVEOF
 # ──────────────────────────────────────────────────────────────────────────────
-# Kortix — Environment Configuration
-# Auto-generated by get-kortix.sh on $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+# Bapx — Environment Configuration
+# Auto-generated by get-bapx.sh on $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 # ──────────────────────────────────────────────────────────────────────────────
 
 # ─── Mode ────────────────────────────────────────────────────────────────────
@@ -1211,7 +1211,7 @@ fixup_db_init() {
 
 # ─── Write CLI ───────────────────────────────────────────────────────────────
 write_cli() {
-  cat > "$INSTALL_DIR/kortix" << 'CLIPATH'
+  cat > "$INSTALL_DIR/bapx" << 'CLIPATH'
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -1241,10 +1241,10 @@ prompt_read() {
 
 # Installed release metadata is persisted in .env so updates stay pinned.
 VERSION=$(grep -m1 '^KORTIX_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
-FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/kortix-frontend:${VERSION}")
-API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/kortix-api:${VERSION}")
-SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/computer:${VERSION}")
-SANDBOX_NAME=$(grep -m1 '^SANDBOX_CONTAINER_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix-hosted-sandbox")
+FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/bapx-frontend:${VERSION}")
+API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/bapx-api:${VERSION}")
+SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/computer:${VERSION}")
+SANDBOX_NAME=$(grep -m1 '^SANDBOX_CONTAINER_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx-hosted-sandbox")
 LOCAL_IMAGES=$(grep -m1 '^KORTIX_LOCAL_IMAGES=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "0")
 LOCAL_TAG=$(grep -m1 '^KORTIX_LOCAL_TAG=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "latest")
 LOCAL_REPO_ROOT=$(grep -m1 '^KORTIX_LOCAL_REPO_ROOT=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "")
@@ -1252,7 +1252,7 @@ LOCAL_REPO_ROOT=$(grep -m1 '^KORTIX_LOCAL_REPO_ROOT=' "$DIR/.env" 2>/dev/null | 
 _resolve_latest_version() {
   local gh_version
   gh_version=$(curl -sf --connect-timeout 5 \
-    "https://api.github.com/repos/kortix-ai/suna/releases/latest" 2>/dev/null \
+    "https://api.github.com/repos/bapx-ai/bapX/releases/latest" 2>/dev/null \
     | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"].lstrip("v"))' 2>/dev/null) || true
   if [ -n "$gh_version" ]; then
     printf '%s' "$gh_version"
@@ -1283,9 +1283,9 @@ PY
 
 _refresh_state_from_env() {
   VERSION=$(grep -m1 '^KORTIX_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
-  FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/kortix-frontend:${VERSION}")
-  API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/kortix-api:${VERSION}")
-  SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix/computer:${VERSION}")
+  FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/bapx-frontend:${VERSION}")
+  API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/bapx-api:${VERSION}")
+  SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/computer:${VERSION}")
 }
 
 _patch_compose_images() {
@@ -1304,8 +1304,8 @@ for line in lines:
         service = 'frontend'
         out.append(line)
         continue
-    if stripped == 'kortix-api:':
-        service = 'kortix-api'
+    if stripped == 'bapx-api:':
+        service = 'bapx-api'
         out.append(line)
         continue
     if service and stripped.startswith('image:'):
@@ -1322,15 +1322,15 @@ PY
 }
 
 _refresh_installer_and_cli() {
-  local tmp_script="$DIR/get-kortix.sh.tmp"
-  curl -fsSL "https://raw.githubusercontent.com/kortix-ai/suna/main/scripts/get-kortix.sh" -o "$tmp_script" || return 0
+  local tmp_script="$DIR/get-bapx.sh.tmp"
+  curl -fsSL "https://raw.githubusercontent.com/bapx-ai/bapX/main/scripts/get-bapx.sh" -o "$tmp_script" || return 0
   chmod +x "$tmp_script"
-  mv "$tmp_script" "$DIR/get-kortix.sh"
+  mv "$tmp_script" "$DIR/get-bapx.sh"
   awk '
     capture && $0 == "CLIPATH" { exit }
     capture { print; next }
     /<< '\''CLIPATH'\''$/ { capture = 1 }
-  ' "$DIR/get-kortix.sh" > "$DIR/kortix.new" && chmod +x "$DIR/kortix.new" && mv "$DIR/kortix.new" "$DIR/kortix" || true
+  ' "$DIR/get-bapx.sh" > "$DIR/bapx.new" && chmod +x "$DIR/bapx.new" && mv "$DIR/bapx.new" "$DIR/bapx" || true
 }
 
 _show_update_notice() {
@@ -1339,7 +1339,7 @@ _show_update_notice() {
   latest=$(_resolve_latest_version)
   [ -n "$latest" ] || return 0
   [ "$latest" = "$VERSION" ] && return 0
-  printf "  ${Y}!${N}  ${Y}Update available:${N} v%s ${F}(run: kortix update)${N}\n" "$latest"
+  printf "  ${Y}!${N}  ${Y}Update available:${N} v%s ${F}(run: bapx update)${N}\n" "$latest"
 }
 
 _open() {
@@ -1375,14 +1375,14 @@ _mode() {
 
 _project_name() {
   if [ -f "$DIR/.env" ]; then
-    grep -m1 '^COMPOSE_PROJECT_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "kortix"
+    grep -m1 '^COMPOSE_PROJECT_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx"
   else
-    echo "kortix"
+    echo "bapx"
   fi
 }
 
-# Free ports used by Kortix (local mode)
-_free_kortix_ports() {
+# Free ports used by Bapx (local mode)
+_free_bapx_ports() {
   local project_name
   project_name=$(_project_name)
   local ports=(13737 13738 13740 13741)
@@ -1392,7 +1392,7 @@ _free_kortix_ports() {
   # EXCLUDES standalone sandbox containers (managed by the API, not compose).
   docker ps -a --format '{{.Names}}' 2>/dev/null \
     | grep -E "^${project_name}-" \
-    | grep -v -E "^(kortix-sandbox|${SANDBOX_NAME})$" \
+    | grep -v -E "^(bapx-sandbox|${SANDBOX_NAME})$" \
     | xargs -r docker rm -f 2>/dev/null || true
 
   # Kill any processes using the ports
@@ -1405,7 +1405,7 @@ _free_kortix_ports() {
     fi
   done
 
-  [ $freed -eq 1 ] && _info "Freed Kortix ports" || true
+  [ $freed -eq 1 ] && _info "Freed Bapx ports" || true
 }
 
 _sync_supabase_passwords() {
@@ -1460,7 +1460,7 @@ _reset_stack() {
   docker compose down -v --remove-orphans 2>/dev/null || true
   docker rm -f "$SANDBOX_NAME" 2>/dev/null || true
   docker volume rm "${SANDBOX_NAME}-data" 2>/dev/null || true
-  [ "$(_mode)" = "local" ] && _free_kortix_ports
+  [ "$(_mode)" = "local" ] && _free_bapx_ports
 
   _info "Starting fresh stack..."
   docker compose up -d || true
@@ -1530,7 +1530,7 @@ _refresh_sandbox_container() {
 
 _banner() {
   printf "\n"
-  printf "  ${C}${B}Kortix CLI${N}  ${F}v${VERSION}${N}\n"
+  printf "  ${C}${B}Bapx CLI${N}  ${F}v${VERSION}${N}\n"
   printf "  ${F}────────────────────────────────────────${N}\n"
   _show_update_notice
 }
@@ -1538,7 +1538,7 @@ _banner() {
 case "${1:-help}" in
   start)
     _banner
-    [ "$(_mode)" = "local" ] && _free_kortix_ports
+    [ "$(_mode)" = "local" ] && _free_bapx_ports
     _sync_supabase_passwords
     docker compose up -d || true
     # Also restart the sandbox container if it exists but is stopped
@@ -1549,7 +1549,7 @@ case "${1:-help}" in
       fi
     fi
     echo ""
-    _ok "Kortix is running!"
+    _ok "Bapx is running!"
     printf "  ${W}Dashboard${N}:  ${C}$(_url)${N}\n\n"
     ;;
   stop)
@@ -1562,7 +1562,7 @@ case "${1:-help}" in
   restart)
     _banner
     docker compose down 2>/dev/null || true
-    [ "$(_mode)" = "local" ] && _free_kortix_ports
+    [ "$(_mode)" = "local" ] && _free_bapx_ports
     _sync_supabase_passwords
     docker compose up -d || true
     _ok "Restarted."
@@ -1595,9 +1595,9 @@ case "${1:-help}" in
       if [ -n "$local_latest" ] && [ "$local_latest" != "$VERSION" ]; then
         _info "Updating from v${VERSION} to v${local_latest}..."
         VERSION="$local_latest"
-        FRONTEND_IMAGE="kortix/kortix-frontend:${VERSION}"
-        API_IMAGE="kortix/kortix-api:${VERSION}"
-        SANDBOX_IMAGE="kortix/computer:${VERSION}"
+        FRONTEND_IMAGE="bapx/bapx-frontend:${VERSION}"
+        API_IMAGE="bapx/bapx-api:${VERSION}"
+        SANDBOX_IMAGE="bapx/computer:${VERSION}"
         _env_set KORTIX_VERSION "$VERSION"
         _env_set KORTIX_SANDBOX_VERSION "$VERSION"
         _env_set FRONTEND_IMAGE "$FRONTEND_IMAGE"
@@ -1615,7 +1615,7 @@ case "${1:-help}" in
       } | python3 -c 'import sys; print("\n".join(sorted(set(line.strip() for line in sys.stdin if line.strip()))))' | xargs -r -n1 -P 4 docker pull
     fi
     _info "Restarting services..."
-    [ "$(_mode)" = "local" ] && _free_kortix_ports
+    [ "$(_mode)" = "local" ] && _free_bapx_ports
     _sync_supabase_passwords
     docker compose down 2>/dev/null || true
     docker compose up -d || true
@@ -1643,22 +1643,22 @@ case "${1:-help}" in
     if echo "$del_volumes" | grep -qi '^y'; then
       docker compose down -v --remove-orphans 2>/dev/null || true
       docker volume rm "${SANDBOX_NAME}-data" 2>/dev/null || true
-      docker volume rm kortix_supabase-db-data 2>/dev/null || true
-      docker volume rm supabase_db_kortix-local 2>/dev/null || true
+      docker volume rm bapx_supabase-db-data 2>/dev/null || true
+      docker volume rm supabase_db_bapx-local 2>/dev/null || true
       _ok "Volumes removed."
     else
       docker compose down 2>/dev/null || true
     fi
-    [ -L "/usr/local/bin/kortix" ] && rm -f /usr/local/bin/kortix 2>/dev/null || true
+    [ -L "/usr/local/bin/bapx" ] && rm -f /usr/local/bin/bapx 2>/dev/null || true
     rm -rf "$DIR"
-    _ok "Kortix uninstalled."
+    _ok "Bapx uninstalled."
     echo ""
     ;;
   open)
     _open "$(_url)"
     ;;
   version)
-    echo "  kortix v${VERSION}"
+    echo "  bapx v${VERSION}"
     ;;
   *)
     _banner
@@ -1666,12 +1666,12 @@ case "${1:-help}" in
     printf "  ${C}start${N}       Start all services\n"
     printf "  ${C}stop${N}        Stop all services\n"
     printf "  ${C}restart${N}     Restart all services\n"
-    printf "  ${C}logs${N}        Tail logs ${F}(kortix logs kortix-api)${N}\n"
+    printf "  ${C}logs${N}        Tail logs ${F}(bapx logs bapx-api)${N}\n"
     printf "  ${C}status${N}      Show running containers\n"
     printf "  ${C}setup${N}       Open sign-in page\n"
     printf "  ${C}update${N}      Pull latest images & restart\n"
     printf "  ${C}reset${N}       Wipe data and recreate stack\n"
-    printf "  ${C}uninstall${N}   Remove Kortix completely\n"
+    printf "  ${C}uninstall${N}   Remove Bapx completely\n"
     printf "  ${C}open${N}        Open dashboard in browser\n"
     printf "  ${C}version${N}     Show installed version\n"
     echo ""
@@ -1679,14 +1679,14 @@ case "${1:-help}" in
  esac
 CLIPATH
 
-  chmod +x "$INSTALL_DIR/kortix"
+  chmod +x "$INSTALL_DIR/bapx"
 }
 
 # ─── Add to PATH ─────────────────────────────────────────────────────────────
 setup_path() {
   if [ -d "/usr/local/bin" ] && [ -w "/usr/local/bin" ]; then
-    ln -sf "$INSTALL_DIR/kortix" /usr/local/bin/kortix 2>/dev/null && {
-      success "Linked 'kortix' -> /usr/local/bin/kortix"
+    ln -sf "$INSTALL_DIR/bapx" /usr/local/bin/bapx 2>/dev/null && {
+      success "Linked 'bapx' -> /usr/local/bin/bapx"
       return
     }
   fi
@@ -1703,9 +1703,9 @@ setup_path() {
   fi
 
   echo "" >> "$shell_rc"
-  echo "# Kortix CLI" >> "$shell_rc"
+  echo "# Bapx CLI" >> "$shell_rc"
   echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$shell_rc"
-  success "Added 'kortix' to PATH (restart terminal or: source $shell_rc)"
+  success "Added 'bapx' to PATH (restart terminal or: source $shell_rc)"
 }
 
 # ─── Pull & Start ───────────────────────────────────────────────────────────
@@ -1738,7 +1738,7 @@ pull_and_start() {
   section "Starting Services"
 
   # Free ports in local mode to avoid conflicts
-  free_kortix_ports
+  free_bapx_ports
 
   docker compose up -d || true
 
@@ -1763,7 +1763,7 @@ pull_and_start() {
   # ─── Final success output ────────────────────────────────────────────
   printf "\n"
   printf "  ${GREEN}${BOLD}╔══════════════════════════════════════════════════╗${NC}\n"
-  printf "  ${GREEN}${BOLD}║             Kortix is running!                  ║${NC}\n"
+  printf "  ${GREEN}${BOLD}║             Bapx is running!                  ║${NC}\n"
   printf "  ${GREEN}${BOLD}╚══════════════════════════════════════════════════╝${NC}\n"
   printf "\n"
   printf "    ${WHITE}Dashboard${NC}   ${CYAN}${BOLD}${PUBLIC_URL}${NC}\n"
@@ -1783,7 +1783,7 @@ pull_and_start() {
 
   if [ "$DEPLOY_MODE" = "local" ]; then
     subsection "Want 24/7 uptime?"
-    printf "    ${WHITE}Kortix Cloud${NC}   ${CYAN}https://kortix.com${NC}     ${FADED}managed, zero setup${NC}\n"
+    printf "    ${WHITE}Bapx Cloud${NC}   ${CYAN}https://bapx.in${NC}     ${FADED}managed, zero setup${NC}\n"
     printf "    ${WHITE}Self-host${NC}      ${CYAN}hetzner.com${NC} / ${CYAN}justavps.com${NC}\n"
   fi
 
@@ -1791,12 +1791,12 @@ pull_and_start() {
   printf "    Open the dashboard and create your owner account.\n"
 
   subsection "CLI Reference"
-  printf "    ${CYAN}kortix start${NC}    Start services\n"
-  printf "    ${CYAN}kortix stop${NC}     Stop services\n"
-  printf "    ${CYAN}kortix setup${NC}    Open sign-in page\n"
-  printf "    ${CYAN}kortix update${NC}   Pull latest & restart\n"
-  printf "    ${CYAN}kortix logs${NC}     Tail service logs\n"
-  printf "    ${CYAN}kortix status${NC}   Show running containers\n"
+  printf "    ${CYAN}bapx start${NC}    Start services\n"
+  printf "    ${CYAN}bapx stop${NC}     Stop services\n"
+  printf "    ${CYAN}bapx setup${NC}    Open sign-in page\n"
+  printf "    ${CYAN}bapx update${NC}   Pull latest & restart\n"
+  printf "    ${CYAN}bapx logs${NC}     Tail service logs\n"
+  printf "    ${CYAN}bapx status${NC}   Show running containers\n"
   printf "\n"
 }
 
@@ -1806,11 +1806,11 @@ main() {
   preflight
 
   # Clean up any stale Docker volumes from a previous install that was
-  # manually removed (rm -rf ~/.kortix) without running `docker compose down -v`.
+  # manually removed (rm -rf ~/.bapx) without running `docker compose down -v`.
   # Without this, fresh installs reuse old Postgres data with old passwords,
   # causing supabase-auth to fail with SASL auth errors.
   if [ ! -f "$INSTALL_DIR/docker-compose.yml" ]; then
-    docker volume rm kortix_supabase-db-data 2>/dev/null || true
+    docker volume rm bapx_supabase-db-data 2>/dev/null || true
     docker rm -f "${SANDBOX_CONTAINER_NAME}" 2>/dev/null || true
     docker volume rm "${SANDBOX_CONTAINER_NAME}-data" 2>/dev/null || true
   fi
@@ -1829,7 +1829,7 @@ main() {
       local existing_url
       existing_url=$(grep -m1 '^PUBLIC_URL=' "$INSTALL_DIR/.env" 2>/dev/null | cut -d= -f2- || echo "http://localhost:13737")
       echo ""
-      success "Kortix is running!"
+      success "Bapx is running!"
       printf "    ${WHITE}Dashboard${NC}:  ${CYAN}${existing_url}${NC}\n\n"
       exit 0
     fi
@@ -1842,8 +1842,8 @@ main() {
     docker compose down -v 2>/dev/null || true
     docker rm -f "${SANDBOX_CONTAINER_NAME}" 2>/dev/null || true
     # Also remove any leftover named volumes from previous installs
-    docker volume rm kortix_supabase-db-data 2>/dev/null || true
-    docker volume rm supabase_db_kortix-local 2>/dev/null || true
+    docker volume rm bapx_supabase-db-data 2>/dev/null || true
+    docker volume rm supabase_db_bapx-local 2>/dev/null || true
     docker volume rm "${SANDBOX_CONTAINER_NAME}-data" 2>/dev/null || true
     echo ""
   fi

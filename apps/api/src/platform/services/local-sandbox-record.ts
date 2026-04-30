@@ -1,5 +1,5 @@
 import { and, desc, eq, ne } from 'drizzle-orm';
-import { accounts, sandboxes, type Database } from '@kortix/db';
+import { accounts, sandboxes, type Database } from '@bapx/db';
 import { config } from '../../config';
 
 type SandboxRow = typeof sandboxes.$inferSelect;
@@ -20,8 +20,8 @@ function getMappedPorts(): Record<string, string> {
 
 function getHealthUrl(): string {
   return config.SANDBOX_NETWORK
-    ? `http://${config.SANDBOX_CONTAINER_NAME}:8000/kortix/health`
-    : `http://localhost:${config.SANDBOX_PORT_BASE || 14000}/kortix/health`;
+    ? `http://${config.SANDBOX_CONTAINER_NAME}:8000/bapx/health`
+    : `http://localhost:${config.SANDBOX_PORT_BASE || 14000}/bapx/health`;
 }
 
 function getBaseUrl(): string {

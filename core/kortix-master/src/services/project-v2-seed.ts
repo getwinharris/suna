@@ -4,7 +4,7 @@
  *
  * Filesystem layout per project:
  *   <project.path>/
- *     ├── .kortix/
+ *     ├── .bapx/
  *     │   └── CONTEXT.md                  (we own a "## Team" region inside)
  *     └── .opencode/
  *         └── agent/
@@ -14,9 +14,9 @@
  * Agent files live under `.opencode/agent/` so OpenCode discovers them as
  * real first-class agents when a session is created with
  * `?directory=<project.path>`. The YAML frontmatter carries BOTH opencode-
- * native keys (name, description, mode, model) AND kortix metadata
+ * native keys (name, description, mode, model) AND bapx metadata
  * (slug, tool_groups, execution_mode, default_assignee_columns). OpenCode
- * ignores unknown keys; the kortix plugin reads the kortix ones from our DB
+ * ignores unknown keys; the bapx plugin reads the bapx ones from our DB
  * mirror, not the file.
  */
 
@@ -54,9 +54,9 @@ export const DEFAULT_PM_SLUG = 'project-manager'
  *   1. per-call `override` (e.g. the caller's session model)
  *   2. `KORTIX_DEFAULT_AGENT_MODEL` env
  *   3. direct `ANTHROPIC_API_KEY` — if the user set it, they want Anthropic
- *   4. cloud: `kortix-yolo/think` when yolo keys are injected (prod billing)
- *   5. local dev via kortix router: `kortix/minimax-m27`
- *   6. last resort: `kortix-yolo/think` (upstream picks up when provisioned)
+ *   4. cloud: `bapx-yolo/think` when yolo keys are injected (prod billing)
+ *   5. local dev via bapx router: `bapx/minimax-m27`
+ *   6. last resort: `bapx-yolo/think` (upstream picks up when provisioned)
  *
  * Kept as a function so env changes between spawns (rare) are respected, and
  * so callers that want to pass a session-level model can override per-call
@@ -71,12 +71,12 @@ export function resolveDefaultModel(opts?: { override?: string | null }): string
     return 'anthropic/claude-sonnet-4-6'
   }
   if (process.env.KORTIX_YOLO_API_KEY && process.env.KORTIX_YOLO_URL) {
-    return 'kortix-yolo/think'
+    return 'bapx-yolo/think'
   }
   if (process.env.KORTIX_TOKEN && process.env.KORTIX_API_URL) {
-    return 'kortix/minimax-m27'
+    return 'bapx/minimax-m27'
   }
-  return 'kortix-yolo/think'
+  return 'bapx-yolo/think'
 }
 
 /**
@@ -101,7 +101,7 @@ export interface AgentFileMeta {
   mode?: 'primary' | 'subagent' | 'all'
   /** `providerID/modelID` form, e.g. `anthropic/claude-sonnet-4-6`. */
   model?: string | null
-  // Kortix metadata — unknown to opencode, read by our plugin hooks from DB.
+  // Bapx metadata — unknown to opencode, read by our plugin hooks from DB.
   tool_groups?: string[]
   execution_mode?: 'per_ticket' | 'per_assignment' | 'persistent'
   default_assignee_columns?: string[]
@@ -110,11 +110,11 @@ export interface AgentFileMeta {
 /**
  * Render a full agent file = YAML frontmatter + markdown body.
  *
- * The frontmatter mixes opencode-native keys (top half) with kortix metadata
+ * The frontmatter mixes opencode-native keys (top half) with bapx metadata
  * (bottom half). OpenCode reads what it knows, ignores the rest. Our plugin
- * reads the kortix keys from the DB mirror — the file is opencode's source
+ * reads the bapx keys from the DB mirror — the file is opencode's source
  * of truth for persona + opencode config; the DB is our source of truth for
- * kortix tool gating.
+ * bapx tool gating.
  */
 /**
  * Per-project agents must NEVER call workspace-global project CRUD —
@@ -155,7 +155,7 @@ export function renderAgentFile(meta: AgentFileMeta, body: string): string {
   for (const [tool, verdict] of Object.entries(PER_PROJECT_AGENT_PERMISSIONS)) {
     lines.push(`  ${tool}: ${verdict}`)
   }
-  // Kortix bookkeeping — opencode ignores, plugin reads via DB
+  // Bapx bookkeeping — opencode ignores, plugin reads via DB
   lines.push(`display_name: ${JSON.stringify(meta.name)}`)
   lines.push(`slug: ${meta.slug}`)
   if (meta.tool_groups?.length) {
@@ -721,7 +721,7 @@ restate, don't trim, don't edit. Just paste.
   2. \`process.env.<VAR_NAME>\` — workspace-global default.
   3. Project-root \`.env\` — \`<project.path>/.env\`. Read it, look
      for the VAR_NAME. If present, export/load it and proceed.
-  4. \`<project.path>/.kortix/.env\` (project-local secrets).
+  4. \`<project.path>/.bapx/.env\` (project-local secrets).
   5. \`/workspace/.env\` (workspace-wide secrets).
   If any of these has the value, use it — don't ask the human.
   Only if NONE have it: STOP. Don't stub it, don't fake values, don't
@@ -978,7 +978,7 @@ export async function seedV2Project(
     try {
       seedDefaultBoardSweepTrigger(db, project, dashboardTicketId, pm.slug)
       // Direct DB insert bypasses TriggerManager, which splits state into
-      // TWO stores: the DB + .kortix/triggers.yaml. We must:
+      // TWO stores: the DB + .bapx/triggers.yaml. We must:
       //   1. reload  → plugin re-reads DB, registers the cron job in memory
       //   2. write-through → plugin flushes DB state into triggers.yaml
       // Without (2), the next YAML-reconcile fires (on restart or file
@@ -1116,7 +1116,7 @@ export const PM_DASHBOARD_BODY = [
  * reads this file and "you" is ambiguous.
  *
  * If `userHandle` is unset we fall back to `user` because `@user` is the
- * kortix-system mention convention that actually triggers a human
+ * bapx-system mention convention that actually triggers a human
  * notification. `@human` isn't a real slug; agents that see "@human" in
  * the team section will tag a slug that doesn't exist → nobody gets the
  * message. The UI should still pass the real handle when it has one.
@@ -1147,7 +1147,7 @@ export async function syncTeamSection(
   project: ProjectRowLite,
   opts: SeedOptions = {},
 ): Promise<string> {
-  const ctxPath = path.join(project.path, '.kortix', 'CONTEXT.md')
+  const ctxPath = path.join(project.path, '.bapx', 'CONTEXT.md')
   const agents = listAgents(db, project.id)
   // If caller didn't pass user_handle on the project literal, read it fresh
   // from the row — seed/update paths don't always include it.
@@ -1210,7 +1210,7 @@ export async function syncMilestonesSection(
   project: ProjectRowLite,
   opts: SeedOptions = {},
 ): Promise<string> {
-  const ctxPath = path.join(project.path, '.kortix', 'CONTEXT.md')
+  const ctxPath = path.join(project.path, '.bapx', 'CONTEXT.md')
   const rows = db.prepare(
     "SELECT number, title, acceptance_md, status FROM milestones WHERE project_id=$pid ORDER BY number ASC"
   ).all({ $pid: project.id }) as Array<{ number: number; title: string; acceptance_md: string; status: string }>
@@ -1244,7 +1244,7 @@ export async function syncMilestonesSection(
 }
 
 export async function tryReadContext(projectPath: string): Promise<string> {
-  const ctxPath = path.join(projectPath, '.kortix', 'CONTEXT.md')
+  const ctxPath = path.join(projectPath, '.bapx', 'CONTEXT.md')
   if (!existsSync(ctxPath)) return ''
   try { return await fs.readFile(ctxPath, 'utf8') } catch { return '' }
 }
@@ -1253,7 +1253,7 @@ export async function writeContextPreservingTeam(
   projectPath: string,
   newFullBody: string,
 ): Promise<void> {
-  const ctxPath = path.join(projectPath, '.kortix', 'CONTEXT.md')
+  const ctxPath = path.join(projectPath, '.bapx', 'CONTEXT.md')
   let preservedTeam = ''
   let preservedMilestones = ''
   try {

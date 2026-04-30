@@ -8,7 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { Check, ImageIcon, Monitor, Moon, Palette, Sun } from 'lucide-react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { KortixLogo } from '@/components/ui/KortixLogo';
+import { BapxLogo } from '@/components/ui/BapxLogo';
 import {
   DEFAULT_APPEARANCE_THEME,
   DEFAULT_WALLPAPER,
@@ -317,7 +317,7 @@ function WallpaperCard({
                 ? (isDark ? 0.08 : 0.06)
                 : (isDark ? 0.18 : 0.14),
           }}>
-            <KortixLogo
+            <BapxLogo
               size={wallpaper.id === 'symbol' ? 48 : wallpaper.id === 'aurora' ? 30 : 94}
               variant={wallpaper.id === 'aurora' ? 'logomark' : 'symbol'}
               color={isDark ? 'dark' : 'light'}

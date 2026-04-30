@@ -1,14 +1,14 @@
 /**
- * Kortix System Plugin — THE single plugin for the entire Kortix environment.
+ * Bapx System Plugin — THE single plugin for the entire Bapx environment.
  *
  * Projects, agents, tasks, sessions, connectors, autowork, todo-enforcer,
  * triggers, auth, PTY, worktree, and /btw.
  *
  * Native OpenCode task is disabled, but native todowrite/todoread can be used
- * alongside Kortix project tasks to support autowork-style persistent worker loops.
- * Kortix also provides its own project/task orchestration surface plus worker lifecycle tools.
+ * alongside Bapx project tasks to support autowork-style persistent worker loops.
+ * Bapx also provides its own project/task orchestration surface plus worker lifecycle tools.
  *
- * opencode.jsonc: "./plugin/kortix-system/kortix-system.ts"
+ * opencode.jsonc: "./plugin/bapx-system/bapx-system.ts"
  */
 
 import * as path from "node:path"
@@ -20,7 +20,7 @@ import { agentTaskTools, handleAgentTaskSessionEvent } from "./agent-tasks"
 import { ticketTools, ticketToolGateHook } from "./ticket-tools"
 import { ensureTasksTable, reconcileAllRunningTasks } from "../../../src/services/task-service"
 import { ensureTicketTables } from "../../../src/services/ticket-service"
-import { resolveKortixWorkspaceRoot, ensureKortixDir } from "./lib/paths"
+import { resolveBapxWorkspaceRoot, ensureBapxDir } from "./lib/paths"
 import { markStartupAbortedSession } from "./lib/startup-aborted-sessions"
 import { getBusySessionIds } from "../../../src/services/runtime-reload"
 
@@ -81,12 +81,12 @@ async function cleanupLingeringBusySessions(client: any, db: Database, cleanupSt
 			})
 			if (busySessionIds.length === 0) {
 				if (candidateBusySessionIds.length > 0) {
-					console.log("[kortix-system] startup cleanup: only fresh busy sessions found, skipping cleanup")
+					console.log("[bapx-system] startup cleanup: only fresh busy sessions found, skipping cleanup")
 				}
 				return
 			}
 
-			console.log(`[kortix-system] startup cleanup: aborting ${busySessionIds.length} lingering busy session(s)`)
+			console.log(`[bapx-system] startup cleanup: aborting ${busySessionIds.length} lingering busy session(s)`)
 			const failures: string[] = []
 			await Promise.all(
 				busySessionIds.map(async (sessionId) => {
@@ -100,14 +100,14 @@ async function cleanupLingeringBusySessions(client: any, db: Database, cleanupSt
 			)
 
 			if (failures.length > 0) {
-				console.warn(`[kortix-system] startup cleanup: failed to abort ${failures.length} session(s): ${failures.join("; ")}`)
+				console.warn(`[bapx-system] startup cleanup: failed to abort ${failures.length} session(s): ${failures.join("; ")}`)
 			} else {
-				console.log("[kortix-system] startup cleanup: lingering busy sessions aborted")
+				console.log("[bapx-system] startup cleanup: lingering busy sessions aborted")
 			}
 			return
 		} catch (err) {
 			if (attempt === 5) {
-				console.warn(`[kortix-system] startup cleanup failed after ${attempt} attempts: ${err instanceof Error ? err.message : String(err)}`)
+				console.warn(`[bapx-system] startup cleanup failed after ${attempt} attempts: ${err instanceof Error ? err.message : String(err)}`)
 				return
 			}
 			await Bun.sleep(attempt * 250)
@@ -132,14 +132,14 @@ function scheduleStartupBusySessionCleanup(client: any, db: Database, cleanupSta
 	}, STARTUP_BUSY_SESSION_CLEANUP_DELAY_MS)
 }
 
-const KortixSystemPlugin: Plugin = async (ctx) => {
+const BapxSystemPlugin: Plugin = async (ctx) => {
 	const { client } = ctx
 	const startupCleanupStartedAt = Date.now()
 
 	// ── Core infra ──
-	const workspaceRoot = resolveKortixWorkspaceRoot(import.meta.dir)
-	const kortixDir = ensureKortixDir(import.meta.dir)
-	const db = initProjectsDb(path.join(kortixDir, "kortix.db"))
+	const workspaceRoot = resolveBapxWorkspaceRoot(import.meta.dir)
+	const bapxDir = ensureBapxDir(import.meta.dir)
+	const db = initProjectsDb(path.join(bapxDir, "bapx.db"))
 	ensureTasksTable(db)
 	ensureTicketTables(db)
 	const mgr = new ProjectManager(client, workspaceRoot, db)
@@ -148,7 +148,7 @@ const KortixSystemPlugin: Plugin = async (ctx) => {
 	// ── Load sub-modules ──
 	// Load sub-modules — each wrapped in try/catch so one failure doesn't kill the whole plugin
 	const load = async (name: string, fn: () => Promise<any>) => {
-		try { return await fn() } catch (e) { console.warn(`[kortix-system] ${name} init failed:`, (e as Error).message); return null }
+		try { return await fn() } catch (e) { console.warn(`[bapx-system] ${name} init failed:`, (e as Error).message); return null }
 	}
 
 	const sessions = await load("sessions", () => import("./sessions").then(m => m.default(ctx)))
@@ -165,7 +165,7 @@ const KortixSystemPlugin: Plugin = async (ctx) => {
 	})
 	const spendingCap = await load("spending-cap", () => import("./spending-cap").then(m => m.default(ctx)))
 	
-	console.log("[kortix-system] Plugin initialized. Tools:", Object.keys(projectTools(mgr, db)).length, "project +", Object.keys(agentTaskTools(db, mgr, client)).length, "task")
+	console.log("[bapx-system] Plugin initialized. Tools:", Object.keys(projectTools(mgr, db)).length, "project +", Object.keys(agentTaskTools(db, mgr, client)).length, "task")
 	scheduleStartupBusySessionCleanup(client, db, startupCleanupStartedAt)
 	setInterval(() => {
 		void reconcileAllRunningTasks(db, client).catch(() => {})
@@ -289,7 +289,7 @@ const KortixSystemPlugin: Plugin = async (ctx) => {
 						}
 					}
 				} catch (err) {
-					console.warn("[kortix-system] persistent-agent queue drain failed:", err)
+					console.warn("[bapx-system] persistent-agent queue drain failed:", err)
 				}
 			}
 		},
@@ -305,14 +305,14 @@ const KortixSystemPlugin: Plugin = async (ctx) => {
 				if (!tasks.length) return
 				const icon = (s: string) => s === "in_progress" ? "→" : s === "input_needed" ? "◐" : s === "awaiting_review" ? "◌" : "○"
 				output.context.push([
-					`<kortix_system type="tasks" source="kortix-system">`,
+					`<bapx_system type="tasks" source="bapx-system">`,
 					`Active tasks for project ${project.name}:`,
 					...tasks.map(t => `${icon(t.status)} ${t.id}: ${t.title}`),
-					`</kortix_system>`,
+					`</bapx_system>`,
 				].join("\n"))
 			} catch {}
 		},
 	}
 }
 
-export default KortixSystemPlugin
+export default BapxSystemPlugin

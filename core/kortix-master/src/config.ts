@@ -10,30 +10,30 @@ function parsePortMap(): Record<string, string> {
   try {
     return JSON.parse(raw)
   } catch {
-    console.warn('[Kortix Master] Failed to parse SANDBOX_PORT_MAP:', raw)
+    console.warn('[Bapx Master] Failed to parse SANDBOX_PORT_MAP:', raw)
     return {}
   }
 }
 
 export const config = {
-  // Kortix Master port (main entry point)
+  // Bapx Master port (main entry point)
   PORT: parseInt(process.env.KORTIX_MASTER_PORT || '8000'),
 
   // OpenCode server (proxied, always unprotected)
   OPENCODE_HOST: process.env.OPENCODE_HOST || 'localhost',
   OPENCODE_PORT: parseInt(process.env.OPENCODE_PORT || '4096'),
 
-  // ─── Kortix Backend ─────────────────────────────────────────────────────────
-  // KORTIX_API_URL: base URL of kortix-api. Source of truth is the secrets-manager-
+  // ─── Bapx Backend ─────────────────────────────────────────────────────────
+  // KORTIX_API_URL: base URL of bapx-api. Source of truth is the secrets-manager-
   // backed s6 env file when present; process.env/.env are fallbacks for native dev.
   get KORTIX_API_URL() { return getEnv('KORTIX_API_URL') || 'http://localhost:8008' },
 
-  // KORTIX_TOKEN — direction: sandbox → kortix-api.
+  // KORTIX_TOKEN — direction: sandbox → bapx-api.
   // Source of truth is the secrets-manager-backed s6 env file. This allows token
   // rotation and sync without trusting stale container process.env values.
   get KORTIX_TOKEN() { return getEnv('KORTIX_TOKEN') || '' },
 
-  // Feature flag: enable or disable local deployment routes (/kortix/deploy/*)
+  // Feature flag: enable or disable local deployment routes (/bapx/deploy/*)
   KORTIX_DEPLOYMENTS_ENABLED: process.env.KORTIX_DEPLOYMENTS_ENABLED === 'true',
 
   // Secret storage
@@ -46,16 +46,16 @@ export const config = {
   PROJECT_ID: process.env.PROJECT_ID || '',
 
   // INTERNAL_SERVICE_KEY — direction: external → sandbox.
-  // This is how kortix-api (and other external callers) authenticates TO the sandbox.
+  // This is how bapx-api (and other external callers) authenticates TO the sandbox.
   // Every inbound request from outside the container must include this as a Bearer token.
   // Validated by the global auth middleware in index.ts.
   // Localhost requests (from inside the sandbox) bypass auth entirely — no token needed.
-  // Counterpart: KORTIX_TOKEN goes the other direction (sandbox → kortix-api).
+  // Counterpart: KORTIX_TOKEN goes the other direction (sandbox → bapx-api).
   // Auto-generates if not provided — external access is ALWAYS auth-protected.
-  // In normal operation, kortix-api injects the key as a Docker env var.
+  // In normal operation, bapx-api injects the key as a Docker env var.
   get INTERNAL_SERVICE_KEY(): string {
     const s6EnvDir = process.env.S6_ENV_DIR || '/run/s6/container_environment'
-    // Always re-read from s6 env dir first — kortix-api may have written it
+    // Always re-read from s6 env dir first — bapx-api may have written it
     // via docker exec after we started (the fallback sync path). Reading from
     // the file ensures we pick up the injected value without a restart.
     const s6Path = `${s6EnvDir}/INTERNAL_SERVICE_KEY`
@@ -78,7 +78,7 @@ export const config = {
 
     if (!process.env.INTERNAL_SERVICE_KEY) {
       console.warn(
-        '[Kortix Master] WARNING: No INTERNAL_SERVICE_KEY or KORTIX_TOKEN available.\n' +
+        '[Bapx Master] WARNING: No INTERNAL_SERVICE_KEY or KORTIX_TOKEN available.\n' +
         '  Sandbox auth will fail until the canonical sandbox token is synced.'
       )
     }

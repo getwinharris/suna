@@ -2,7 +2,7 @@ import { toast } from '@/lib/toast';
 import { saveAs } from 'file-saver';
 import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/trailbase/client';
 import { getEnv } from '@/lib/env-config';
 
 export type ExportFormat = 'pdf' | 'docx' | 'html' | 'markdown';

@@ -49,9 +49,9 @@ sys.exit(1)
 PY
 
 echo "[start] Starting frontend (production build)..."
-pnpm --filter Kortix-Computer-Frontend start &
+pnpm --filter Bapx-Media-Frontend start &
 FRONTEND_PID=$!
 
 echo "[start] Starting API..."
 cd "$ROOT_DIR"
-KORTIX_SKIP_ENSURE_SCHEMA=1 pnpm --filter kortix-api start
+KORTIX_SKIP_ENSURE_SCHEMA=1 pnpm --filter bapx-api start

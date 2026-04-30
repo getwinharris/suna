@@ -22,7 +22,7 @@ function getApiV1(): string {
 
 /**
  * Build X-Pipedream-* headers from sandbox env vars.
- * These let the sandbox send its own Pipedream credentials to kortix-api,
+ * These let the sandbox send its own Pipedream credentials to bapx-api,
  * which uses them instead of (or as fallback for) its global config.
  */
 function getPipedreamHeaders(): Record<string, string> {
@@ -38,13 +38,13 @@ function getPipedreamHeaders(): Record<string, string> {
 // always enforces INTERNAL_SERVICE_KEY on all routes (auto-generated if not set).
 
 /**
- * Guard: ensure KORTIX_TOKEN is available before proxying to kortix-api.
+ * Guard: ensure KORTIX_TOKEN is available before proxying to bapx-api.
  * The bootstrap-env service restores it at boot if needed, so this should
  * only fire if something went seriously wrong.
  */
 pipedreamRouter.use('*', async (c, next) => {
   if (!config.KORTIX_TOKEN) {
-    console.error('[Pipedream] KORTIX_TOKEN is not set — cannot authenticate to kortix-api.')
+    console.error('[Pipedream] KORTIX_TOKEN is not set — cannot authenticate to bapx-api.')
     return c.json({
       error: 'Pipedream unavailable: KORTIX_TOKEN is not configured. Restart the sandbox.',
     }, 503)
@@ -52,20 +52,20 @@ pipedreamRouter.use('*', async (c, next) => {
 
   // Local PIPEDREAM_* env vars are optional overrides.
   // If present, getPipedreamHeaders() sends them as X-Pipedream-* headers.
-  // If absent, kortix-api uses its own defaults (env or per-account DB creds).
+  // If absent, bapx-api uses its own defaults (env or per-account DB creds).
   await next()
 })
 
 /**
  * POST /api/pipedream/token
- * Proxy to kortix-api: POST /v1/pipedream/token
+ * Proxy to bapx-api: POST /v1/pipedream/token
  * Used by agent tools to fetch OAuth tokens for third-party APIs.
  */
 pipedreamRouter.post('/token',
   describeRoute({
     tags: ['Pipedream'],
     summary: 'Get OAuth token',
-    description: 'Proxies to kortix-api to fetch an OAuth token for a connected third-party integration. Used by agent tools.',
+    description: 'Proxies to bapx-api to fetch an OAuth token for a connected third-party integration. Used by agent tools.',
     responses: {
       200: { description: 'OAuth token response', content: { 'application/json': { schema: resolver(z.object({ token: z.string(), expires_at: z.string().optional() }).passthrough()) } } },
       401: { description: 'Unauthorized', content: { 'application/json': { schema: resolver(ErrorResponse) } } },
@@ -570,8 +570,8 @@ async function upsertPipedreamConnector(app: string, appName?: string): Promise<
   const { randomUUID } = await import('node:crypto')
 
   const root = process.env.KORTIX_WORKSPACE || '/workspace'
-  mkdirSync(`${root}/.kortix`, { recursive: true })
-  const db = new Database(`${root}/.kortix/kortix.db`)
+  mkdirSync(`${root}/.bapx`, { recursive: true })
+  const db = new Database(`${root}/.bapx/bapx.db`)
   db.exec("PRAGMA journal_mode=DELETE; PRAGMA busy_timeout=5000")
   db.exec(`CREATE TABLE IF NOT EXISTS connectors (
     id TEXT PRIMARY KEY, name TEXT NOT NULL UNIQUE, description TEXT, source TEXT,
@@ -608,7 +608,7 @@ pipedreamRouter.post('/connector-sync', async (c) => {
 // Self-heals sandboxes that missed the fire-and-forget connector-sync call from
 // the API — e.g. sandbox was booting, network blipped, or this sandbox was
 // created after the user OAuth'd the connector. Fetches the account's current
-// Pipedream integrations from kortix-api and upserts each into kortix.db.
+// Pipedream integrations from bapx-api and upserts each into bapx.db.
 
 export async function syncExistingConnectorsFromApi(): Promise<void> {
   if (!config.KORTIX_TOKEN || !config.KORTIX_API_URL) {

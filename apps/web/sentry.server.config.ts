@@ -1,5 +1,5 @@
 /**
- * Sentry server-side configuration for Kortix Frontend (Next.js server components, API routes).
+ * Sentry server-side configuration for Bapx Frontend (Next.js server components, API routes).
  *
  * Uses @sentry/nextjs SDK pointed at Better Stack's Sentry-compatible endpoint.
  */

@@ -9,7 +9,7 @@ import OAIIcon from '@/assets/images/models/OAI.svg';
 import GeminiIcon from '@/assets/images/models/Gemini.svg';
 import GrokIcon from '@/assets/images/models/Grok.svg';
 import MoonshotIcon from '@/assets/images/models/Moonshot.svg';
-import KortixSymbolIcon from '@/assets/brand/kortix-symbol.svg';
+import BapxSymbolIcon from '@/assets/brand/bapx-symbol.svg';
 import type { SvgProps } from 'react-native-svg';
 import type React from 'react';
 
@@ -21,22 +21,22 @@ export type ModelProvider =
   | 'moonshotai'
   | 'bedrock'
   | 'openrouter'
-  | 'kortix';
+  | 'bapx';
 
 /**
- * Check if a model ID corresponds to a Kortix mode (Basic or Advanced)
+ * Check if a model ID corresponds to a Bapx mode (Basic or Advanced)
  */
-export function isKortixMode(modelId: string): boolean {
-  // New Kortix registry IDs
-  if (modelId === 'kortix/basic' || modelId === 'kortix/power' ||
-      modelId === 'kortix-basic' || modelId === 'kortix-power') {
+export function isBapxMode(modelId: string): boolean {
+  // New Bapx registry IDs
+  if (modelId === 'bapx/basic' || modelId === 'bapx/power' ||
+      modelId === 'bapx-basic' || modelId === 'bapx-power') {
     return true;
   }
-  // Legacy: Kortix Basic (Haiku 4.5)
+  // Legacy: Bapx Basic (Haiku 4.5)
   if (modelId.includes('claude-haiku-4-5') || modelId.includes('heol2zyy5v48')) {
     return true;
   }
-  // Legacy: Kortix Advanced Mode (Sonnet 4.5)
+  // Legacy: Bapx Advanced Mode (Sonnet 4.5)
   if (modelId.includes('claude-sonnet-4-5') || modelId.includes('few7z4l830xh')) {
     return true;
   }
@@ -47,9 +47,9 @@ export function isKortixMode(modelId: string): boolean {
  * Get the provider from a model ID
  */
 export function getModelProvider(modelId: string): ModelProvider {
-  // Check for Kortix modes first
-  if (isKortixMode(modelId)) {
-    return 'kortix';
+  // Check for Bapx modes first
+  if (isBapxMode(modelId)) {
+    return 'bapx';
   }
   if (modelId.includes('anthropic') || modelId.includes('claude')) {
     return 'anthropic';
@@ -77,7 +77,7 @@ export function getModelProvider(modelId: string): ModelProvider {
   const parts = modelId.split('/');
   if (parts.length > 1) {
     const provider = parts[0].toLowerCase();
-    if (['openai', 'anthropic', 'google', 'xai', 'moonshotai', 'bedrock', 'openrouter', 'kortix'].includes(provider)) {
+    if (['openai', 'anthropic', 'google', 'xai', 'moonshotai', 'bedrock', 'openrouter', 'bapx'].includes(provider)) {
       return provider as ModelProvider;
     }
   }
@@ -92,7 +92,7 @@ export function getModelProviderName(modelId: string): string {
   const provider = getModelProvider(modelId);
 
   const nameMap: Record<ModelProvider, string> = {
-    kortix: 'Kortix',
+    bapx: 'Bapx',
     anthropic: 'Anthropic',
     openai: 'OpenAI',
     google: 'Google',
@@ -112,7 +112,7 @@ export function getModelProviderIcon(modelId: string): React.FC<SvgProps> {
   const provider = getModelProvider(modelId);
 
   const iconMap: Record<ModelProvider, React.FC<SvgProps>> = {
-    kortix: KortixSymbolIcon, // Kortix modes use the Kortix symbol
+    bapx: BapxSymbolIcon, // Bapx modes use the Bapx symbol
     anthropic: AnthropicIcon,
     openai: OAIIcon,
     google: GeminiIcon,

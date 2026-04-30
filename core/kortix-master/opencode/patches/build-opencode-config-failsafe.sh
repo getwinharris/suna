@@ -7,7 +7,7 @@ CORE_PATCH="$SCRIPT_DIR/opencode-config-failsafe-core.patch"
 TEST_PATCH="$SCRIPT_DIR/opencode-config-failsafe-tests.patch"
 VERSION="${OPENCODE_VERSION:-${1:-}}"
 TARBALL_URL="${OPENCODE_SOURCE_TARBALL_URL:-https://api.github.com/repos/anomalyco/opencode/tarball/v${VERSION}}"
-OUTPUT_BIN="${KORTIX_OPENCODE_OUTPUT_BIN:-/usr/local/bin/opencode-kortix}"
+OUTPUT_BIN="${KORTIX_OPENCODE_OUTPUT_BIN:-/usr/local/bin/opencode-bapx}"
 
 if [ -z "$VERSION" ]; then
   echo "[opencode-failsafe] ERROR: OPENCODE_VERSION is required"
@@ -31,7 +31,7 @@ ARCHIVE="$TMP_DIR/opencode.tar.gz"
 echo "[opencode-failsafe] Downloading OpenCode source v${VERSION}..."
 curl -fsSL --retry 3 --retry-delay 1 \
   -H "Accept: application/vnd.github+json" \
-  -H "User-Agent: kortix-opencode-build" \
+  -H "User-Agent: bapx-opencode-build" \
   "$TARBALL_URL" \
   -o "$ARCHIVE"
 

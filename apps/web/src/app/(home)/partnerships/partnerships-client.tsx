@@ -117,10 +117,10 @@ export default function PartnershipsPageClient() {
 
             <div className="flex flex-col gap-1.5 mt-5">
               <a
-                href="mailto:marko@kortix.com"
+                href="mailto:marko@bapx.in"
                 className="text-base text-foreground hover:text-foreground underline underline-offset-4 decoration-foreground/20 hover:decoration-foreground/50 transition-colors w-fit"
               >
-                marko@kortix.com
+                marko@bapx.in
               </a>
               <a
                 href="https://x.com/markokraemer"

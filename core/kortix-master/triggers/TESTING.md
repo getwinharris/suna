@@ -1,11 +1,11 @@
-# Testing Guide — @kortix/triggers
+# Testing Guide — @bapx/triggers
 
-Tests live in `core/kortix-master/tests/unit/` and `tests/e2e/`.
+Tests live in `core/bapx-master/tests/unit/` and `tests/e2e/`.
 
 ## Run tests
 
 ```bash
-# From core/kortix-master/
+# From core/bapx-master/
 bun test tests/unit/trigger-store.test.ts
 bun test tests/unit/trigger-yaml.test.ts
 bun test tests/unit/trigger-actions.test.ts

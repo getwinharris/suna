@@ -1,16 +1,16 @@
 /**
  * Channel management routes — thin wrapper over SQLite channel DB.
  *
- * GET    /kortix/channels              — list all channels
- * POST   /kortix/channels/verify-telegram  — verify a Telegram bot token
- * POST   /kortix/channels/setup/telegram   — full Telegram bot setup
- * POST   /kortix/channels/setup/slack      — full Slack bot setup
- * POST   /kortix/channels/slack-manifest   — generate Slack app manifest
- * GET    /kortix/channels/:id          — get channel details
- * POST   /kortix/channels/:id/enable   — enable channel
- * POST   /kortix/channels/:id/disable  — disable channel
- * DELETE /kortix/channels/:id          — remove channel
- * PATCH  /kortix/channels/:id          — update settings
+ * GET    /bapx/channels              — list all channels
+ * POST   /bapx/channels/verify-telegram  — verify a Telegram bot token
+ * POST   /bapx/channels/setup/telegram   — full Telegram bot setup
+ * POST   /bapx/channels/setup/slack      — full Slack bot setup
+ * POST   /bapx/channels/slack-manifest   — generate Slack app manifest
+ * GET    /bapx/channels/:id          — get channel details
+ * POST   /bapx/channels/:id/enable   — enable channel
+ * POST   /bapx/channels/:id/disable  — disable channel
+ * DELETE /bapx/channels/:id          — remove channel
+ * PATCH  /bapx/channels/:id          — update settings
  */
 
 import { Hono } from 'hono'
@@ -210,14 +210,14 @@ const FIRST_NAMES = [
 
 function generateBotName(): string {
   const name = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)]
-  return `Kortix ${name}`
+  return `Bapx ${name}`
 }
 
 function buildSlackManifest(displayName: string, webhookUrl: string) {
   return {
     display_information: {
       name: displayName,
-      description: 'Kortix AI instance',
+      description: 'Bapx AI instance',
       background_color: '#1a1a2e',
     },
     features: {
@@ -263,7 +263,7 @@ channelsRouter.post('/slack-manifest', async (c) => {
     const resolvedUrl = publicUrl || getChannelPublicBaseUrl() || ''
     if (!resolvedUrl) return c.json({ ok: false, error: 'Could not resolve public URL. Set PUBLIC_BASE_URL or provide publicUrl.' }, 400)
 
-    const displayName = botName?.trim() || 'Kortix Slack'
+    const displayName = botName?.trim() || 'Bapx Slack'
 
     // Create the channel row NOW so the manifest gets a real webhook URL.
     const { createChannel } = await loadDb()

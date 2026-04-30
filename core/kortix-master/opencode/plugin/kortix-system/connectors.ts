@@ -1,5 +1,5 @@
 /**
- * Kortix Connectors Plugin — thin wrapper around the kconnectors CLI.
+ * Bapx Connectors Plugin — thin wrapper around the kconnectors CLI.
  * All logic lives in channels/kconnectors.ts; this plugin just shells out.
  */
 
@@ -67,7 +67,7 @@ const ConnectorsPlugin: Plugin = async () => ({
 		connector_setup: tool({
 			description: `Create or update connectors. Pass a JSON array. Only "name" is required. Fields: name, description, source (pipedream/cli/api-key/mcp/custom), pipedream_slug, env_keys (array), notes.`,
 			args: {
-				connectors: tool.schema.string().describe('JSON array. E.g. [{"name":"github","description":"kortix-ai org","source":"cli"}]'),
+				connectors: tool.schema.string().describe('JSON array. E.g. [{"name":"github","description":"bapx-ai org","source":"cli"}]'),
 			},
 			async execute(args: { connectors: string }): Promise<string> {
 				// Shell-escape the JSON by passing it as a single-quoted argument

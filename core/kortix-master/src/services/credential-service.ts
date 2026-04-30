@@ -45,7 +45,7 @@ let _cachedKey: Buffer | null = null
  */
 function workspaceDbPathForKeyCheck(): string {
   const ws = process.env.KORTIX_WORKSPACE?.trim() || '/workspace'
-  return join(ws, '.kortix', 'kortix.db')
+  return join(ws, '.bapx', 'bapx.db')
 }
 
 /**
@@ -56,7 +56,7 @@ function workspaceDbPathForKeyCheck(): string {
  * preserving user data over starting fresh: throw with an actionable
  * message instead of silently making the rows undecryptable.
  *
- * Saw this in prod 2026-04-28: 25 credentials on suna-on-call-agent
+ * Saw this in prod 2026-04-28: 25 credentials on bapX-on-call-agent
  * went unrecoverable because the key file got rewritten between
  * encrypt-time and the next decrypt. Tech-lead's `credential_get`
  * returned errors, the agent silently confabulated success.

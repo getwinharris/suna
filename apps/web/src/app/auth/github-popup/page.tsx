@@ -2,8 +2,8 @@
 
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { createClient } from '@/lib/trailbase/client';
+import { BapxLoader } from '@/components/ui/bapx-loader';
 
 interface AuthMessage {
   type: 'github-auth-success' | 'github-auth-error';
@@ -18,7 +18,7 @@ export default function GitHubOAuthPopup() {
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
-    const supabase = createClient();
+    const trailbase = createClient();
 
     // Get return URL from sessionStorage (set by parent component)
     const returnUrl =
@@ -64,7 +64,6 @@ export default function GitHubOAuthPopup() {
     const handleOAuth = async () => {
       try {
         const urlParams = new URLSearchParams(window.location.search);
-        const isCallback = urlParams.has('code');
         const hasError = urlParams.has('error');
 
         // Handle OAuth errors
@@ -74,135 +73,62 @@ export default function GitHubOAuthPopup() {
           throw new Error(errorDescription || error || 'GitHub OAuth error');
         }
 
-        if (isCallback) {
-          // This is the callback from GitHub
-          setStatus('processing');
-
-          try {
-            // Wait a moment for Supabase to process the session
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            const {
-              data: { session },
-              error,
-            } = await supabase.auth.getSession();
-
-            if (error) {
-              throw error;
-            }
-
-            if (session?.user) {
-              handleSuccess();
-              return;
-            }
-
-            // If no session yet, listen for auth state change
-            const {
-              data: { subscription },
-            } = supabase.auth.onAuthStateChange(async (event, session) => {
-              if (event === 'SIGNED_IN' && session?.user) {
-                subscription.unsubscribe();
-                handleSuccess();
-              } else if (event === 'SIGNED_OUT') {
-                subscription.unsubscribe();
-                handleError('Authentication failed - please try again');
-              }
-            });
-
-            // Cleanup subscription after timeout
-            setTimeout(() => {
-              subscription.unsubscribe();
-              handleError('Authentication timeout - please try again');
-            }, 10000); // 10 second timeout
-          } catch (authError: any) {
-            console.error('Auth processing error:', authError);
-            handleError(authError.message || 'Authentication failed');
-          }
+        // Trailbase OAuth is typically handled via redirect or specialized endpoints.
+        // For now, we assume the user is redirected back here after successful auth
+        // and the session is already established in the browser.
+        
+        const user = await trailbase.auth.getUser();
+        if (user) {
+          handleSuccess();
         } else {
-          // Start the OAuth flow
-          setStatus('loading');
-
-          const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'github',
-            options: {
-              redirectTo: `${window.location.origin}/auth/github-popup`,
-              queryParams: {
-                access_type: 'online',
-                prompt: 'select_account',
-              },
-            },
-          });
-
-          if (error) {
-            throw error;
-          }
+          // If no user yet, wait a bit and try again (one retry)
+          setTimeout(async () => {
+            const userRetry = await trailbase.auth.getUser();
+            if (userRetry) {
+              handleSuccess();
+            } else {
+              handleError('Authentication failed. Please try again.');
+            }
+          }, 2000);
         }
       } catch (err: any) {
-        console.error('OAuth error:', err);
-        handleError(err.message || 'Failed to authenticate with GitHub');
+        console.error('OAuth processing error:', err);
+        handleError(err.message || 'Failed to process authentication');
       }
     };
 
-    // Cleanup sessionStorage when popup closes
-    const handleBeforeUnload = () => {
-      sessionStorage.removeItem('github-returnUrl');
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    // Start OAuth process
     handleOAuth();
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
   }, []);
 
-  const getStatusMessage = () => {
-    switch (status) {
-      case 'loading':
-        return 'Starting GitHub authentication...';
-      case 'processing':
-        return 'Completing sign-in...';
-      case 'error':
-        return errorMessage || 'Authentication failed';
-      default:
-        return 'Processing...';
-    }
-  };
-
-  const getStatusColor = () => {
-    switch (status) {
-      case 'error':
-        return 'text-red-500';
-      case 'processing':
-        return 'text-emerald-500';
-      default:
-        return 'text-muted-foreground';
-    }
-  };
-
   return (
-    <main className="flex flex-col items-center justify-center h-screen bg-background p-8">
-      <div className="flex flex-col items-center gap-4 text-center max-w-sm">
-        {status !== 'error' && (
-          <KortixLoader size="large" />
-        )}
-
-        <div className="space-y-2">
-          <h1 className="text-lg font-medium">GitHub Sign-In</h1>
-          <p className={cn('text-sm', getStatusColor())}>{getStatusMessage()}</p>
-        </div>
-
-        {status === 'error' && (
-          <button
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-6 text-center">
+      {status === 'loading' || status === 'processing' ? (
+        <>
+          <BapxLoader size="lg" className="mb-4" />
+          <h1 className="text-xl font-semibold mb-2">
+            {status === 'loading' ? 'Connecting to GitHub...' : 'Finishing setup...'}
+          </h1>
+          <p className="text-muted-foreground">
+            This window will close automatically.
+          </p>
+        </>
+      ) : (
+        <>
+          <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4 mx-auto text-destructive text-2xl font-bold">
+            !
+          </div>
+          <h1 className="text-xl font-semibold mb-2 text-destructive">Authentication Error</h1>
+          <p className="text-muted-foreground mb-6 max-w-xs mx-auto">
+            {errorMessage || 'An unexpected error occurred during sign in.'}
+          </p>
+          <button 
             onClick={() => window.close()}
-            className="mt-4 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium"
           >
-            Close
+            Close Window
           </button>
-        )}
-      </div>
-    </main>
+        </>
+      )}
+    </div>
   );
 }

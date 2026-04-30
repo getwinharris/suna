@@ -1,5 +1,5 @@
 /**
- * TriggerStore — Unified SQLite CRUD against kortix.db:triggers + trigger_executions.
+ * TriggerStore — Unified SQLite CRUD against bapx.db:triggers + trigger_executions.
  *
  * Single source of truth for all trigger runtime state.
  * Config fields are synced from triggers.yaml; runtime fields live here only.

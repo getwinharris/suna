@@ -95,7 +95,7 @@ async function notifyTaskLifecycle(
 				eventText,
 				"</project_maintainer_event>",
 				"",
-				"Update .kortix/CONTEXT.md to reflect this event, then call project_context_sync and stop.",
+				"Update .bapx/CONTEXT.md to reflect this event, then call project_context_sync and stop.",
 			].filter((line): line is string => line !== null).join("\n")
 			await client.session.promptAsync({
 				path: { id: maintainerId },

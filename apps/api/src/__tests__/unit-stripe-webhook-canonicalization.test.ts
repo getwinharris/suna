@@ -34,7 +34,7 @@ mock.module('../config', () => ({
   },
 }));
 
-mock.module('@kortix/shared', () => ({
+mock.module('@bapx/shared', () => ({
   AUTO_TOPUP_DEFAULT_AMOUNT: 20,
   AUTO_TOPUP_DEFAULT_THRESHOLD: 5,
 }));

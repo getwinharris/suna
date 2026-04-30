@@ -18,7 +18,7 @@ import {
   WifiOff,
 } from 'lucide-react';
 
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { BapxLogo } from '@/components/sidebar/bapx-logo';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from '@/lib/toast';
@@ -400,10 +400,10 @@ function SupportFooter() {
     <p className="pointer-events-auto absolute bottom-7 left-0 right-0 text-center text-[12px] text-muted-foreground/60">
       Having trouble? Contact{' '}
       <a
-        href="mailto:support@kortix.com"
+        href="mailto:support@bapx.in"
         className="font-medium text-foreground/80 underline-offset-4 transition-colors hover:text-foreground hover:underline"
       >
-        support@kortix.com
+        support@bapx.in
       </a>
     </p>
   );
@@ -451,7 +451,7 @@ function ConnectingView({
 
   return (
     <>
-      <KortixLogo size={40} />
+      <BapxLogo size={40} />
 
       {line && (
         <p className="text-[13px] font-normal text-foreground/55 max-w-[320px] truncate">
@@ -535,7 +535,7 @@ function ProvisioningView({
 
   return (
     <>
-      <KortixLogo size={40} />
+      <BapxLogo size={40} />
 
       <p className="text-[13px] font-normal text-foreground/55 max-w-[320px] truncate">
         {label}

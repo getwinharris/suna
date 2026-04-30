@@ -1,9 +1,9 @@
 /**
  * Preferences routes — default model management.
  *
- * GET  /kortix/preferences/model   — get current default model
- * PUT  /kortix/preferences/model   — set or clear default model
- * GET  /kortix/preferences/models  — list all available models from connected providers
+ * GET  /bapx/preferences/model   — get current default model
+ * PUT  /bapx/preferences/model   — set or clear default model
+ * GET  /bapx/preferences/models  — list all available models from connected providers
  */
 
 import { Hono } from 'hono'

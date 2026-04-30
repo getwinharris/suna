@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ─── Kortix env setup ───────────────────────────────────────────────────────
+# ─── Bapx env setup ───────────────────────────────────────────────────────
 # Reads the root .env and generates per-service .env files.
 #
 # Usage:
@@ -97,7 +97,7 @@ write_env "apps/api/.env" \
   "$(kv JUSTAVPS_DEFAULT_SERVER_TYPE pro)" \
   "$(kv JUSTAVPS_IMAGE_BUILD_LOCATION)" \
   "$(kv JUSTAVPS_IMAGE_BUILD_SERVER_TYPE)" \
-  "$(kv JUSTAVPS_PROXY_DOMAIN kortix.cloud)" \
+  "$(kv JUSTAVPS_PROXY_DOMAIN bapx.cloud)" \
   "$(kv JUSTAVPS_WEBHOOK_SECRET)" \
   "$(kv JUSTAVPS_WEBHOOK_URL)" \
   "" \
@@ -144,7 +144,7 @@ write_env "apps/web/.env" \
   "$(kv NEXT_PUBLIC_APP_URL "$(e NEXT_PUBLIC_URL http://localhost:3000)")" \
   "$(kv NEXT_PUBLIC_URL http://localhost:3000)" \
   "$(kv NEXT_PUBLIC_BACKEND_URL http://localhost:8008/v1)" \
-  "$(kv NEXT_PUBLIC_SANDBOX_ID "$(e SANDBOX_CONTAINER_NAME kortix-sandbox)")" \
+  "$(kv NEXT_PUBLIC_SANDBOX_ID "$(e SANDBOX_CONTAINER_NAME bapx-sandbox)")" \
   "" \
   "$(kv NEXT_PUBLIC_GOOGLE_CLIENT_ID)" \
   "$(kv NEXT_PUBLIC_POSTHOG_KEY)" \

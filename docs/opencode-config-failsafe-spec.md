@@ -47,7 +47,7 @@ This is a legacy/foreign config shape. OpenCode treats it as fatal, and then:
 - `/session/status` returns 500
 - `/session` returns 500
 - `/provider`, `/config`, `/agent`, etc. all return 500
-- Kortix sees runtime layer degraded even though host and workload are healthy
+- Bapx sees runtime layer degraded even though host and workload are healthy
 
 That is unacceptable. Invalid config must degrade the runtime, not take it down.
 
@@ -82,11 +82,11 @@ OpenCode already strips some legacy keys safely:
 
 So there is precedent for **compatibility migrations** in config loading.
 
-### 3. Kortix should not rely only on startup wrappers
+### 3. Bapx should not rely only on startup wrappers
 
-Even though Kortix launches OpenCode via:
+Even though Bapx launches OpenCode via:
 
-- `suna/core/kortix-master/scripts/run-opencode-serve.sh`
+- `bapX/core/bapx-master/scripts/run-opencode-serve.sh`
 
 the true issue is inside OpenCode config loading itself. A wrapper can help, but it is not sufficient because:
 
@@ -117,7 +117,7 @@ For example, the legacy top-level `models` array should be either:
 - converted automatically, or
 - ignored with a clear warning and optional backup
 
-### G4. Kortix should surface config degradation without pretending the runtime is healthy
+### G4. Bapx should surface config degradation without pretending the runtime is healthy
 
 The layer-3 health should become:
 
@@ -323,11 +323,11 @@ If we want less API surface, `/config` can return:
 
 Either approach is fine. Dedicated `/config/status` is cleaner.
 
-### C3. Kortix health integration
+### C3. Bapx health integration
 
-Then in Kortix Master:
+Then in Bapx Master:
 
-- `/kortix/health` can include:
+- `/bapx/health` can include:
 
 ```json
 {
@@ -342,9 +342,9 @@ This lets the runtime stay up while still signaling degradation.
 
 ---
 
-## Layer D — Kortix-side guardrail (secondary fix)
+## Layer D — Bapx-side guardrail (secondary fix)
 
-Even after patching OpenCode, add a small Kortix-side safeguard.
+Even after patching OpenCode, add a small Bapx-side safeguard.
 
 ### D1. Preflight validator in `run-opencode-serve.sh`
 
@@ -352,7 +352,7 @@ Before launching OpenCode:
 
 - detect known-bad config file(s)
 - optionally run a lightweight migration/sanity check
-- write a marker file under `/ephemeral/kortix-master/opencode-config-status.json`
+- write a marker file under `/ephemeral/bapx-master/opencode-config-status.json`
 
 Purpose:
 
@@ -415,7 +415,7 @@ The primary fix remains inside OpenCode config loading.
 ### Phase 3 — surfacing
 
 6. add `/config/status` (or config status payload)
-7. propagate into Kortix `/kortix/health` and runtime-layer health
+7. propagate into Bapx `/bapx/health` and runtime-layer health
 
 ### Phase 4 — optional UX
 
@@ -435,7 +435,7 @@ The primary fix remains inside OpenCode config loading.
 ### Strongly preferred
 
 - legacy top-level `models` config automatically migrates
-- Kortix health reflects `runtime healthy but config degraded`
+- Bapx health reflects `runtime healthy but config degraded`
 
 ---
 
@@ -444,7 +444,7 @@ The primary fix remains inside OpenCode config loading.
 Do **both**:
 
 1. **Patch OpenCode** so config errors are non-fatal and tracked
-2. **Add Kortix health/config reporting** so degraded config is visible
+2. **Add Bapx health/config reporting** so degraded config is visible
 
 That is the real “once and for all” fix.
 

@@ -147,7 +147,7 @@ import {
 } from '@/components/ui/definition-list';
 import { InlineMeta } from '@/components/ui/inline-meta';
 import { EmptyState } from '@/components/ui/empty-state';
-import { IconInbox } from '@/components/ui/kortix-icons';
+import { IconInbox } from '@/components/ui/bapx-icons';
 import { PageHeader } from '@/components/ui/page-header';
 import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { PageSearchBar } from '@/components/ui/page-search-bar';
@@ -371,7 +371,7 @@ function Hex({ value }: { value: string }) {
 function LogoCard({ asset, fmt }: { asset: LogoAsset; fmt: LogoFormat }) {
   const isWordmark = asset.label === 'Wordmark';
   const downloadHref = fmt === 'png' ? asset.pngSrc : asset.svgSrc;
-  const downloadName = `kortix-${asset.label.toLowerCase()}-${asset.variant.toLowerCase()}.${fmt}`;
+  const downloadName = `bapx-${asset.label.toLowerCase()}-${asset.variant.toLowerCase()}.${fmt}`;
 
   return (
     <div className="group relative">
@@ -1726,14 +1726,14 @@ export default function BrandPage() {
                         </CollapsibleTrigger>
                       </div>
                       <div className="rounded-md border border-border/50 px-4 py-2 mt-2 text-sm">
-                        @kortix/design-system
+                        @bapx/design-system
                       </div>
                       <CollapsibleContent className="mt-2 space-y-2">
                         <div className="rounded-md border border-border/50 px-4 py-2 text-sm">
-                          @kortix/components
+                          @bapx/components
                         </div>
                         <div className="rounded-md border border-border/50 px-4 py-2 text-sm">
-                          @kortix/tokens
+                          @bapx/tokens
                         </div>
                       </CollapsibleContent>
                     </Collapsible>

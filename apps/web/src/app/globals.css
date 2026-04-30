@@ -13,7 +13,7 @@
 @source "../node_modules/streamdown/dist/*.js";
 @source "../node_modules/fumadocs-ui/dist/**/*.js";
 
-/* ─── Fumadocs → Kortix brand overrides ─── */
+/* ─── Fumadocs → Bapx brand overrides ─── */
 :root {
   --color-fd-background: oklch(0.985 0 0);
   --color-fd-foreground: oklch(0.145 0 0);
@@ -983,8 +983,8 @@
 /* Fix Shiki code block rendering: the global * { border-border } rule gives every
    .line span a solid border-style. Combined with display:contents on Shiki wrappers,
    browsers can render thin artifact lines between code lines in large blocks. */
-.kortix-markdown pre .line,
-.kortix-markdown pre code span {
+.bapx-markdown pre .line,
+.bapx-markdown pre code span {
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
@@ -1419,22 +1419,22 @@
   animation: stream-word-pop 200ms ease-out forwards;
 }
 
-.kortix-markdown [data-streamdown-animating="true"] > * {
+.bapx-markdown [data-streamdown-animating="true"] > * {
   animation: stream-fade-in 200ms ease-out forwards;
 }
 
-.kortix-markdown [data-streamdown-animating="true"] p,
-.kortix-markdown [data-streamdown-animating="true"] li,
-.kortix-markdown [data-streamdown-animating="true"] h1,
-.kortix-markdown [data-streamdown-animating="true"] h2,
-.kortix-markdown [data-streamdown-animating="true"] h3,
-.kortix-markdown [data-streamdown-animating="true"] h4,
-.kortix-markdown [data-streamdown-animating="true"] h5,
-.kortix-markdown [data-streamdown-animating="true"] h6 {
+.bapx-markdown [data-streamdown-animating="true"] p,
+.bapx-markdown [data-streamdown-animating="true"] li,
+.bapx-markdown [data-streamdown-animating="true"] h1,
+.bapx-markdown [data-streamdown-animating="true"] h2,
+.bapx-markdown [data-streamdown-animating="true"] h3,
+.bapx-markdown [data-streamdown-animating="true"] h4,
+.bapx-markdown [data-streamdown-animating="true"] h5,
+.bapx-markdown [data-streamdown-animating="true"] h6 {
   animation: stream-word-pop 180ms ease-out forwards;
 }
 
-.kortix-markdown [data-streamdown-animating="true"] code {
+.bapx-markdown [data-streamdown-animating="true"] code {
   animation: stream-char-reveal 150ms ease-out forwards;
 }
 
@@ -1456,17 +1456,17 @@
   }
 }
 
-.kortix-markdown.streaming-active {
+.bapx-markdown.streaming-active {
   position: relative;
 }
 
-.kortix-markdown.streaming-active p:last-child,
-.kortix-markdown.streaming-active li:last-child,
-.kortix-markdown.streaming-active div:last-child:not(:has(table)) {
+.bapx-markdown.streaming-active p:last-child,
+.bapx-markdown.streaming-active li:last-child,
+.bapx-markdown.streaming-active div:last-child:not(:has(table)) {
   display: inline;
 }
 
-.kortix-markdown[data-streaming="true"] > *:last-child {
+.bapx-markdown[data-streaming="true"] > *:last-child {
   animation: stream-fade-in 180ms ease-out;
 }
 
@@ -1496,7 +1496,7 @@
   }
 }
 
-.kortix-markdown[data-streaming="true"] > *:last-child {
+.bapx-markdown[data-streaming="true"] > *:last-child {
   animation: blur-fade-in 0.3s ease-out forwards;
 }
 
@@ -1537,7 +1537,7 @@
   display: inline;
 }
 
-/* Pulse heartbeat animation for reasoning section Kortix icon */
+/* Pulse heartbeat animation for reasoning section Bapx icon */
 @keyframes pulse-heartbeat {
   0%, 100% {
     transform: scale(1);
@@ -1636,8 +1636,8 @@
   animation: setting-up-fade-in 0.4s ease-out forwards;
 }
 
-/* ─── Kortix Loader keyframe ─── */
-@keyframes kortix-spin {
+/* ─── Bapx Loader keyframe ─── */
+@keyframes bapx-spin {
   to { transform: rotate(360deg); }
 }
 /* ─── Instance page animations ─── */

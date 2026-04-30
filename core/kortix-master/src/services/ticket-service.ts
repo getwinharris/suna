@@ -1,5 +1,5 @@
 /**
- * Kortix Tickets — v2 project board.
+ * Bapx Tickets — v2 project board.
  *
  * Parallel to tasks/task_events (v1). New projects default to structure_version=2
  * and get tickets/columns/fields/templates/agents. v1 projects keep using tasks.

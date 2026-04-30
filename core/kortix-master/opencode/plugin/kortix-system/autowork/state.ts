@@ -1,11 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
-import { ensureKortixDir } from "../lib/paths"
+import { ensureBapxDir } from "../lib/paths"
 import { AUTOWORK_DEFAULTS, createInitialAutoworkState, type AutoworkState } from "./config"
 import type { AutoworkStopReason } from "./engine"
 
 function stateDir(): string {
-	return `${ensureKortixDir(import.meta.dir)}/autowork-states`
+	return `${ensureBapxDir(import.meta.dir)}/autowork-states`
 }
 
 function statePath(sessionId: string): string {

@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 const suggestionsRouter = new Hono()
 const WORKSPACE_ROOT = process.env.KORTIX_WORKSPACE_ROOT || '/workspace'
-const GLOBAL_MEMORY_PATH = `${WORKSPACE_ROOT}/.kortix/MEMORY.md`
+const GLOBAL_MEMORY_PATH = `${WORKSPACE_ROOT}/.bapx/MEMORY.md`
 
 interface Suggestion {
   text: string

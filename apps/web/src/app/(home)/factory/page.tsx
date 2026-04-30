@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: 'The Autonomy Factory — Bapx Media Hub',
     description:
       'We build self-driving companies. The playbook for migrating from human-operated to AI-operated. 76% agents, 24% humans.',
-    url: 'https://www.kortix.com/factory',
+    url: 'https://www.bapx.in/factory',
     images: [
       {
         url: '/images/team.webp',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     images: ['/images/team.webp'],
   },
   alternates: {
-    canonical: 'https://www.kortix.com/factory',
+    canonical: 'https://www.bapx.in/factory',
   },
 };
 

@@ -78,15 +78,15 @@ interface Fixture {
 }
 
 async function makeFixture(): Promise<Fixture> {
-  const dir = mkdtempSync(path.join(tmpdir(), 'kortix-trigtix-e2e-'))
+  const dir = mkdtempSync(path.join(tmpdir(), 'bapx-trigtix-e2e-'))
   const projectPath = path.join(dir, 'demo-proj')
   mkdirSync(projectPath, { recursive: true })
-  mkdirSync(path.join(projectPath, '.kortix'), { recursive: true })
+  mkdirSync(path.join(projectPath, '.bapx'), { recursive: true })
 
   // Point the ticket-create-action at our temp DB via env.
   process.env.KORTIX_WORKSPACE = dir
-  mkdirSync(path.join(dir, '.kortix'), { recursive: true })
-  const db = new Database(path.join(dir, '.kortix', 'kortix.db'), { create: true, readwrite: true })
+  mkdirSync(path.join(dir, '.bapx'), { recursive: true })
+  const db = new Database(path.join(dir, '.bapx', 'bapx.db'), { create: true, readwrite: true })
   db.exec(`
     CREATE TABLE IF NOT EXISTS projects (
       id TEXT PRIMARY KEY, name TEXT NOT NULL, path TEXT NOT NULL UNIQUE,

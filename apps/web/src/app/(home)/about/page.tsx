@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: 'About Bapx Media Hub – Building Self-Driving Companies',
     description:
       'We take process-heavy companies and turn them into AI-operated ones. Full agent teams doing engineering, product, operations, finance, support, and growth.',
-    url: 'https://www.kortix.com/about',
+    url: 'https://www.bapx.in/about',
     images: [
       {
         url: '/images/team.webp',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     images: ['/images/team.webp'],
   },
   alternates: {
-    canonical: 'https://www.kortix.com/about',
+    canonical: 'https://www.bapx.in/about',
   },
 };
 

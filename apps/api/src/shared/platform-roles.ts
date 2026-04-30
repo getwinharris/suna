@@ -1,4 +1,4 @@
-import { platformUserRoles } from '@kortix/db';
+import { platformUserRoles } from '@bapx/db';
 import { eq } from 'drizzle-orm';
 import { db, hasDatabase } from './db';
 

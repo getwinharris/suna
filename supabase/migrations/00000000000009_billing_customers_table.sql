@@ -1,9 +1,9 @@
--- Ensure billing customers table exists in kortix schema.
+-- Ensure billing customers table exists in bapx schema.
 -- Needed by billing setup/checkout flows in cloud billing mode.
 
-create schema if not exists kortix;
+create schema if not exists bapx;
 
-create table if not exists kortix.billing_customers (
+create table if not exists bapx.billing_customers (
   account_id uuid not null,
   id text primary key,
   email text,
@@ -11,5 +11,5 @@ create table if not exists kortix.billing_customers (
   provider text
 );
 
-create index if not exists idx_kortix_billing_customers_account_id
-  on kortix.billing_customers(account_id);
+create index if not exists idx_bapx_billing_customers_account_id
+  on bapx.billing_customers(account_id);

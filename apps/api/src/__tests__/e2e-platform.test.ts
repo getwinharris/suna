@@ -27,7 +27,7 @@ import {
   OTHER_USER_ID,
   OTHER_USER_EMAIL,
 } from './helpers';
-import { sandboxes } from '@kortix/db';
+import { sandboxes } from '@bapx/db';
 import { eq } from 'drizzle-orm';
 
 const HAS_DB = HAS_SAFE_TEST_DB;
@@ -189,7 +189,7 @@ describe.skipIf(!HAS_DB)('Platform — Sandbox Lifecycle', () => {
       const justavpsProvider = createMockProvider('justavps', {
         createResult: {
           externalId: 'mock-justavps-recovered',
-          baseUrl: 'https://recovered.kortix.cloud',
+          baseUrl: 'https://recovered.bapx.cloud',
           metadata: {
             justavpsSlug: 'recovered-sandbox',
             provisioningStage: 'server_creating',
@@ -212,7 +212,7 @@ describe.skipIf(!HAS_DB)('Platform — Sandbox Lifecycle', () => {
         externalId: '',
         status: 'error',
         baseUrl: '',
-        config: { serviceKey: 'kortix_sb_retry_test' },
+        config: { serviceKey: 'bapx_sb_retry_test' },
         metadata: {
           serverType: 'cpx32',
           location: 'nbg1',
@@ -235,7 +235,7 @@ describe.skipIf(!HAS_DB)('Platform — Sandbox Lifecycle', () => {
 
       expect(justavpsProvider.calls.create.length).toBe(1);
       expect(justavpsProvider.calls.create[0]?.accountId).toBe(TEST_USER_ID);
-      expect(justavpsProvider.calls.create[0]?.envVars?.KORTIX_TOKEN).toBe('kortix_sb_retry_test');
+      expect(justavpsProvider.calls.create[0]?.envVars?.KORTIX_TOKEN).toBe('bapx_sb_retry_test');
       expect(justavpsProvider.calls.create[0]?.serverType).toBe('cpx32');
       expect(justavpsProvider.calls.create[0]?.location).toBe('nbg1');
 

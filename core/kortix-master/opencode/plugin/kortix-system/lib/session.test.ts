@@ -15,7 +15,7 @@ afterEach(() => {
 })
 
 function makeStorage(): { storageBase: string; dbPath: string } {
-	const root = mkdtempSync(path.join(tmpdir(), "kortix-session-test-"))
+	const root = mkdtempSync(path.join(tmpdir(), "bapx-session-test-"))
 	tempRoots.push(root)
 	const storageBase = path.join(root, ".local", "share", "opencode")
 	mkdirSync(storageBase, { recursive: true })
@@ -69,7 +69,7 @@ function seedDb(dbPath: string): void {
 		"ses_child", "global", "ses_root", "child", "/tmp/project", "Hermes comparison continued", "1", null, 1, 0, 1, null, null, null, 3000, 4000, null, null, null,
 	)
 	db.query(`INSERT INTO message VALUES (?,?,?,?,?)`).run(
-		"msg_1", "ses_root", 1100, 1100, JSON.stringify({ role: "user", content: "Please compare Hermes Agent vs Kortix memory systems." }),
+		"msg_1", "ses_root", 1100, 1100, JSON.stringify({ role: "user", content: "Please compare Hermes Agent vs Bapx memory systems." }),
 	)
 	db.query(`INSERT INTO part VALUES (?,?,?,?,?,?)`).run(
 		"prt_1", "msg_1", "ses_root", 1200, 1200, JSON.stringify({ type: "text", text: "Session lineage should be resolved before summarization." }),
@@ -87,7 +87,7 @@ describe("session helpers", () => {
 		expect(hits.length).toBe(1)
 		expect(hits[0]?.id).toBe("ses_root")
 		expect(hits[0]?.reason).toContain("message")
-		expect(hits[0]?.snippet).toContain("Hermes Agent vs Kortix")
+		expect(hits[0]?.snippet).toContain("Hermes Agent vs Bapx")
 	})
 
 	test("buildSessionLineage formats parent chain", async () => {

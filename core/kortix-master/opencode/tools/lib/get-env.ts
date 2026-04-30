@@ -86,12 +86,12 @@ function getDotenv(): Record<string, string> {
  * 3. `.env` file          — nearest `.env` walking up from the OpenCode config dir (native dev fallback)
  *
  * s6 is checked first so that env var updates from the secrets manager
- * (kortix-master /env API) take effect immediately — no service restart needed.
+ * (bapx-master /env API) take effect immediately — no service restart needed.
  * In native dev (no s6 dir), the read throws and falls through to process.env.
  */
 export function getEnv(key: string): string | undefined {
   // 1. s6 env dir — authoritative in containers, always fresh from disk.
-  //    kortix-master writes here on every /env POST, so values update without restart.
+  //    bapx-master writes here on every /env POST, so values update without restart.
   //    tmpfs read is ~1μs — negligible cost for always-correct values.
   try {
     const val = readFileSync(`${S6_ENV_DIR}/${key}`, "utf-8").trim();

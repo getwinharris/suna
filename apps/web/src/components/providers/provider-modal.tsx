@@ -527,14 +527,14 @@ export function GlobalProviderModal() {
   const models = useMemo(() => {
     if (!providers) return [];
     const connectedIds = new Set(providers.connected ?? []);
-    // If kortix provider is connected, it serves all models — hide redundant
-    // built-in providers so users see a clean Kortix-only model list.
+    // If bapx provider is connected, it serves all models — hide redundant
+    // built-in providers so users see a clean Bapx-only model list.
     const KORTIX_SUPERSEDED = ['anthropic', 'openai', 'google', 'xai', 'moonshotai', 'minimax', 'zhipuai'];
-    const kortixConnected = connectedIds.has('kortix');
+    const bapxConnected = connectedIds.has('bapx');
     const result: FlatModel[] = [];
     for (const provider of providers.all ?? []) {
       if (!connectedIds.has(provider.id)) continue;
-      if (kortixConnected && KORTIX_SUPERSEDED.includes(provider.id)) continue;
+      if (bapxConnected && KORTIX_SUPERSEDED.includes(provider.id)) continue;
       for (const [modelID, model] of Object.entries(provider.models ?? {})) {
         const caps = (model as any).capabilities;
         const modalities = (model as any).modalities;

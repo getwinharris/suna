@@ -21,15 +21,15 @@ import { describe, test, expect } from 'bun:test';
 // ---------------------------------------------------------------------------
 
 const cloudOrigins = [
-  'https://www.kortix.com',
-  'https://kortix.com',
-  'https://dev.kortix.com',
-  'https://new-dev.kortix.com',
-  'https://staging.kortix.com',
-  'https://kortix.cloud',
-  'https://www.kortix.cloud',
-  'https://new.kortix.com',
-  'https://computer-preview.kortix.com',
+  'https://www.bapx.in',
+  'https://bapx.in',
+  'https://dev.bapx.in',
+  'https://new-dev.bapx.in',
+  'https://staging.bapx.in',
+  'https://bapx.cloud',
+  'https://www.bapx.cloud',
+  'https://new.bapx.in',
+  'https://computer-preview.bapx.in',
 ];
 
 const justavpsOrigins = [
@@ -57,13 +57,13 @@ describe('Security Audit: CORS Security', () => {
 
   describe('Allowed origins', () => {
     test('production domains are allowed', () => {
-      expect(isOriginAllowed('https://kortix.com')).toBe(true);
-      expect(isOriginAllowed('https://www.kortix.com')).toBe(true);
+      expect(isOriginAllowed('https://bapx.in')).toBe(true);
+      expect(isOriginAllowed('https://www.bapx.in')).toBe(true);
     });
 
     test('staging/dev domains are allowed', () => {
-      expect(isOriginAllowed('https://dev.kortix.com')).toBe(true);
-      expect(isOriginAllowed('https://staging.kortix.com')).toBe(true);
+      expect(isOriginAllowed('https://dev.bapx.in')).toBe(true);
+      expect(isOriginAllowed('https://staging.bapx.in')).toBe(true);
     });
 
     test('localhost is allowed for local dev', () => {
@@ -72,7 +72,7 @@ describe('Security Audit: CORS Security', () => {
     });
 
     test('preview domain is allowed', () => {
-      expect(isOriginAllowed('https://computer-preview.kortix.com')).toBe(true);
+      expect(isOriginAllowed('https://computer-preview.bapx.in')).toBe(true);
     });
   });
 
@@ -95,21 +95,21 @@ describe('Security Audit: CORS Security', () => {
       expect(isOriginAllowed('*')).toBe(false);
     });
 
-    test('rejects kortix subdomain not in allowlist', () => {
-      expect(isOriginAllowed('https://evil.kortix.com')).toBe(false);
-      expect(isOriginAllowed('https://malicious.kortix.com')).toBe(false);
+    test('rejects bapx subdomain not in allowlist', () => {
+      expect(isOriginAllowed('https://evil.bapx.in')).toBe(false);
+      expect(isOriginAllowed('https://malicious.bapx.in')).toBe(false);
     });
 
     test('rejects similar-looking domains', () => {
       expect(isOriginAllowed('https://k0rtix.com')).toBe(false); // zero instead of o
-      expect(isOriginAllowed('https://kortix-evil.com')).toBe(false);
-      expect(isOriginAllowed('https://kortix.com.evil.com')).toBe(false);
+      expect(isOriginAllowed('https://bapx-evil.com')).toBe(false);
+      expect(isOriginAllowed('https://bapx.in.evil.com')).toBe(false);
     });
 
     test('rejects HTTP versions of HTTPS origins', () => {
-      expect(isOriginAllowed('http://kortix.com')).toBe(false);
-      expect(isOriginAllowed('http://www.kortix.com')).toBe(false);
-      expect(isOriginAllowed('http://dev.kortix.com')).toBe(false);
+      expect(isOriginAllowed('http://bapx.in')).toBe(false);
+      expect(isOriginAllowed('http://www.bapx.in')).toBe(false);
+      expect(isOriginAllowed('http://dev.bapx.in')).toBe(false);
     });
 
     test('rejects localhost on wrong port', () => {
@@ -125,28 +125,28 @@ describe('Security Audit: CORS Security', () => {
 
   describe('Origin manipulation attacks', () => {
     test('rejects origin with trailing slash', () => {
-      expect(isOriginAllowed('https://kortix.com/')).toBe(false);
+      expect(isOriginAllowed('https://bapx.in/')).toBe(false);
     });
 
     test('rejects origin with path', () => {
-      expect(isOriginAllowed('https://kortix.com/api')).toBe(false);
+      expect(isOriginAllowed('https://bapx.in/api')).toBe(false);
     });
 
     test('rejects origin with query string', () => {
-      expect(isOriginAllowed('https://kortix.com?evil=true')).toBe(false);
+      expect(isOriginAllowed('https://bapx.in?evil=true')).toBe(false);
     });
 
     test('rejects origin with port on production domain', () => {
-      expect(isOriginAllowed('https://kortix.com:443')).toBe(false);
-      expect(isOriginAllowed('https://kortix.com:8080')).toBe(false);
+      expect(isOriginAllowed('https://bapx.in:443')).toBe(false);
+      expect(isOriginAllowed('https://bapx.in:8080')).toBe(false);
     });
 
     test('rejects origin with user info', () => {
-      expect(isOriginAllowed('https://admin@kortix.com')).toBe(false);
+      expect(isOriginAllowed('https://admin@bapx.in')).toBe(false);
     });
 
     test('rejects origin with fragment', () => {
-      expect(isOriginAllowed('https://kortix.com#evil')).toBe(false);
+      expect(isOriginAllowed('https://bapx.in#evil')).toBe(false);
     });
   });
 
@@ -176,7 +176,7 @@ describe('Security Audit: CORS Security', () => {
       const extraOrigins = ['https://custom.example.com', 'http://localhost:5000'];
       expect(isOriginAllowed('https://custom.example.com', extraOrigins)).toBe(true);
       // Original origins still work
-      expect(isOriginAllowed('https://kortix.com', extraOrigins)).toBe(true);
+      expect(isOriginAllowed('https://bapx.in', extraOrigins)).toBe(true);
     });
 
     test('extra origins do not weaken existing restrictions', () => {

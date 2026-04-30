@@ -24,9 +24,9 @@ import { buildCanonicalSandboxAuthCommand } from './platform/services/sandbox-au
 import { ensureLocalSandboxPublicBase } from './platform/services/local-public-base';
 import { getSandboxBaseUrl, proxyToSandbox } from './sandbox-proxy/routes/local-preview';
 import { validateSecretKey } from './repositories/api-keys';
-import { isKortixToken } from './shared/crypto';
-import { getSupabase } from './shared/supabase';
-import { verifySupabaseJwt } from './shared/jwt-verify';
+import { isBapxToken } from './shared/crypto';
+import { getTrailbase } from './shared/trailbase';
+import { verifyTrailbaseJwt } from './shared/jwt-verify';
 import { canAccessPreviewSandbox } from './shared/preview-ownership';
 import { setupApp } from './setup';
 import { providersApp } from './providers/routes';
@@ -35,7 +35,7 @@ import { integrationsApp } from './integrations';
 import { queueApp, startDrainer, stopDrainer } from './queue';
 import { serversApp } from './servers';
 // WoA is now mounted under the router at /v1/router/woa (see router/index.ts)
-import { supabaseAuth, combinedAuth } from './middleware/auth';
+import { trailbaseAuth, combinedAuth } from './middleware/auth';
 import { ensureSchema } from './ensure-schema';
 import { initModelPricing, stopModelPricing } from './router/config/model-pricing';
 import { tunnelApp, wsHandlers as tunnelWsHandlers, startTunnelService, stopTunnelService, getTunnelServiceStatus } from './tunnel';
@@ -98,15 +98,15 @@ const app = new Hono();
 
 // CORS origins: production domains + localhost for local dev + any extras from env.
 const cloudOrigins = [
-  'https://www.kortix.com',
-  'https://kortix.com',
-  'https://dev.kortix.com',
-  'https://new-dev.kortix.com',
-  'https://dev-new.kortix.com',
-  'https://staging.kortix.com',
-  'https://kortix.cloud',
-  'https://www.kortix.cloud',
-  'https://new.kortix.com',
+  'https://www.bapx.in',
+  'https://bapx.in',
+  'https://dev.bapx.in',
+  'https://new-dev.bapx.in',
+  'https://dev-new.bapx.in',
+  'https://staging.bapx.in',
+  'https://bapx.cloud',
+  'https://www.bapx.cloud',
+  'https://new.bapx.in',
 ];
 const justavpsOrigins = [
   'https://justavps.com',
@@ -133,7 +133,7 @@ app.use(
   cors({
     origin: corsOrigins,
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization', 'X-Kortix-Token', 'X-Api-Key', 'Accept'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Bapx-Token', 'X-Api-Key', 'Accept'],
     credentials: true,
   })
 );
@@ -187,7 +187,7 @@ app.use('*', async (c, next) => {
   const isProxyLongPoll = isSandboxProxyPath && path.includes('/global/event');
   const isProxyStartupProbe = isSandboxProxyPath && (
     path.includes('/global/health') ||
-    path.includes('/kortix/health') ||
+    path.includes('/bapx/health') ||
     /\/sessions(?:\/|$)/.test(path)
   );
   const isExpectedProxyNoise = method === 'GET' && (
@@ -217,14 +217,14 @@ if (config.INTERNAL_KORTIX_ENV === 'dev') {
 // === Top-Level Health Check (no auth) ===
 
 // API version is injected at container start by deploy-zero-downtime.sh,
-// which extracts it from the Docker image tag (e.g. kortix/kortix-api:0.8.29 → 0.8.29).
+// which extracts it from the Docker image tag (e.g. bapx/bapx-api:0.8.29 → 0.8.29).
 // Falls back to 'dev' for local development.
 const API_VERSION = process.env.SANDBOX_VERSION || 'dev';
 
 app.get('/health', (c) => {
   return c.json({
     status: 'ok',
-    service: 'kortix-api',
+    service: 'bapx-api',
     version: API_VERSION,
     timestamp: new Date().toISOString(),
     env: config.ENV_MODE,
@@ -236,7 +236,7 @@ app.get('/health', (c) => {
 app.get('/v1/health', (c) => {
   return c.json({
     status: 'ok',
-    service: 'kortix-api',
+    service: 'bapx-api',
     version: API_VERSION,
     timestamp: new Date().toISOString(),
     env: config.ENV_MODE,
@@ -263,16 +263,16 @@ app.post('/v1/prewarm', (c) => {
 });
 
 // GET /v1/accounts — returns user's accounts.
-// Dual-read: kortix.account_members first, falls back to basejump.account_user.
-app.get('/v1/accounts', supabaseAuth, async (c: any) => {
+// Dual-read: bapx.account_members first, falls back to basejump.account_user.
+app.get('/v1/accounts', trailbaseAuth, async (c: any) => {
   const userId = c.get('userId') as string;
   const userEmail = c.get('userEmail') as string;
 
   const { eq } = await import('drizzle-orm');
-  const { accountMembers, accounts, accountUser } = await import('@kortix/db');
+  const { accountMembers, accounts, accountUser } = await import('@bapx/db');
   const { db } = await import('./shared/db');
 
-  // 1. Try kortix.account_members (new table)
+  // 1. Try bapx.account_members (new table)
   try {
     const memberships = await db
       .select({
@@ -345,7 +345,7 @@ app.get('/v1/accounts', supabaseAuth, async (c: any) => {
 });
 
 
-app.get('/v1/user-roles', supabaseAuth, async (c: any) => {
+app.get('/v1/user-roles', trailbaseAuth, async (c: any) => {
   const { getPlatformRole } = await import('./shared/platform-roles');
 
   const accountId = c.get('userId') as string;
@@ -388,7 +388,7 @@ app.route('/v1/admin/sandbox-pool', sandboxPoolAdminApp); // /v1/admin/sandbox-p
 // OAuth2 provider — public token endpoint, auth on authorize/consent
 app.route('/v1/oauth', oauthApp);
 
-// All remaining routes require authentication (JWT or kortix_ token).
+// All remaining routes require authentication (JWT or bapx_ token).
 app.use('/v1/providers/*', combinedAuth);
 app.route('/v1/providers', providersApp);   // /v1/providers, /v1/providers/schema, /v1/providers/:id/connect, /v1/providers/:id/disconnect, /v1/providers/health
 
@@ -418,21 +418,21 @@ app.route('/v1/tunnel', tunnelApp);
 
 // WoA moved to /v1/router/woa — see router/index.ts
 
-// ── Kortix API — proxies /v1/kortix/* to the sandbox's /kortix/* ─────────────
+// ── Bapx API — proxies /v1/bapx/* to the sandbox's /bapx/* ─────────────
 // Direct server-to-server proxy. Avoids double-CORS from the /v1/p/ path.
 // Auth: Supabase JWT (global middleware). Sandbox auth: INTERNAL_SERVICE_KEY.
-import { kortixProxyHandler } from './routes/kortix-projects';
-app.use('/v1/kortix/*', combinedAuth);
-app.use('/v1/kortix', combinedAuth);
-app.all('/v1/kortix/*', kortixProxyHandler);
-app.all('/v1/kortix', kortixProxyHandler);
+import { bapxProxyHandler } from './routes/bapx-projects';
+app.use('/v1/bapx/*', combinedAuth);
+app.use('/v1/bapx', combinedAuth);
+app.all('/v1/bapx/*', bapxProxyHandler);
+app.all('/v1/bapx', bapxProxyHandler);
 
 // Preview Proxy — unified route for both cloud (Daytona) and local mode.
 // Pattern: /v1/p/{sandboxId}/{port}/* for ALL modes.
 // Cloud:  sandboxId = Daytona external ID → proxied via Daytona SDK
-// Local:  sandboxId = container name (e.g. 'kortix-sandbox') → Docker DNS resolution
-// JustAVPS: sandboxId → CF Worker proxy at {port}--{slug}.kortix.cloud
-// Auth: unified previewProxyAuth (accepts Supabase JWT and kortix_ tokens).
+// Local:  sandboxId = container name (e.g. 'bapx-sandbox') → Docker DNS resolution
+// JustAVPS: sandboxId → CF Worker proxy at {port}--{slug}.bapx.cloud
+// Auth: unified previewProxyAuth (accepts Supabase JWT and bapx_ tokens).
 // MUST be after all explicit routes (wildcard catch-all).
 app.route('/v1/p', sandboxProxyApp);
 
@@ -532,7 +532,7 @@ app.notFound((c) => {
  * Ensure a valid KORTIX_TOKEN exists in the DB and is synced to the sandbox.
  *
  * Architecture:
- *   Source of truth: kortix.api_keys table (hash) + sandboxes.config.serviceKey (plaintext)
+ *   Source of truth: bapx.api_keys table (hash) + sandboxes.config.serviceKey (plaintext)
  *   Delivery:        POST to sandbox /env API → triple-write (s6 + bootstrap + SecretStore) + auto-restart
  *   Fallback:        docker exec raw write when /env API is unreachable (sandbox still booting)
  *
@@ -542,8 +542,8 @@ app.notFound((c) => {
  */
 async function injectSandboxToken(sandboxId: string, accountId: string): Promise<string> {
   const { db } = await import('./shared/db');
-  const { kortixApiKeys } = await import('@kortix/db');
-  const { sandboxes } = await import('@kortix/db');
+  const { bapxApiKeys } = await import('@bapx/db');
+  const { sandboxes } = await import('@bapx/db');
   const { eq, and } = await import('drizzle-orm');
   const { execSync: rawExecSync } = await import('child_process');
   const rawDockerHost = config.DOCKER_HOST || process.env.DOCKER_HOST || '';
@@ -558,7 +558,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
     const deadline = Date.now() + 20_000;
     while (Date.now() < deadline) {
       try {
-        const res = await fetch(`${sandboxBaseUrl}/kortix/health`, {
+        const res = await fetch(`${sandboxBaseUrl}/bapx/health`, {
           signal: AbortSignal.timeout(2_000),
         });
         if (res.ok || res.status === 503) return;
@@ -569,16 +569,16 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
     }
   };
 
-  // Resolve how sandbox reaches kortix-api
+  // Resolve how sandbox reaches bapx-api
   const rawUrl = (config.KORTIX_URL || '').replace(/\/v1\/router\/?$/, '');
-  let kortixApiUrl = `http://host.docker.internal:${config.PORT}`;
+  let bapxApiUrl = `http://host.docker.internal:${config.PORT}`;
   try {
     const parsed = new URL(rawUrl || `http://localhost:${config.PORT}`);
     if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') {
       parsed.hostname = 'host.docker.internal';
-      kortixApiUrl = parsed.toString().replace(/\/$/, '');
+      bapxApiUrl = parsed.toString().replace(/\/$/, '');
     } else if (rawUrl) {
-      kortixApiUrl = rawUrl.replace(/\/$/, '');
+      bapxApiUrl = rawUrl.replace(/\/$/, '');
     }
   } catch { /* keep default */ }
 
@@ -599,9 +599,9 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
     } else {
       // Key exists in config but not valid in DB — re-issue
       console.log('[startup] Existing KORTIX_TOKEN invalid in DB — re-issuing');
-      const [oldKey] = await db.select().from(kortixApiKeys)
-        .where(and(eq(kortixApiKeys.sandboxId, sandboxId), eq(kortixApiKeys.type, 'sandbox')));
-      if (oldKey) await db.delete(kortixApiKeys).where(eq(kortixApiKeys.keyId, oldKey.keyId));
+      const [oldKey] = await db.select().from(bapxApiKeys)
+        .where(and(eq(bapxApiKeys.sandboxId, sandboxId), eq(bapxApiKeys.type, 'sandbox')));
+      if (oldKey) await db.delete(bapxApiKeys).where(eq(bapxApiKeys.keyId, oldKey.keyId));
       const newKey = await createApiKey({ sandboxId, accountId, title: 'Sandbox Token', type: 'sandbox' });
       token = newKey.secretKey;
       await db.update(sandboxes)
@@ -643,7 +643,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
   const sandboxAlreadyHasToken = async (): Promise<boolean> => (await readSandboxEnvValue('KORTIX_TOKEN')) === token;
 
   // Also check KORTIX_API_URL
-  const sandboxAlreadyHasUrl = async (): Promise<boolean> => (await readSandboxEnvValue('KORTIX_API_URL')) === kortixApiUrl;
+  const sandboxAlreadyHasUrl = async (): Promise<boolean> => (await readSandboxEnvValue('KORTIX_API_URL')) === bapxApiUrl;
   const sandboxAlreadyHasInboundKey = async (): Promise<boolean> => (await readSandboxEnvValue('INTERNAL_SERVICE_KEY')) === token;
   const sandboxAlreadyHasYoloKey = async (): Promise<boolean> => {
     if (config.ENV_MODE !== 'cloud') return true;
@@ -700,8 +700,8 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
     KORTIX_TOKEN: token,
     INTERNAL_SERVICE_KEY: token,
     TUNNEL_TOKEN: token,
-    KORTIX_API_URL: kortixApiUrl,
-    TUNNEL_API_URL: kortixApiUrl,
+    KORTIX_API_URL: bapxApiUrl,
+    TUNNEL_API_URL: bapxApiUrl,
     ...(config.ENV_MODE === 'cloud' ? { KORTIX_YOLO_API_KEY: token, KORTIX_YOLO_URL: config.KORTIX_YOLO_URL } : {}),
     ...(config.SANDBOX_NETWORK ? { ONBOARDING_COMPLETE: 'true' } : {}),
   };
@@ -757,7 +757,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
         rawExecSync(
           `docker exec ${shellQuote(config.SANDBOX_CONTAINER_NAME)} bash -c ${shellQuote(buildBootstrapUpdateCommand({
             KORTIX_TOKEN: token,
-            KORTIX_API_URL: kortixApiUrl,
+            KORTIX_API_URL: bapxApiUrl,
             INTERNAL_SERVICE_KEY: token,
             TUNNEL_TOKEN: token,
             ...(config.ENV_MODE === 'cloud' ? { KORTIX_YOLO_API_KEY: token, KORTIX_YOLO_URL: config.KORTIX_YOLO_URL } : {}),
@@ -780,7 +780,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
   const forceLocalDockerAuthBundle = (): void => {
     if (config.SANDBOX_NETWORK) return;
     rawExecSync(
-      `docker exec ${shellQuote(config.SANDBOX_CONTAINER_NAME)} bash -c ${shellQuote(buildCanonicalSandboxAuthCommand(token, kortixApiUrl))}`,
+      `docker exec ${shellQuote(config.SANDBOX_CONTAINER_NAME)} bash -c ${shellQuote(buildCanonicalSandboxAuthCommand(token, bapxApiUrl))}`,
       { stdio: 'pipe', timeout: 15_000, env: dockerEnv },
     );
   };
@@ -834,7 +834,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
 
 async function ensureLocalSandboxRegistered() {
   const { db } = await import('./shared/db');
-  const { sandboxes } = await import('@kortix/db');
+  const { sandboxes } = await import('@bapx/db');
   const { eq, and } = await import('drizzle-orm');
   const { execSync } = await import('child_process');
 
@@ -906,7 +906,7 @@ async function ensureLocalSandboxRegistered() {
 
   // No existing sandbox — auto-provision for local single-user setup.
   // Only create if the container is actually running (image pulled, container started).
-  const { accounts } = await import('@kortix/db');
+  const { accounts } = await import('@bapx/db');
   const [account] = await db.select().from(accounts).limit(1);
   if (!account) {
     console.log('[startup] No account yet — sandbox will be created on first login via POST /init');
@@ -973,11 +973,11 @@ function startLocalSandboxSelfHeal(): void {
 
 console.log(`
 ╔═══════════════════════════════════════════════════════════╗
-║                  Kortix API Starting                      ║
+║                  Bapx API Starting                      ║
 ╠═══════════════════════════════════════════════════════════╣
 ║  Port: ${config.PORT.toString().padEnd(49)}║
 ║  Mode: ${config.ENV_MODE.padEnd(49)}║
-║  Env:  ${config.INTERNAL_KORTIX_ENV.padEnd(49)}║
+║  Env:  ${config.INTERNAL_BAPX_ENV.padEnd(49)}║
 ╠═══════════════════════════════════════════════════════════╣
 ║  Services:                                                ║
 ║    /v1/router     (search, LLM, proxy)                    ║
@@ -1083,7 +1083,7 @@ process.on('SIGINT', () => shutdown('SIGINT'));
 // ─── WebSocket proxy for sandbox PTY ─────────────────────────────────────────
 // The Bun server needs to handle WebSocket upgrades at the top level.
 // We intercept WS upgrade requests for /v1/p/{sandboxId}/* and proxy them
-// to the sandbox's Kortix Master (which further proxies to OpenCode).
+// to the sandbox's Bapx Master (which further proxies to OpenCode).
 
 const WS_CONNECT_TIMEOUT_MS = 10_000;
 const WS_BUFFER_MAX_BYTES = 1024 * 1024; // 1MB
@@ -1143,7 +1143,7 @@ function extractCookieToken(req: Request): string | null {
 }
 
 async function validatePreviewToken(token: string, sandboxId: string): Promise<boolean> {
-  if (isKortixToken(token)) {
+  if (isBapxToken(token)) {
     const result = await validateSecretKey(token);
     return !!result.isValid && !!result.accountId && await canAccessPreviewSandbox({
       previewSandboxId: sandboxId,
@@ -1338,12 +1338,12 @@ export default {
       if (!allowLocalPreviewBridge && !isSubdomainAuthenticated(sandboxId, port)) {
         const authHeader = req.headers.get('Authorization');
         const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-        const kortixTokenHeader = req.headers.get('X-Kortix-Token');
+        const bapxTokenHeader = req.headers.get('X-Bapx-Token');
         const cookieToken = extractCookieToken(req);
         // Also accept ?token= query param — browser WebSocket API can't set
         // custom headers, and initial page loads may not have cookies yet.
         const queryToken = url.searchParams.get('token');
-        const token = bearerToken || cookieToken || kortixTokenHeader || queryToken;
+        const token = bearerToken || cookieToken || bapxTokenHeader || queryToken;
 
         if (!token || !(await validatePreviewToken(token, sandboxId))) {
           return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -1410,7 +1410,7 @@ export default {
 
         // JustAVPS: route through CF Worker proxy at {port}--{slug}.{domain}
         if (config.isJustAVPSEnabled()) {
-          const { sandboxes } = await import('@kortix/db');
+          const { sandboxes } = await import('@bapx/db');
           const { db } = await import('./shared/db');
           const { eq, and, ne } = await import('drizzle-orm');
           const [sandbox] = await db
@@ -1552,10 +1552,10 @@ export default {
 
         const wsAuthHeader = req.headers.get('Authorization');
         const wsBearerToken = wsAuthHeader?.startsWith('Bearer ') ? wsAuthHeader.slice(7) : null;
-        const wsKortixTokenHeader = req.headers.get('X-Kortix-Token');
+        const wsBapxTokenHeader = req.headers.get('X-Bapx-Token');
         const wsCookieToken = extractCookieToken(req);
         const wsQueryToken = url.searchParams.get('token');
-        const wsToken = wsBearerToken || wsCookieToken || wsKortixTokenHeader || wsQueryToken;
+        const wsToken = wsBearerToken || wsCookieToken || wsBapxTokenHeader || wsQueryToken;
 
         if (wsToken && (await validatePreviewToken(wsToken, wsSandboxId))) {
           const resolved = await resolveProvider(wsSandboxId).catch(() => null);

@@ -8,8 +8,8 @@
  *  - Missing Authorization header
  *  - Empty Bearer token
  *  - Malformed Authorization header (no "Bearer " prefix)
- *  - Non-kortix token sent to apiKeyAuth
- *  - Random/forged kortix_ tokens
+ *  - Non-bapx token sent to apiKeyAuth
+ *  - Random/forged bapx_ tokens
  *  - Expired JWT tokens
  *  - Tampered JWT tokens
  *  - OPTIONS preflight bypass in combinedAuth (intentional, must not set userId)
@@ -53,9 +53,9 @@ function extractToken(
   return null;
 }
 
-/** isKortixToken — mirrors shared/crypto.ts */
-function isKortixToken(token: string): boolean {
-  return token.startsWith('kortix_');
+/** isBapxToken — mirrors shared/crypto.ts */
+function isBapxToken(token: string): boolean {
+  return token.startsWith('bapx_');
 }
 
 // ---------------------------------------------------------------------------
@@ -82,30 +82,30 @@ describe('Security Audit: Auth Middleware', () => {
       expect(token).toBeNull();
     });
 
-    test('rejects non-kortix token format', () => {
+    test('rejects non-bapx token format', () => {
       const token = 'sk-abc123def456';
-      expect(isKortixToken(token)).toBe(false);
+      expect(isBapxToken(token)).toBe(false);
     });
 
     test('rejects token with cortix_ typo prefix', () => {
-      expect(isKortixToken('cortix_abc123')).toBe(false);
+      expect(isBapxToken('cortix_abc123')).toBe(false);
     });
 
     test('rejects token with KORTIX_ uppercase prefix', () => {
       // The check is case-sensitive — uppercase must not match
-      expect(isKortixToken('KORTIX_abc123')).toBe(false);
+      expect(isBapxToken('KORTIX_abc123')).toBe(false);
     });
 
-    test('accepts valid kortix_ prefix', () => {
-      expect(isKortixToken('kortix_abc123')).toBe(true);
+    test('accepts valid bapx_ prefix', () => {
+      expect(isBapxToken('bapx_abc123')).toBe(true);
     });
 
-    test('accepts valid kortix_sb_ prefix (sandbox key)', () => {
-      expect(isKortixToken('kortix_sb_abc123')).toBe(true);
+    test('accepts valid bapx_sb_ prefix (sandbox key)', () => {
+      expect(isBapxToken('bapx_sb_abc123')).toBe(true);
     });
 
-    test('accepts valid kortix_tnl_ prefix (tunnel key)', () => {
-      expect(isKortixToken('kortix_tnl_abc123')).toBe(true);
+    test('accepts valid bapx_tnl_ prefix (tunnel key)', () => {
+      expect(isBapxToken('bapx_tnl_abc123')).toBe(true);
     });
   });
 

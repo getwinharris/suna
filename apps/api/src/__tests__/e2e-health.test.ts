@@ -18,7 +18,7 @@ describe('Health & System endpoints', () => {
 
     const body = await res.json();
     expect(body.status).toBe('ok');
-    expect(body.service).toBe('kortix-api');
+    expect(body.service).toBe('bapx-api');
     expect(body.timestamp).toBeDefined();
   });
 
@@ -30,7 +30,7 @@ describe('Health & System endpoints', () => {
 
     const body = await res.json();
     expect(body.status).toBe('ok');
-    expect(body.service).toBe('kortix');
+    expect(body.service).toBe('bapx');
     expect(body.timestamp).toBeDefined();
   });
 

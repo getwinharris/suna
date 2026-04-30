@@ -5,13 +5,13 @@ import { join } from "node:path"
 import { spawnSync } from "node:child_process"
 
 function makeWorkspace(): string {
-  return mkdtempSync(join(tmpdir(), "kortix-trigger-agent-e2e-"))
+  return mkdtempSync(join(tmpdir(), "bapx-trigger-agent-e2e-"))
 }
 
 function runPluginScenario(workspaceRoot: string) {
   const script = String.raw`
 const workspaceRoot = process.env.KORTIX_WORKSPACE
-const pluginMod = await import(new URL("./opencode/plugin/kortix-system/kortix-system.ts?e2e=" + Date.now(), import.meta.url).href)
+const pluginMod = await import(new URL("./opencode/plugin/bapx-system/bapx-system.ts?e2e=" + Date.now(), import.meta.url).href)
 const promptCalls = []
 const plugin = await pluginMod.default({
   client: {
@@ -37,10 +37,10 @@ const get = await plugin.tool.triggers.execute({ action: "get", trigger_id: "Ran
 const triggerId = JSON.parse(get).id
 const run = await plugin.tool.triggers.execute({ action: "run", trigger_id: triggerId }, ctx)
 const executions = await plugin.tool.triggers.execute({ action: "executions", trigger_id: triggerId }, ctx)
-const yamlBeforeDelete = await Bun.file(workspaceRoot + "/.kortix/triggers.yaml").text()
+const yamlBeforeDelete = await Bun.file(workspaceRoot + "/.bapx/triggers.yaml").text()
 const remove = await plugin.tool.triggers.execute({ action: "delete", trigger_id: triggerId }, ctx)
 const finalList = await plugin.tool.triggers.execute({ action: "list" }, ctx)
-const yamlAfterDelete = await Bun.file(workspaceRoot + "/.kortix/triggers.yaml").text()
+const yamlAfterDelete = await Bun.file(workspaceRoot + "/.bapx/triggers.yaml").text()
 console.log(JSON.stringify({
   hasTriggers: keys.includes("triggers"),
   triggerKeys: keys.filter((k) => k.includes("trigger")),
@@ -60,7 +60,7 @@ process.exit(0)
 `
 
   const result = spawnSync("bun", ["-e", script], {
-    cwd: "/Users/markokraemer/Projects/heyagi/suna/core/kortix-master",
+    cwd: "/Users/markokraemer/Projects/heyagi/bapX/core/bapx-master",
     env: {
       ...process.env,
       KORTIX_WORKSPACE: workspaceRoot,
@@ -94,7 +94,7 @@ process.exit(0)
   }
 }
 
-describe("Kortix trigger tool agent e2e", () => {
+describe("Bapx trigger tool agent e2e", () => {
   let workspaceRoot = ""
 
   afterEach(() => {
@@ -102,7 +102,7 @@ describe("Kortix trigger tool agent e2e", () => {
     workspaceRoot = ""
   })
 
-  test("kortix-system exposes trigger tools and they work through the returned tool registry", () => {
+  test("bapx-system exposes trigger tools and they work through the returned tool registry", () => {
     workspaceRoot = makeWorkspace()
     const result = runPluginScenario(workspaceRoot)
 
@@ -130,15 +130,15 @@ describe("Kortix trigger tool agent e2e", () => {
     expect(result.promptCalls[0]?.body?.parts?.[0]?.text || "").toContain("Share one surprising fun fact.")
   })
 
-  test("kortix agent instructions explicitly direct the model to use trigger tools", () => {
-    const kortixPrompt = readFileSync(
-      "/Users/markokraemer/Projects/heyagi/suna/core/kortix-master/opencode/agents/kortix.md",
+  test("bapx agent instructions explicitly direct the model to use trigger tools", () => {
+    const bapxPrompt = readFileSync(
+      "/Users/markokraemer/Projects/heyagi/bapX/core/bapx-master/opencode/agents/bapx.md",
       "utf8",
     )
 
-    expect(kortixPrompt).toContain("If a user asks you to create, inspect, pause, resume, run, or sync triggers, start with the `triggers` tool")
-    expect(kortixPrompt).toContain("triggers action=create")
-    expect(kortixPrompt).toContain("triggers action=list")
-    expect(kortixPrompt).toContain("Do **not** invent a `ktriggers` CLI")
+    expect(bapxPrompt).toContain("If a user asks you to create, inspect, pause, resume, run, or sync triggers, start with the `triggers` tool")
+    expect(bapxPrompt).toContain("triggers action=create")
+    expect(bapxPrompt).toContain("triggers action=list")
+    expect(bapxPrompt).toContain("Do **not** invent a `ktriggers` CLI")
   })
 })

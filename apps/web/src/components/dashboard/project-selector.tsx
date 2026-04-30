@@ -25,14 +25,14 @@ import {
   CommandFooter,
 } from '@/components/ui/command';
 import {
-  useKortixProjects,
-  type KortixProject,
-} from '@/hooks/kortix/use-kortix-projects';
+  useBapxProjects,
+  type BapxProject,
+} from '@/hooks/bapx/use-bapx-projects';
 import { openTabAndNavigate } from '@/stores/tab-store';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function projectRecency(p: KortixProject): number {
+function projectRecency(p: BapxProject): number {
   if (p.time?.updated) return p.time.updated;
   if (p.created_at) {
     const t = new Date(p.created_at).getTime();
@@ -79,7 +79,7 @@ export function ProjectSelector({
   selectedProjectId,
   onSelect,
 }: ProjectSelectorProps) {
-  const { data: projects, isLoading } = useKortixProjects();
+  const { data: projects, isLoading } = useBapxProjects();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -90,7 +90,7 @@ export function ProjectSelector({
 
   // Sort by recency (desc)
   const sorted = useMemo(() => {
-    if (!projects) return [] as KortixProject[];
+    if (!projects) return [] as BapxProject[];
     return [...projects].sort((a, b) => projectRecency(b) - projectRecency(a));
   }, [projects]);
 
@@ -112,7 +112,7 @@ export function ProjectSelector({
   const displayName = selected?.name ?? 'Default project';
   const hasProjects = sorted.length > 0;
 
-  const handleOpenProject = (project: KortixProject) => {
+  const handleOpenProject = (project: BapxProject) => {
     openTabAndNavigate({
       id: `project:${project.id}`,
       title: project.name,

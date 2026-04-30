@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
 
 /**
- * Tests for the share route (GET /kortix/share/:port).
+ * Tests for the share route (GET /bapx/share/:port).
  *
  * Now creates token-based short-lived share URLs with TTL.
  * Imports the real route module to test actual behavior.
@@ -22,7 +22,7 @@ function restoreEnv() {
 }
 function clearEnv() { for (const k of ENV_KEYS) delete process.env[k] }
 
-describe('GET /kortix/share/:port (token-based)', () => {
+describe('GET /bapx/share/:port (token-based)', () => {
   let shareRouter: any
   let Hono: any
 
@@ -43,7 +43,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   function buildApp() {
     const app = new Hono()
-    app.route('/kortix/share', shareRouter)
+    app.route('/bapx/share', shareRouter)
     return app
   }
 
@@ -51,7 +51,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   it('returns a share with token, url, expiresAt, ttl', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000')
+    const res = await app.request('/bapx/share/3000')
 
     expect(res.status).toBe(200)
     const body = await res.json() as any
@@ -65,7 +65,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   it('default TTL is 1 hour', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000')
+    const res = await app.request('/bapx/share/3000')
     const body = await res.json() as any
 
     const expires = new Date(body.expiresAt).getTime()
@@ -80,7 +80,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   it('accepts ?ttl=30m', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000?ttl=30m')
+    const res = await app.request('/bapx/share/3000?ttl=30m')
     const body = await res.json() as any
 
     expect(body.ttl).toBe('30m')
@@ -88,7 +88,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   it('accepts ?ttl=2h', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000?ttl=2h')
+    const res = await app.request('/bapx/share/3000?ttl=2h')
     const body = await res.json() as any
 
     expect(body.ttl).toBe('2h')
@@ -96,7 +96,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   it('rejects TTL below minimum (5m)', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000?ttl=1s')
+    const res = await app.request('/bapx/share/3000?ttl=1s')
 
     expect(res.status).toBe(400)
     const body = await res.json() as any
@@ -105,7 +105,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   it('rejects TTL above maximum (365d)', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000?ttl=400d')
+    const res = await app.request('/bapx/share/3000?ttl=400d')
 
     expect(res.status).toBe(400)
     const body = await res.json() as any
@@ -114,7 +114,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   it('rejects invalid TTL format', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000?ttl=banana')
+    const res = await app.request('/bapx/share/3000?ttl=banana')
 
     expect(res.status).toBe(400)
     const body = await res.json() as any
@@ -125,7 +125,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   it('accepts ?label=demo', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000?label=demo')
+    const res = await app.request('/bapx/share/3000?label=demo')
     const body = await res.json() as any
 
     expect(body.label).toBe('demo')
@@ -135,7 +135,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   it('adds hint for TTL > 24h', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000?ttl=2d')
+    const res = await app.request('/bapx/share/3000?ttl=2d')
     const body = await res.json() as any
 
     expect(body.hint).toContain('deploy')
@@ -143,7 +143,7 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   it('no hint for TTL <= 24h', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000?ttl=1h')
+    const res = await app.request('/bapx/share/3000?ttl=1h')
     const body = await res.json() as any
 
     expect(body.hint).toBeUndefined()
@@ -157,17 +157,17 @@ describe('GET /kortix/share/:port (token-based)', () => {
     process.env.JUSTAVPS_PROXY_TOKEN = 'tok_xyz'
 
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000')
+    const res = await app.request('/bapx/share/3000')
     const body = await res.json() as any
 
-    expect(body.url).toContain('8000--abc123.kortix.cloud')
+    expect(body.url).toContain('8000--abc123.bapx.cloud')
     expect(body.url).toContain('__proxy_token=tok_xyz')
     expect(body.url).toContain('/s/')
   })
 
   it('local mode: URL is localhost', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/3000')
+    const res = await app.request('/bapx/share/3000')
     const body = await res.json() as any
 
     expect(body.url).toContain('localhost')
@@ -178,24 +178,24 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   it('returns 400 for port 0', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/0')
+    const res = await app.request('/bapx/share/0')
     expect(res.status).toBe(400)
   })
 
   it('returns 400 for port 99999', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/99999')
+    const res = await app.request('/bapx/share/99999')
     expect(res.status).toBe(400)
   })
 
   // ── List shares ───────────────────────────────────────────────────────
 
-  it('GET /kortix/share lists active shares', async () => {
+  it('GET /bapx/share lists active shares', async () => {
     const app = buildApp()
-    await app.request('/kortix/share/3000')
-    await app.request('/kortix/share/5000')
+    await app.request('/bapx/share/3000')
+    await app.request('/bapx/share/5000')
 
-    const res = await app.request('/kortix/share')
+    const res = await app.request('/bapx/share')
     const body = await res.json() as any
 
     expect(body.count).toBeGreaterThanOrEqual(2)
@@ -204,23 +204,23 @@ describe('GET /kortix/share/:port (token-based)', () => {
 
   // ── Delete share ──────────────────────────────────────────────────────
 
-  it('DELETE /kortix/share/:token revokes a share', async () => {
+  it('DELETE /bapx/share/:token revokes a share', async () => {
     const app = buildApp()
-    const createRes = await app.request('/kortix/share/3000')
+    const createRes = await app.request('/bapx/share/3000')
     const { token } = await createRes.json() as any
 
-    const delRes = await app.request(`/kortix/share/${token}`, { method: 'DELETE' })
+    const delRes = await app.request(`/bapx/share/${token}`, { method: 'DELETE' })
     expect(delRes.status).toBe(200)
 
     // Should no longer appear in list
-    const listRes = await app.request('/kortix/share')
+    const listRes = await app.request('/bapx/share')
     const { shares } = await listRes.json() as any
     expect(shares.some((s: any) => s.token === token)).toBe(false)
   })
 
   it('DELETE unknown token returns 404', async () => {
     const app = buildApp()
-    const res = await app.request('/kortix/share/nonexistent', { method: 'DELETE' })
+    const res = await app.request('/bapx/share/nonexistent', { method: 'DELETE' })
     expect(res.status).toBe(404)
   })
 })

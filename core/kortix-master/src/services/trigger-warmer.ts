@@ -1,6 +1,6 @@
 /**
  * Forces opencode to bootstrap every project on this sandbox at startup so
- * the kortix-system plugin (which owns the cron trigger scheduler) loads
+ * the bapx-system plugin (which owns the cron trigger scheduler) loads
  * eagerly instead of lazily on first user request.
  *
  * Without this: container respawns, opencode-serve starts, but no project
@@ -11,7 +11,7 @@
  * the trigger plugin only registered when an unrelated /session request
  * hit at 19:31.
  *
- * What we do: read projects from .kortix/kortix.db and `GET /session`
+ * What we do: read projects from .bapx/bapx.db and `GET /session`
  * with `?directory=<project.path>` for each — that's enough to make
  * opencode call `Project.fromDirectory` and load the project-scoped
  * plugin tree (which includes triggers).
@@ -53,7 +53,7 @@ async function waitForOpencode(): Promise<boolean> {
 
 function listProjectPaths(): string[] {
   const workspace = process.env.KORTIX_WORKSPACE?.trim() || '/workspace'
-  const dbPath = join(workspace, '.kortix', 'kortix.db')
+  const dbPath = join(workspace, '.bapx', 'bapx.db')
   if (!existsSync(dbPath)) return []
 
   let db: Database

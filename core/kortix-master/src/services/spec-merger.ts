@@ -1,10 +1,10 @@
 /**
- * OpenAPI Spec Merger — combines kortix-master and OpenCode specs into one.
+ * OpenAPI Spec Merger — combines bapx-master and OpenCode specs into one.
  *
  * Strategy:
- * - kortix-master spec is generated via hono-openapi generateSpecs()
+ * - bapx-master spec is generated via hono-openapi generateSpecs()
  * - OpenCode spec is fetched live from localhost:{OPENCODE_PORT}/doc
- * - Paths are merged (kortix-master wins conflicts like /file, /file/content)
+ * - Paths are merged (bapx-master wins conflicts like /file, /file/content)
  * - OpenCode endpoints are auto-tagged based on path prefix
  * - Component schemas are merged with "OC_" prefix for OpenCode schemas
  * - Result is cached with a TTL to avoid re-fetching on every request
@@ -69,7 +69,7 @@ const OPENCODE_TAG_RULES: Array<{ prefix: string; tag: string }> = [
 
 // ─── Tag metadata ───────────────────────────────────────────────────────────
 
-// Sandbox Gateway tags (from kortix-master describeRoute)
+// Sandbox Gateway tags (from bapx-master describeRoute)
 const GATEWAY_TAGS: Array<{ name: string; description: string }> = [
   { name: 'GW: System',       description: 'Health checks, version info, and sandbox updates' },
   { name: 'GW: Secrets',      description: 'Environment variable / secret management (encrypted at rest via KORTIX_TOKEN)' },
@@ -103,7 +103,7 @@ const OPENCODE_TAGS: Array<{ name: string; description: string }> = [
   { name: 'OC: Experimental',    description: 'Experimental endpoints — resources, tools (may change without notice)' },
 ]
 
-// Map from old kortix-master tag names to new GW: prefixed names
+// Map from old bapx-master tag names to new GW: prefixed names
 const GATEWAY_TAG_REMAP: Record<string, string> = {
   'System':       'GW: System',
   'Secrets':      'GW: Secrets',
@@ -175,7 +175,7 @@ async function fetchOpenCodeSpec(): Promise<OpenAPISpec | null> {
 }
 
 export async function buildMergedSpec(
-  kortixSpec: OpenAPISpec,
+  bapxSpec: OpenAPISpec,
 ): Promise<OpenAPISpec> {
   // Check cache
   const now = Date.now()
@@ -185,15 +185,15 @@ export async function buildMergedSpec(
 
   const openCodeSpec = await fetchOpenCodeSpec()
 
-   // Start with kortix-master as the base
+   // Start with bapx-master as the base
   const merged: OpenAPISpec = {
     openapi: '3.1.0',
     info: {
-      title: 'Kortix Sandbox API',
+      title: 'Bapx Sandbox API',
       version: '1.0.0',
       description:
-        'Unified API reference for the Kortix sandbox.\n\n' +
-        '**Sandbox Gateway** — the sandbox infrastructure layer (kortix-master). ' +
+        'Unified API reference for the Bapx sandbox.\n\n' +
+        '**Sandbox Gateway** — the sandbox infrastructure layer (bapx-master). ' +
         'Manages secrets, files, deployments, semantic search, integrations, and proxies traffic to internal services.\n\n' +
         '**OpenCode** — the AI agent engine running inside the sandbox. ' +
         'Manages coding sessions, pseudo-terminals, messages, MCP servers, LLM providers, and configuration.\n\n' +
@@ -204,26 +204,26 @@ export async function buildMergedSpec(
         'In production, all requests go through the **platform proxy** (`/v1/p/{sandboxId}/{port}/...`) ' +
         'which authenticates callers before forwarding to the sandbox. ' +
         'The sandbox itself has **no built-in auth** — it relies entirely on the proxy layer and (optionally) an `INTERNAL_SERVICE_KEY` for service-to-service trust.\n\n' +
-        '### Kortix API Key (programmatic access)\n\n' +
+        '### Bapx API Key (programmatic access)\n\n' +
         'Create keys from **Settings > API Keys**. Each key is a public/secret pair:\n\n' +
         '| Key | Format | Length |\n' +
         '|-----|--------|--------|\n' +
-        '| **Secret key** | `kortix_` + 32 alphanumeric chars | 39 chars |\n' +
+        '| **Secret key** | `bapx_` + 32 alphanumeric chars | 39 chars |\n' +
         '| **Public key** | `pk_` + 32 alphanumeric chars | 35 chars |\n\n' +
         'The secret key is shown **once** at creation. Only an HMAC-SHA256 hash is stored server-side.\n\n' +
-        '```\nAuthorization: Bearer kortix_<your-secret-key>\n```\n\n' +
+        '```\nAuthorization: Bearer bapx_<your-secret-key>\n```\n\n' +
         '### Supabase JWT (frontend / dashboard)\n\n' +
         'The dashboard authenticates via Supabase Auth (ES256 JWT, ~900 chars). Handled automatically by the UI.\n\n' +
         '```\nAuthorization: Bearer eyJhbGciOiJFUzI1NiIs...\n```\n\n' +
         '### Sandbox Token (agents inside the sandbox)\n\n' +
-        'Each sandbox gets an auto-generated token (`kortix_sb_` prefix, 42 chars) injected as the `KORTIX_TOKEN` environment variable. ' +
+        'Each sandbox gets an auto-generated token (`bapx_sb_` prefix, 42 chars) injected as the `KORTIX_TOKEN` environment variable. ' +
         'AI agents use this to authenticate back to the platform API.\n\n' +
         '### What does NOT work\n\n' +
         '- **Supabase service role key** — rejected by all endpoints (not a valid user token)\n' +
         '- **Supabase anon key** — rejected by all endpoints\n\n' +
         '### End-to-end flow\n\n' +
         '1. Client sends `Authorization: Bearer <token>` to the **platform proxy**\n' +
-        '2. Proxy validates token (Kortix API key → HMAC-SHA256 hash lookup, or Supabase JWT → `getUser()` verification)\n' +
+        '2. Proxy validates token (Bapx API key → HMAC-SHA256 hash lookup, or Supabase JWT → `getUser()` verification)\n' +
         '3. Proxy strips client auth, injects `INTERNAL_SERVICE_KEY` as Bearer token\n' +
         '4. Sandbox validates the internal service key (if configured)\n' +
         '5. Response streams back to client\n\n' +
@@ -234,19 +234,19 @@ export async function buildMergedSpec(
         'The `INTERNAL_SERVICE_KEY` env var adds a second layer: when set, the sandbox gateway rejects requests without a matching Bearer token. ' +
         'In local development, both the firewall and service key are typically absent — all sandbox ports are open on localhost.',
     },
-    servers: [{ url: 'https://YOUR_KORTIX_API/v1/p/{sandboxId}/8000', description: 'Replace with your Kortix API base URL' }],
+    servers: [{ url: 'https://YOUR_KORTIX_API/v1/p/{sandboxId}/8000', description: 'Replace with your Bapx API base URL' }],
     tags: [],
     paths: {},
     components: {
       schemas: {},
       securitySchemes: {
-        KortixApiKey: {
+        BapxApiKey: {
           type: 'http',
           scheme: 'bearer',
           description:
-            'Kortix API key (`kortix_` prefix, 39 characters total). ' +
+            'Bapx API key (`bapx_` prefix, 39 characters total). ' +
             'Create one from Settings > API Keys in the dashboard. ' +
-            'Pass as: `Authorization: Bearer kortix_<your-key>`',
+            'Pass as: `Authorization: Bearer bapx_<your-key>`',
         },
         SupabaseJWT: {
           type: 'http',
@@ -260,16 +260,16 @@ export async function buildMergedSpec(
       },
     },
     security: [
-      { KortixApiKey: [] },
+      { BapxApiKey: [] },
       { SupabaseJWT: [] },
     ],
   }
 
   // ── Merge paths ─────────────────────────────────────────────────────────
 
-  // 1) Add all kortix-master paths first (they take priority)
+  // 1) Add all bapx-master paths first (they take priority)
   //    Remap their tags from "System" → "GW: System" etc.
-  for (const [path, methods] of Object.entries(kortixSpec.paths || {})) {
+  for (const [path, methods] of Object.entries(bapxSpec.paths || {})) {
     const remapped: Record<string, any> = {}
     for (const [method, details] of Object.entries(methods as Record<string, any>)) {
       if (method === 'parameters') {
@@ -285,11 +285,11 @@ export async function buildMergedSpec(
     merged.paths[path] = remapped
   }
 
-  // 2) Add OpenCode paths (skip conflicts where kortix-master already has them)
+  // 2) Add OpenCode paths (skip conflicts where bapx-master already has them)
   if (openCodeSpec) {
     for (const [path, methods] of Object.entries(openCodeSpec.paths || {})) {
       if (merged.paths[path]) {
-        // Conflict — kortix-master wins, but merge any missing methods
+        // Conflict — bapx-master wins, but merge any missing methods
         for (const [method, details] of Object.entries(methods as Record<string, any>)) {
           if (method === 'parameters') continue
           if (!merged.paths[path][method]) {
@@ -322,7 +322,7 @@ export async function buildMergedSpec(
 
     // ── Merge component schemas ─────────────────────────────────────────
     const ocSchemas = openCodeSpec.components?.schemas || {}
-    const kmSchemas = kortixSpec.components?.schemas || {}
+    const kmSchemas = bapxSpec.components?.schemas || {}
 
     for (const [name, schema] of Object.entries(kmSchemas)) {
       merged.components!.schemas![name] = schema

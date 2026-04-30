@@ -1,13 +1,13 @@
 ---
 name: computer-use
-description: "Control desktop applications on the user's machine using agent-click. Use when you need to click buttons, type text, read screens, scroll, drag files, move/resize windows, open/quit apps, interact with UI elements, or automate desktop workflows. Triggers: 'click on', 'open app', 'type into', 'scroll down', 'drag file', 'take screenshot', 'read the screen', 'interact with UI', 'desktop automation', 'computer use', 'agent-click'. Built on agent-click (https://github.com/kortix-ai/agent-click, https://www.agent-click.dev/) — an open-source computer use CLI by Kortix. Right now only works on macOS."
+description: "Control desktop applications on the user's machine using agent-click. Use when you need to click buttons, type text, read screens, scroll, drag files, move/resize windows, open/quit apps, interact with UI elements, or automate desktop workflows. Triggers: 'click on', 'open app', 'type into', 'scroll down', 'drag file', 'take screenshot', 'read the screen', 'interact with UI', 'desktop automation', 'computer use', 'agent-click'. Built on agent-click (https://github.com/bapx-ai/agent-click, https://www.agent-click.dev/) — an open-source computer use CLI by Bapx. Right now only works on macOS."
 ---
 
 # Computer Use — agent-click
 
-Control desktop applications on the user's machine via `agent-click`, an open-source CLI tool by Kortix for macOS desktop automation. All commands run through Agent Tunnel on the user's local machine.
+Control desktop applications on the user's machine via `agent-click`, an open-source CLI tool by Bapx for macOS desktop automation. All commands run through Agent Tunnel on the user's local machine.
 
-- GitHub: https://github.com/kortix-ai/agent-click
+- GitHub: https://github.com/bapx-ai/agent-click
 - Docs: https://www.agent-click.dev/
 
 ## Setup

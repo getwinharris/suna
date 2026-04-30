@@ -12,13 +12,13 @@
 # ║    supabase stop           (stop all containers)                           ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
-project_id = "kortix-local"
+project_id = "bapx-local"
 
 # ─── API (PostgREST) ─────────────────────────────────────────────────────────
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "kortix"]
+schemas = ["public", "bapx"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 

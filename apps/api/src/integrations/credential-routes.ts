@@ -93,7 +93,7 @@ async function resolveAccount(c: any): Promise<string> {
   const direct = c.get('accountId') as string | undefined;
   if (direct) return direct;
 
-  // supabaseAuth sets userId — resolve to accountId
+  // trailbaseAuth sets userId — resolve to accountId
   const userId = c.get('userId') as string | undefined;
   if (userId) return resolveAccountId(userId);
 

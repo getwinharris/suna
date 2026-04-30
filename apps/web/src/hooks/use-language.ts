@@ -4,7 +4,7 @@ import { locales, defaultLocale, type Locale } from '@/i18n/config';
 import { useCallback, useState, useEffect } from 'react';
 import { detectBestLocale } from '@/lib/utils/geo-detection';
 import { useAuth } from '@/components/AuthProvider';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/trailbase/client';
 import type { User } from '@supabase/supabase-js';
 
 /**

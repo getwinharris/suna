@@ -42,12 +42,12 @@ export class TriggerManager {
     this.webhookServer = new WebhookTriggerServer(host, port, (route, payload) => this.dispatchWebhook(route, payload))
     // Pipedream handler: route events from Pipedream through the webhook server
     this.webhookServer.setPipedreamHandler((listenerId, payload) => this.dispatchPipedreamEvent(listenerId, payload))
-    // Reload handler: external CRUD paths (kortix-master's /kortix/triggers
+    // Reload handler: external CRUD paths (bapx-master's /bapx/triggers
     // route) bypass manager.createTrigger and hit the store directly. They
     // POST /internal/reload on this server after mutating the DB so we
     // re-read and re-register runtime (cron + webhook routes).
     this.webhookServer.setReloadHandler(() => this.rebuildRuntime())
-    // Run handler: kortix-master's /kortix/triggers/:id/run forwards to
+    // Run handler: bapx-master's /bapx/triggers/:id/run forwards to
     // POST /internal/run/:id so the trigger actually fires through the
     // action dispatcher (real cron tick path). Without this, /run only
     // inserts a stale execution row and nothing dispatches.
@@ -60,8 +60,8 @@ export class TriggerManager {
   }
 
   private resolveDbPath(directory: string): string {
-    // Use the central kortix.db if it exists, otherwise create in .kortix/
-    const centralDb = `${directory}/.kortix/kortix.db`
+    // Use the central bapx.db if it exists, otherwise create in .bapx/
+    const centralDb = `${directory}/.bapx/bapx.db`
     return centralDb
   }
 
@@ -173,7 +173,7 @@ export class TriggerManager {
       const ctx = JSON.parse(trigger.context_config || "{}") as Record<string, unknown>
 
       const route: WebhookRoute = {
-        agentName: trigger.agent_name ?? "kortix",
+        agentName: trigger.agent_name ?? "bapx",
         trigger: {
           name: trigger.name,
           source: {
@@ -449,7 +449,7 @@ export class TriggerManager {
     const { existsSync, readFileSync } = await import("node:fs")
     const path = await import("node:path")
     const directory = this.options.directory ?? process.cwd()
-    const oldDir = path.join(directory, ".kortix", "agent-triggers")
+    const oldDir = path.join(directory, ".bapx", "agent-triggers")
     const migratedMarker = path.join(oldDir, ".migrated-v2")
 
     if (existsSync(migratedMarker)) return // Already migrated

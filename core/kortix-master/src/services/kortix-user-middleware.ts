@@ -1,10 +1,10 @@
 /**
- * Hono middleware that verifies the signed `X-Kortix-User-Context` header
+ * Hono middleware that verifies the signed `X-Bapx-User-Context` header
  * on incoming requests and attaches the parsed context to the Hono context
- * under the `kortixUser` key. Downstream handlers read it to make per-user
+ * under the `bapxUser` key. Downstream handlers read it to make per-user
  * authorization decisions (project ACL, session scoping).
  *
- * No header → `kortixUser` is absent (legacy / anonymous path). Any existing
+ * No header → `bapxUser` is absent (legacy / anonymous path). Any existing
  * route stays functional — user-aware logic layers on top without breaking
  * service-to-service traffic or pre-phase-1 clients.
  *
@@ -17,22 +17,22 @@
 import type { Context, Next } from 'hono'
 import {
   KORTIX_USER_CONTEXT_HEADER,
-  verifyKortixUserContext,
-  type KortixUserContext,
-} from './kortix-user-context'
+  verifyBapxUserContext,
+  type BapxUserContext,
+} from './bapx-user-context'
 import { rememberUserScopes } from './user-scope-cache'
 
 declare module 'hono' {
   interface ContextVariableMap {
-    kortixUser?: KortixUserContext
+    bapxUser?: BapxUserContext
   }
 }
 
-export function kortixUserContextMiddleware() {
+export function bapxUserContextMiddleware() {
   return async (c: Context, next: Next) => {
     const raw = c.req.header(KORTIX_USER_CONTEXT_HEADER)
     console.log(
-      `[kortix-user] ${c.req.method} ${c.req.path} header=${raw ? `present(${raw.slice(0, 16)}…)` : 'absent'}`,
+      `[bapx-user] ${c.req.method} ${c.req.path} header=${raw ? `present(${raw.slice(0, 16)}…)` : 'absent'}`,
     )
     if (!raw) {
       await next()
@@ -41,24 +41,24 @@ export function kortixUserContextMiddleware() {
 
     const secret = process.env.KORTIX_TOKEN
     if (!secret) {
-      console.warn('[kortix-user] KORTIX_TOKEN unset; skipping verification')
+      console.warn('[bapx-user] KORTIX_TOKEN unset; skipping verification')
       await next()
       return
     }
 
-    const result = verifyKortixUserContext(raw, secret)
+    const result = verifyBapxUserContext(raw, secret)
     if (!result.ok) {
       console.warn(
-        `[kortix-user] Ignoring bad ${KORTIX_USER_CONTEXT_HEADER} (${result.reason}); continuing without user context`,
+        `[bapx-user] Ignoring bad ${KORTIX_USER_CONTEXT_HEADER} (${result.reason}); continuing without user context`,
       )
       await next()
       return
     }
 
     console.log(
-      `[kortix-user] verified user=${result.context.userId} sandbox=${result.context.sandboxId} role=${result.context.sandboxRole}`,
+      `[bapx-user] verified user=${result.context.userId} sandbox=${result.context.sandboxId} role=${result.context.sandboxRole}`,
     )
-    c.set('kortixUser', result.context)
+    c.set('bapxUser', result.context)
     rememberUserScopes(result.context.userId, result.context.scopes ?? [])
 
     await next()

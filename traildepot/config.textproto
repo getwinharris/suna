@@ -1,0 +1,50 @@
+# Kortix TrailBase Configuration
+email {}
+server {
+  application_name: "Kortix Media Hub"
+  logs_retention_sec: 604800
+}
+auth {
+  auth_token_ttl_sec: 3600
+  refresh_token_ttl_sec: 2592000
+}
+
+record_apis: [
+  {
+    name: "accounts"
+    table_name: "accounts"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "account_members"
+    table_name: "account_members"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "sandboxes"
+    table_name: "sandboxes"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "sandbox_members"
+    table_name: "sandbox_members"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "api_keys"
+    table_name: "api_keys"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "integrations"
+    table_name: "integrations"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "deployments"
+    table_name: "deployments"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  }
+]
+
+jobs {}

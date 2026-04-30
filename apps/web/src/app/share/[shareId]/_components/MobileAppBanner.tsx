@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Bapx Media HubLogo } from '@/components/sidebar/kortix-logo';
+import { Bapx Media HubLogo } from '@/components/sidebar/bapx-logo';
 
 function isMobileDevice(): boolean {
   if (typeof window === 'undefined') return false;
@@ -58,14 +58,14 @@ export function MobileAppBanner({ shareId }: MobileAppBannerProps) {
   };
 
   const handleOpenInApp = () => {
-    const appUrl = `kortix://share/${shareId}`;
+    const appUrl = `bapx://share/${shareId}`;
     window.location.href = appUrl;
 
     setTimeout(() => {
       if (platform === 'ios') {
-        window.location.href = 'https://apps.apple.com/ie/app/kortix/id6754448524';
+        window.location.href = 'https://apps.apple.com/ie/app/bapx/id6754448524';
       } else if (platform === 'android') {
-        window.location.href = 'https://play.google.com/store/apps/details?id=com.kortix.app';
+        window.location.href = 'https://play.google.com/store/apps/details?id=com.bapx.app';
       }
     }, 2000);
   };

@@ -7,11 +7,11 @@
  * keep working — internally it now routes through the teams module's
  * visibleSandboxFilter + loadUserTeamContext.
  *
- * New callers should import from '@kortix/api/teams' directly.
+ * New callers should import from '@bapx/api/teams' directly.
  */
 
 import { and, desc, eq, inArray, ne, type SQL } from 'drizzle-orm';
-import { sandboxes, type Database } from '@kortix/db';
+import { sandboxes, type Database } from '@bapx/db';
 import {
   loadUserTeamContext,
   visibleSandboxFilter,

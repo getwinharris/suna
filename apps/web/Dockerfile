@@ -6,11 +6,11 @@
 #   cd apps/web && NEXT_OUTPUT=standalone pnpm run build
 #
 # Then from repo root:
-#   docker build -f apps/web/Dockerfile -t kortix/kortix-frontend:latest .
+#   docker build -f apps/web/Dockerfile -t bapx/bapx-frontend:latest .
 #
-# For CLOUD builds (kortix.ai), override billing at build time:
+# For CLOUD builds (bapx.ai), override billing at build time:
 #   NEXT_PUBLIC_BILLING_ENABLED=true pnpm build
-#   docker build -f apps/web/Dockerfile -t kortix/kortix-frontend:cloud .
+#   docker build -f apps/web/Dockerfile -t bapx/bapx-frontend:cloud .
 #
 # Build-time env vars (baked into the image):
 #   NEXT_PUBLIC_ENV_MODE       - "local" or "cloud"

@@ -12,7 +12,7 @@ import {
 
 function getWorkspaceDbPath(): string {
   const root = process.env.WORKSPACE_DIR || process.env.KORTIX_WORKSPACE || "/workspace"
-  return join(root, ".kortix", "kortix.db")
+  return join(root, ".bapx", "bapx.db")
 }
 
 /**
@@ -51,7 +51,7 @@ function registerTriggerSession(
 function parseModel(modelId?: string | null): { providerID: string; modelID: string } | undefined {
   if (!modelId) return undefined
   const [providerID, ...rest] = modelId.split("/")
-  if (!providerID || rest.length === 0) return { providerID: "kortix", modelID: modelId }
+  if (!providerID || rest.length === 0) return { providerID: "bapx", modelID: modelId }
   return { providerID, modelID: rest.join("/") }
 }
 

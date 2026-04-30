@@ -20,7 +20,7 @@
  * refreshes from Supabase.
  */
 
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/trailbase/client";
 
 
 /** Max retries for token acquisition (getSession + refreshSession fallback) */
@@ -167,7 +167,7 @@ async function fetchToken(): Promise<string | null> {
 /**
  * Unified auth token getter.
  *
- * Returns the Supabase JWT. All requests go through kortix-api which
+ * Returns the Supabase JWT. All requests go through bapx-api which
  * authenticates via Supabase JWT — no additional sandbox lock/key needed.
  */
 export async function getAuthToken(): Promise<string | null> {

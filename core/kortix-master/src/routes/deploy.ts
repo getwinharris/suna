@@ -21,7 +21,7 @@ deployRouter.post('/',
   describeRoute({
     tags: ['Deployments'],
     summary: 'Register and start a managed app service',
-    description: 'Creates or updates a persistent project service managed by Kortix Master, then starts it.',
+    description: 'Creates or updates a persistent project service managed by Bapx Master, then starts it.',
     responses: {
       200: { description: 'Deployment result', content: { 'application/json': { schema: resolver(DeployResponse) } } },
       400: { description: 'Missing deploymentId', content: { 'application/json': { schema: resolver(ErrorResponse) } } },

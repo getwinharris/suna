@@ -23,11 +23,11 @@ import Animated, {
 import { API_URL } from '@/api/config';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { KortixLoader } from '@/components/ui/kortix-loader';
-import { KortixLogo } from '@/components/ui/KortixLogo';
+import { BapxLoader } from '@/components/ui/bapx-loader';
+import { BapxLogo } from '@/components/ui/BapxLogo';
 import { ThreadContent, type ToolMessagePair } from '@/components/chat/ThreadContent';
-import { KortixComputer } from '@/components/kortix-computer';
-import { useKortixComputerStore } from '@/stores/kortix-computer-store';
+import { BapxComputer } from '@/components/bapx-computer';
+import { useBapxComputerStore } from '@/stores/bapx-computer-store';
 
 // Fetch public thread without requiring auth
 async function fetchPublicThread(threadId: string) {
@@ -348,14 +348,14 @@ export default function ShareThreadPage() {
   const insets = useSafeAreaInsets();
   const scrollViewRef = React.useRef<ScrollView>(null);
   
-  // Kortix Computer for viewing tool calls
-  const { isOpen: isKortixComputerOpen, openPanel } = useKortixComputerStore();
+  // Bapx Computer for viewing tool calls
+  const { isOpen: isBapxComputerOpen, openPanel } = useBapxComputerStore();
   const [selectedToolData, setSelectedToolData] = React.useState<{
     toolMessages: ToolMessagePair[];
     initialIndex: number;
   } | null>(null);
 
-  // Handle tool press - open Kortix Computer
+  // Handle tool press - open Bapx Computer
   const handleToolPress = React.useCallback(
     (toolMessages: ToolMessagePair[], initialIndex: number) => {
       setSelectedToolData({ toolMessages, initialIndex });
@@ -448,7 +448,7 @@ export default function ShareThreadPage() {
       <>
         <Stack.Screen options={{ headerShown: false }} />
         <View className="flex-1 bg-background items-center justify-center">
-          <KortixLoader size="large" />
+          <BapxLoader size="large" />
         </View>
       </>
     );
@@ -474,7 +474,7 @@ export default function ShareThreadPage() {
 
           <View className="flex-1 mx-3">
             <View className="flex-row items-center gap-2">
-              <KortixLogo size={16} variant="symbol" color={isDark ? 'dark' : 'light'} />
+              <BapxLogo size={16} variant="symbol" color={isDark ? 'dark' : 'light'} />
               <Text
                 className="font-roobert-semibold text-base text-foreground"
                 numberOfLines={1}
@@ -528,9 +528,9 @@ export default function ShareThreadPage() {
         )}
       </View>
 
-      {/* Kortix Computer for viewing tool calls */}
-      {isKortixComputerOpen && (
-        <KortixComputer
+      {/* Bapx Computer for viewing tool calls */}
+      {isBapxComputerOpen && (
+        <BapxComputer
           toolMessages={selectedToolData?.toolMessages || []}
           currentIndex={selectedToolData?.initialIndex || 0}
           onNavigate={(newIndex) => {

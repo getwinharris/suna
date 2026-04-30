@@ -3,7 +3,7 @@
  * Agent Tunnel CLI — self-contained script for the agent-tunnel skill.
  *
  * Zero external dependencies — TunnelClient is inlined so this works
- * standalone in the sandbox without @kortix/agent-tunnel in node_modules.
+ * standalone in the sandbox without @bapx/agent-tunnel in node_modules.
  *
  * Usage: bun run tunnel.ts <command> [args as JSON]
  *
@@ -185,7 +185,7 @@ class TunnelClient {
       -1,
       "No tunnel connection found. The user needs to set up Agent Tunnel first:\n" +
         "1. Create a tunnel connection in the UI\n" +
-        '2. Run `npx @kortix/agent-tunnel connect` on their local machine'
+        '2. Run `npx @bapx/agent-tunnel connect` on their local machine'
     );
   }
 }
@@ -325,7 +325,7 @@ async function status() {
     hasOnline,
     message: hasOnline
       ? undefined
-      : "No tunnel is currently online. Ask the user to run `npx @kortix/agent-tunnel connect` on their local machine.",
+      : "No tunnel is currently online. Ask the user to run `npx @bapx/agent-tunnel connect` on their local machine.",
   });
 }
 

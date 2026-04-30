@@ -1,5 +1,5 @@
 // ============================================================================
-// Kortix System XML Tags — wrap internal/system content for conditional rendering
+// Bapx System XML Tags — wrap internal/system content for conditional rendering
 // ============================================================================
 //
 // Usage: Wrap any system/internal content (instructions, reminders, AGENTS.md
@@ -7,31 +7,31 @@
 // these tags before rendering, so internal content never appears in the UI.
 //
 // Examples:
-//   <kortix_system>AGENTS.md instruction content here</kortix_system>
-//   <kortix_system reminder="project-gate">Project must be selected first</kortix_system>
-//   <kortix_system type="instruction" source="AGENTS.md">System prompt...</kortix_system>
+//   <bapx_system>AGENTS.md instruction content here</bapx_system>
+//   <bapx_system reminder="project-gate">Project must be selected first</bapx_system>
+//   <bapx_system type="instruction" source="AGENTS.md">System prompt...</bapx_system>
 
-export const MEMORY_CONTEXT_MARKER = "<!-- kortix-mem-context -->"
-export const MEMORY_CONTEXT_MESSAGE_ID = "__kortix_mem_context__"
+export const MEMORY_CONTEXT_MARKER = "<!-- bapx-mem-context -->"
+export const MEMORY_CONTEXT_MESSAGE_ID = "__bapx_mem_context__"
 
-export const KORTIX_SYSTEM_OPEN_TAG = "<kortix_system"
-export const KORTIX_SYSTEM_CLOSE_TAG = "</kortix_system>"
+export const KORTIX_SYSTEM_OPEN_TAG = "<bapx_system"
+export const KORTIX_SYSTEM_CLOSE_TAG = "</bapx_system>"
 
 /**
- * Check if text contains any kortix_system XML tags.
+ * Check if text contains any bapx_system XML tags.
  */
-export function containsKortixSystemTags(text: string): boolean {
+export function containsBapxSystemTags(text: string): boolean {
 	return text.includes(KORTIX_SYSTEM_OPEN_TAG) && text.includes(KORTIX_SYSTEM_CLOSE_TAG)
 }
 
 /**
- * Wrap text content in kortix_system XML tags with optional attributes.
+ * Wrap text content in bapx_system XML tags with optional attributes.
  * 
  * @param content - The text content to wrap
  * @param attrs - Optional attributes (e.g., { type: "instruction", source: "AGENTS.md" })
- * @returns The wrapped text, e.g., '<kortix_system type="instruction" source="AGENTS.md">content</kortix_system>'
+ * @returns The wrapped text, e.g., '<bapx_system type="instruction" source="AGENTS.md">content</bapx_system>'
  */
-export function wrapInKortixSystemTags(
+export function wrapInBapxSystemTags(
 	content: string,
 	attrs?: Record<string, string>,
 ): string {
@@ -47,33 +47,33 @@ export function wrapInKortixSystemTags(
 }
 
 /**
- * Strip all kortix_system XML tags and their content from text.
+ * Strip all bapx_system XML tags and their content from text.
  * Use this in the frontend to remove internal content before rendering.
  * 
- * @param text - Text containing kortix_system tags
- * @returns Text with all kortix_system content removed
+ * @param text - Text containing bapx_system tags
+ * @returns Text with all bapx_system content removed
  */
-export function stripKortixSystemTags(text: string): string {
+export function stripBapxSystemTags(text: string): string {
 	if (!text) return ""
 	
-	// Pattern to match <kortix_system ...>...</kortix_system> with optional attributes
+	// Pattern to match <bapx_system ...>...</bapx_system> with optional attributes
 	// Handles multiline content
-	const SYSTEM_TAG_REGEX = /<kortix_system[^>]*>[\s\S]*?<\/kortix_system>/gi
+	const SYSTEM_TAG_REGEX = /<bapx_system[^>]*>[\s\S]*?<\/bapx_system>/gi
 	
 	return text.replace(SYSTEM_TAG_REGEX, "").trim()
 }
 
 /**
- * Extract all kortix_system content blocks from text without removing them.
+ * Extract all bapx_system content blocks from text without removing them.
  * Useful for debugging or logging what system content was injected.
  * 
- * @param text - Text containing kortix_system tags
- * @returns Array of content blocks found inside kortix_system tags
+ * @param text - Text containing bapx_system tags
+ * @returns Array of content blocks found inside bapx_system tags
  */
-export function extractKortixSystemContent(text: string): string[] {
+export function extractBapxSystemContent(text: string): string[] {
 	if (!text) return []
 	
-	const SYSTEM_TAG_REGEX = /<kortix_system[^>]*>([\s\S]*?)<\/kortix_system>/gi
+	const SYSTEM_TAG_REGEX = /<bapx_system[^>]*>([\s\S]*?)<\/bapx_system>/gi
 	const results: string[] = []
 	let match
 	
@@ -85,14 +85,14 @@ export function extractKortixSystemContent(text: string): string[] {
 }
 
 /**
- * Wrap multiple lines or content blocks in kortix_system tags.
+ * Wrap multiple lines or content blocks in bapx_system tags.
  * Automatically handles multiline content.
  * 
  * @param linesOrBlocks - Array of strings to wrap, or a single string
  * @param attrs - Optional attributes for the wrapper tag
  * @returns Single string with all content wrapped
  */
-export function wrapLinesInKortixSystemTags(
+export function wrapLinesInBapxSystemTags(
 	linesOrBlocks: string | string[],
 	attrs?: Record<string, string>,
 ): string {
@@ -102,7 +102,7 @@ export function wrapLinesInKortixSystemTags(
 	
 	if (!content.trim()) return ""
 	
-	return wrapInKortixSystemTags(content, attrs)
+	return wrapInBapxSystemTags(content, attrs)
 }
 
 // ============================================================================

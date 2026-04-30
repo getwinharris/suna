@@ -5,7 +5,7 @@ import { Globe, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { AnimatedBg } from '@/components/ui/animated-bg';
-import { KortixLogo } from '@/components/sidebar/kortix-logo';
+import { BapxLogo } from '@/components/sidebar/bapx-logo';
 
 export default function CountryError() {
   return (
@@ -16,7 +16,7 @@ export default function CountryError() {
 
         <div className="relative z-10 w-full max-w-[456px] flex flex-col items-center gap-5 sm:gap-8">
           {/* Logo */}
-          <KortixLogo size={28} className="sm:w-8 sm:h-8" />
+          <BapxLogo size={28} className="sm:w-8 sm:h-8" />
 
           {/* Title */}
           <h1 className="text-2xl sm:text-3xl md:text-[43px] font-normal tracking-tight text-foreground leading-tight text-center">
@@ -57,7 +57,7 @@ export default function CountryError() {
               className="w-full h-12 rounded-lg font-medium"
             >
               <Link
-                href="mailto:support@kortix.ai"
+                href="mailto:support@bapx.ai"
                 className="flex items-center justify-center gap-2"
               >
                 <Mail className="h-4 w-4" />

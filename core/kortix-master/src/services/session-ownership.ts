@@ -1,6 +1,6 @@
 /**
- * Session-ownership tracking. Rows in `.kortix/kortix.db` mapping each
- * opencode session id to the user who created it. Kortix-master uses
+ * Session-ownership tracking. Rows in `.bapx/bapx.db` mapping each
+ * opencode session id to the user who created it. Bapx-master uses
  * this to:
  *   - Stamp ownership on session creation (POST /session).
  *   - Filter session lists (GET /session) to the caller's own sessions.
@@ -25,7 +25,7 @@ function getDb(): Database {
     process.env.KORTIX_WORKSPACE?.trim() ||
     process.env.OPENCODE_CONFIG_DIR?.replace(/\/opencode\/?$/, '') ||
     '/workspace'
-  const dbPath = join(workspace, '.kortix', 'kortix.db')
+  const dbPath = join(workspace, '.bapx', 'bapx.db')
   if (!existsSync(dirname(dbPath))) mkdirSync(dirname(dbPath), { recursive: true })
 
   const db = new Database(dbPath)

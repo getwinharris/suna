@@ -22,7 +22,7 @@ import { useOpenCodeLocal, formatModelString } from '@/hooks/opencode/use-openco
 import { useOpenCodeConfig } from '@/hooks/opencode/use-opencode-config';
 import { ProjectSelector } from '@/components/dashboard/project-selector';
 import { useSelectedProjectStore } from '@/stores/selected-project-store';
-import { useKortixProjects } from '@/hooks/kortix/use-kortix-projects';
+import { useBapxProjects } from '@/hooks/bapx/use-bapx-projects';
 import { appendProjectRef } from '@/lib/project-preamble';
 import { Menu } from 'lucide-react';
 import type { Command } from '@/hooks/opencode/use-opencode-sessions';
@@ -58,17 +58,17 @@ export function DashboardContent() {
   // Project selection — persisted across reloads
   const selectedProjectId = useSelectedProjectStore((s) => s.projectId);
   const setSelectedProjectId = useSelectedProjectStore((s) => s.setProjectId);
-  const { data: kortixProjects } = useKortixProjects();
+  const { data: bapxProjects } = useBapxProjects();
   const selectedProject = React.useMemo(
-    () => kortixProjects?.find((p) => p.id === selectedProjectId) ?? null,
-    [kortixProjects, selectedProjectId],
+    () => bapxProjects?.find((p) => p.id === selectedProjectId) ?? null,
+    [bapxProjects, selectedProjectId],
   );
   // If the persisted project id no longer exists, clear it transparently
   React.useEffect(() => {
-    if (selectedProjectId && kortixProjects && !selectedProject) {
+    if (selectedProjectId && bapxProjects && !selectedProject) {
       setSelectedProjectId(null);
     }
-  }, [selectedProjectId, kortixProjects, selectedProject, setSelectedProjectId]);
+  }, [selectedProjectId, bapxProjects, selectedProject, setSelectedProjectId]);
 
   const handleSend = useCallback(
     async (text: string, files?: AttachedFile[]) => {

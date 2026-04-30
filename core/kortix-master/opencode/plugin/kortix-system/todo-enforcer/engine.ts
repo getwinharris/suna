@@ -75,7 +75,7 @@ function checkSafetyLimits(config: ContinuationConfig, state: ContinuationState)
 
 function buildContinuationPrompt(todoResult: TodoEnforcerResult, state: ContinuationState): string {
 	const body = [
-		`You are in the Kortix native-todo continuation loop. Continuation ${state.totalSessionContinuations + 1}.`,
+		`You are in the Bapx native-todo continuation loop. Continuation ${state.totalSessionContinuations + 1}.`,
 		"",
 		"Keep working until the native OpenCode todo list is truly finished. Do real work this turn — no restating, no fake completion, no stopping early.",
 		"",

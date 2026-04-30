@@ -6,7 +6,7 @@ import { tool } from "@opencode-ai/plugin";
  * When called, this sends POST /instance/dispose to the OpenCode server,
  * causing it to rescan skills, agents, plugins, tools, and config from disk.
  *
- * WHY: The hot-reload watcher in kortix-master auto-triggers dispose whenever
+ * WHY: The hot-reload watcher in bapx-master auto-triggers dispose whenever
  * any file in .opencode/ changes. This kills in-flight operations ("The operation
  * was aborted."). By giving the agent a manual dispose tool, the agent can:
  *   1. Edit config files (opencode.jsonc, etc.)

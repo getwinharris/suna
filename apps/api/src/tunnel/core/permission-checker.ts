@@ -1,7 +1,7 @@
 import { resolve, normalize } from 'path';
 import { eq, and } from 'drizzle-orm';
-import { tunnelPermissions } from '@kortix/db';
-import type { TunnelFilesystemScope, TunnelShellScope, TunnelPermissionScope } from '@kortix/db';
+import { tunnelPermissions } from '@bapx/db';
+import type { TunnelFilesystemScope, TunnelShellScope, TunnelPermissionScope } from '@bapx/db';
 import { db } from '../../shared/db';
 import type { TunnelCapability } from 'agent-tunnel';
 

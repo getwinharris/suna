@@ -280,7 +280,7 @@ export default function GlobalError({
     if (shouldIgnoreBrowserRuntimeNoise({ message: error.message, error })) {
       return;
     }
-    console.error('[Kortix Global Error]', error);
+    console.error('[Bapx Global Error]', error);
 
     const loc = typeof window !== 'undefined' ? window.location : undefined;
     const nav = typeof navigator !== 'undefined' ? navigator : undefined;
@@ -420,7 +420,7 @@ export default function GlobalError({
 
           <p className="fault-support">
             If this persists, contact{' '}
-            <a href="mailto:support@kortix.ai">support@kortix.ai</a>
+            <a href="mailto:support@bapx.ai">support@bapx.ai</a>
           </p>
         </main>
       </body>

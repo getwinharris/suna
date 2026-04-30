@@ -1,5 +1,5 @@
 /**
- * auth-sync — Two-way sync between OpenCode auth.json and Kortix SecretStore.
+ * auth-sync — Two-way sync between OpenCode auth.json and Bapx SecretStore.
  *
  * Problem: OpenCode stores LLM keys in auth.json. Other services (lss-sync,
  * tools) read keys from s6 env (populated by SecretStore). Without sync,

@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import path from "node:path"
 
-import { clearAllStartupAbortedSessions } from "../../opencode/plugin/kortix-system/lib/startup-aborted-sessions"
+import { clearAllStartupAbortedSessions } from "../../opencode/plugin/bapx-system/lib/startup-aborted-sessions"
 import {
 	assistantMessage,
 	completedTool,
@@ -24,7 +24,7 @@ afterEach(() => {
 })
 
 function makeStorage(): string {
-	const root = mkdtempSync(path.join(tmpdir(), "kortix-autowork-e2e-"))
+	const root = mkdtempSync(path.join(tmpdir(), "bapx-autowork-e2e-"))
 	tempRoots.push(root)
 	const storageBase = path.join(root, ".local", "share", "opencode")
 	mkdirSync(storageBase, { recursive: true })
@@ -47,7 +47,7 @@ describe("autowork lifecycle e2e", () => {
 
 		expect(harness.prompts).toHaveLength(1)
 		expect(harness.prompts[0]?.text).toContain("planning phase")
-		expect(harness.prompts[0]?.text).toContain("<kortix_autowork_plan>")
+		expect(harness.prompts[0]?.text).toContain("<bapx_autowork_plan>")
 		expect(harness.loadState()?.phase).toBe("planning")
 	})
 
@@ -62,7 +62,7 @@ describe("autowork lifecycle e2e", () => {
 
 		expect(harness.prompts).toHaveLength(1)
 		expect(harness.prompts[0]?.text).toContain("Planning is complete")
-		expect(harness.prompts[0]?.text).toContain("<kortix_autowork_plan>")
+		expect(harness.prompts[0]?.text).toContain("<bapx_autowork_plan>")
 		expect(harness.loadState()?.phase).toBe("execution")
 	})
 
@@ -76,7 +76,7 @@ describe("autowork lifecycle e2e", () => {
 		await harness.idle()
 
 		expect(harness.prompts).toHaveLength(1)
-		expect(harness.prompts[0]?.text).toContain("<kortix_autowork_plan>")
+		expect(harness.prompts[0]?.text).toContain("<bapx_autowork_plan>")
 		expect(harness.isActive()).toBe(true)
 		expect(harness.loadState()?.phase).toBe("planning")
 	})
@@ -144,7 +144,7 @@ describe("autowork lifecycle e2e", () => {
 
 		expect(harness.prompts).toHaveLength(2)
 		expect(harness.prompts[1]?.text).toContain("verifier phase")
-		expect(harness.prompts[1]?.text).toContain("<kortix_autowork_verified>")
+		expect(harness.prompts[1]?.text).toContain("<bapx_autowork_verified>")
 		expect(harness.isActive()).toBe(true)
 		expect(harness.loadState()?.phase).toBe("verifying")
 	})

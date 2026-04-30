@@ -1,5 +1,5 @@
 /**
- * Sentry edge runtime configuration for Kortix Frontend (middleware, edge API routes).
+ * Sentry edge runtime configuration for Bapx Frontend (middleware, edge API routes).
  *
  * Uses @sentry/nextjs SDK pointed at Better Stack's Sentry-compatible endpoint.
  */

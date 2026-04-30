@@ -1,13 +1,13 @@
 {
-  "name": "kortix",
+  "name": "bapX",
   "private": true,
   "scripts": {
     "dev": "bash scripts/dev-local.sh",
     "dev:prod": "bash scripts/dev-prod.sh",
-    "dev:web": "pnpm --filter Kortix-Computer-Frontend dev",
-    "dev:frontend": "pnpm --filter Kortix-Computer-Frontend dev",
+    "dev:web": "pnpm --filter Bapx-Media-Frontend dev",
+    "dev:frontend": "pnpm --filter Bapx-Media-Frontend dev",
     "dev:mobile": "pnpm --filter ./apps/mobile dev",
-    "dev:api": "pnpm --filter kortix-api dev",
+    "dev:api": "pnpm --filter bapx-api dev",
     "dev:core": "docker compose -f core/docker/docker-compose.yml -f core/docker/docker-compose.dev.yml up",
     "dev:core:build": "docker compose -f core/docker/docker-compose.yml -f core/docker/docker-compose.dev.yml up --build",
     "dev:sandbox": "docker compose -f core/docker/docker-compose.yml -f core/docker/docker-compose.dev.yml up",
@@ -19,7 +19,7 @@
     "stripe:listen": "stripe listen --forward-to http://localhost:8008/v1/billing/webhooks/stripe"
   },
   "devDependencies": {
-    "agent-tunnel": "workspace:@kortix/agent-tunnel@*"
+    "agent-tunnel": "workspace:@bapx/agent-tunnel@*"
   },
   "pnpm": {
     "overrides": {

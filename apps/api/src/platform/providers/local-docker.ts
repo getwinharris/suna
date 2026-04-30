@@ -39,8 +39,8 @@ function shellQuote(value: string): string {
 }
 
 /**
- * Resolve bind-mounts that overlay the host's `core/kortix-master` checkout
- * onto the baked sandbox image's `/ephemeral/kortix-master` tree.
+ * Resolve bind-mounts that overlay the host's `core/bapx-master` checkout
+ * onto the baked sandbox image's `/ephemeral/bapx-master` tree.
  *
  * Returns [] when not running from a repo checkout (packaged install) so
  * production / self-hosted deployments are unaffected.
@@ -51,10 +51,10 @@ function shellQuote(value: string): string {
 function findRepoRoot(): string | null {
   if (process.env.KORTIX_DEV_BIND_SOURCE === '0') return null;
   // apps/api/src → repo root = ../../.. from this file's runtime location.
-  // Walk up until we find a `core/kortix-master/opencode/opencode.jsonc`.
+  // Walk up until we find a `core/bapx-master/opencode/opencode.jsonc`.
   let dir = resolve(__dirname);
   for (let i = 0; i < 8; i++) {
-    const probe = resolve(dir, 'core/kortix-master/opencode/opencode.jsonc');
+    const probe = resolve(dir, 'core/bapx-master/opencode/opencode.jsonc');
     if (existsSync(probe)) return dir;
     const parent = resolve(dir, '..');
     if (parent === dir) break;
@@ -67,22 +67,22 @@ function buildDevSourceBinds(): string[] {
   const repoRoot = findRepoRoot();
   if (!repoRoot) return [];
 
-  const km = resolve(repoRoot, 'core/kortix-master');
+  const km = resolve(repoRoot, 'core/bapx-master');
   const services = resolve(repoRoot, 'core/services');
   // Mirror core/docker/docker-compose.dev.yml — read-only, ephemeral target.
   const paths: Array<[string, string]> = [
-    [resolve(km, 'src'),                       '/ephemeral/kortix-master/src'],
-    [resolve(km, 'opencode/plugin'),           '/ephemeral/kortix-master/opencode/plugin'],
-    [resolve(km, 'opencode/agents'),           '/ephemeral/kortix-master/opencode/agents'],
-    [resolve(km, 'opencode/commands'),         '/ephemeral/kortix-master/opencode/commands'],
-    [resolve(km, 'opencode/skills'),           '/ephemeral/kortix-master/opencode/skills'],
-    [resolve(km, 'opencode/tools'),            '/ephemeral/kortix-master/opencode/tools'],
-    [resolve(km, 'opencode/patches'),          '/ephemeral/kortix-master/opencode/patches'],
-    [resolve(km, 'opencode/opencode.jsonc'),   '/ephemeral/kortix-master/opencode/opencode.jsonc'],
-    [resolve(km, 'opencode/kortix-system.md'), '/ephemeral/kortix-master/opencode/kortix-system.md'],
-    [resolve(km, 'channels/src'),              '/ephemeral/kortix-master/channels/src'],
-    [resolve(km, 'triggers/src'),              '/ephemeral/kortix-master/triggers/src'],
-    [resolve(km, 'scripts'),                   '/ephemeral/kortix-master/scripts'],
+    [resolve(km, 'src'),                       '/ephemeral/bapx-master/src'],
+    [resolve(km, 'opencode/plugin'),           '/ephemeral/bapx-master/opencode/plugin'],
+    [resolve(km, 'opencode/agents'),           '/ephemeral/bapx-master/opencode/agents'],
+    [resolve(km, 'opencode/commands'),         '/ephemeral/bapx-master/opencode/commands'],
+    [resolve(km, 'opencode/skills'),           '/ephemeral/bapx-master/opencode/skills'],
+    [resolve(km, 'opencode/tools'),            '/ephemeral/bapx-master/opencode/tools'],
+    [resolve(km, 'opencode/patches'),          '/ephemeral/bapx-master/opencode/patches'],
+    [resolve(km, 'opencode/opencode.jsonc'),   '/ephemeral/bapx-master/opencode/opencode.jsonc'],
+    [resolve(km, 'opencode/bapx-system.md'), '/ephemeral/bapx-master/opencode/bapx-system.md'],
+    [resolve(km, 'channels/src'),              '/ephemeral/bapx-master/channels/src'],
+    [resolve(km, 'triggers/src'),              '/ephemeral/bapx-master/triggers/src'],
+    [resolve(km, 'scripts'),                   '/ephemeral/bapx-master/scripts'],
     [services,                                 '/ephemeral/services'],
   ];
   return paths
@@ -118,12 +118,12 @@ const PORT_BINDINGS: Record<string, { HostPort: string; HostIp: string }[]> = Ob
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
- * Compute the URL the sandbox container should use to reach kortix-api.
+ * Compute the URL the sandbox container should use to reach bapx-api.
  *
- * This is the INTERNAL url — how the sandbox talks to kortix-api from inside Docker.
+ * This is the INTERNAL url — how the sandbox talks to bapx-api from inside Docker.
  * NOT the external/browser-facing URL.
  *
- * - Shared Docker network (SANDBOX_NETWORK set):  http://kortix-api:{PORT}  (Docker DNS)
+ * - Shared Docker network (SANDBOX_NETWORK set):  http://bapx-api:{PORT}  (Docker DNS)
  * - Default bridge (sandbox on host ports):        http://host.docker.internal:{PORT}
  *
  * If KORTIX_URL is set to something other than localhost (e.g. a real domain),
@@ -131,7 +131,7 @@ const PORT_BINDINGS: Record<string, { HostPort: string; HostIp: string }[]> = Ob
  */
 function getSandboxInternalApiUrl(): string {
   if (config.SANDBOX_NETWORK) {
-    return `http://kortix-api:${config.PORT}`;
+    return `http://bapx-api:${config.PORT}`;
   }
 
   const externalUrl = config.KORTIX_URL?.replace(/\/v1\/router\/?$/, '');
@@ -251,7 +251,7 @@ function setUpdateStatus(partial: Partial<SandboxUpdateStatus>): void {
 /**
  * Derive the target image name from a version string.
  * Uses the current SANDBOX_IMAGE config as the base (strips existing tag).
- * e.g. "kortix/computer:0.7.5" + version "0.8.0" → "kortix/computer:0.8.0"
+ * e.g. "bapx/computer:0.7.5" + version "0.8.0" → "bapx/computer:0.8.0"
  */
 function getImageForVersion(version: string): string {
   const current = config.SANDBOX_IMAGE;
@@ -602,10 +602,10 @@ export class LocalDockerProvider implements SandboxProvider {
   /**
    * Sync the non-auth core env vars to the sandbox via the secrets manager API.
    *
-   * Uses kortix-master's /env endpoint which does triple-write:
+   * Uses bapx-master's /env endpoint which does triple-write:
    *   1. SecretStore (.secrets.json — encrypted at rest)
    *   2. s6 env dir  (/run/s6/container_environment/ — tools read this on every call)
-   *   3. process.env (kortix-master's own process)
+   *   3. process.env (bapx-master's own process)
    *
    * Since getEnv() reads s6 first (always fresh from disk), updated values
    * take effect immediately — no service restart needed.
@@ -628,7 +628,7 @@ export class LocalDockerProvider implements SandboxProvider {
     const desired: Record<string, string> = {
       KORTIX_API_URL: sandboxApiBase,
       TUNNEL_API_URL: sandboxApiBase,
-      // Tool proxy URLs — route through kortix-api router so sandbox tools
+      // Tool proxy URLs — route through bapx-api router so sandbox tools
       // auth with KORTIX_TOKEN and the router injects real upstream API keys.
       TAVILY_API_URL: `${routerBase}/tavily`,
       REPLICATE_API_URL: `${routerBase}/replicate`,
@@ -681,7 +681,7 @@ export class LocalDockerProvider implements SandboxProvider {
   }
 
   /**
-   * GET /env from kortix-master — returns all current env vars.
+   * GET /env from bapx-master — returns all current env vars.
    */
   private async fetchMasterEnv(authCandidates: string[]): Promise<Record<string, string>> {
     const url = `http://localhost:${config.SANDBOX_PORT_BASE || 14000}/env`;
@@ -700,7 +700,7 @@ export class LocalDockerProvider implements SandboxProvider {
   }
 
   /**
-   * POST /env to kortix-master — sets env vars via the secrets manager.
+   * POST /env to bapx-master — sets env vars via the secrets manager.
    * No restart needed: getEnv() reads s6 env dir directly on every call.
    */
   private async postMasterEnv(keys: Record<string, string>, authCandidates: string[]): Promise<void> {
@@ -722,7 +722,7 @@ export class LocalDockerProvider implements SandboxProvider {
 
   /**
    * Fallback: write directly to s6 env dir via docker exec.
-   * Used only when the /env API is unreachable (e.g. kortix-master not ready yet).
+   * Used only when the /env API is unreachable (e.g. bapx-master not ready yet).
    */
   private syncCoreEnvVarsFallback(stale: Record<string, string>): void {
     const env = { ...process.env };
@@ -843,7 +843,7 @@ export class LocalDockerProvider implements SandboxProvider {
   }
 
   /**
-   * Pull a specific image by full name (e.g. "kortix/computer:0.8.0").
+   * Pull a specific image by full name (e.g. "bapx/computer:0.8.0").
    * Updates both _pullStatus and _updateStatus with progress.
    */
   private async pullImageByName(imageName: string): Promise<void> {
@@ -937,8 +937,8 @@ export class LocalDockerProvider implements SandboxProvider {
       'PGID=911',
       'TZ=Etc/UTC',
       'SUBFOLDER=/',
-      'TITLE=Kortix Sandbox',
-      'OPENCODE_CONFIG_DIR=/ephemeral/kortix-master/opencode',
+      'TITLE=Bapx Sandbox',
+      'OPENCODE_CONFIG_DIR=/ephemeral/bapx-master/opencode',
       'OPENCODE_PERMISSION={"*":"allow"}',
       'DISPLAY=:1',
       'LSS_DIR=/persistent/lss',
@@ -960,7 +960,7 @@ export class LocalDockerProvider implements SandboxProvider {
       // All components share one version (set by deploy-zero-downtime.sh from image tag).
       `SANDBOX_VERSION=${SANDBOX_VERSION}`,
       'PROJECT_ID=local',
-      // ── Tool proxy URLs — route through kortix-api router ─────────────
+      // ── Tool proxy URLs — route through bapx-api router ─────────────
       // Sandbox tools use KORTIX_TOKEN to auth; the router injects the real
       // upstream API key. Matches cloud provider env injection (justavps/daytona/pool).
       `TAVILY_API_URL=${routerBase}/tavily`,
@@ -974,10 +974,10 @@ export class LocalDockerProvider implements SandboxProvider {
     ];
 
     // Dev-mode bind-mounts: when running from a repo checkout, mount the
-    // host's `core/kortix-master` source tree over the image's baked copy so
+    // host's `core/bapx-master` source tree over the image's baked copy so
     // plugin/agent/config edits are live without rebuilding the image. Without
     // this, `pnpm start` auto-provisions with whatever's baked into
-    // `kortix/computer:latest` — which lags the branch. Mirrors what
+    // `bapx/computer:latest` — which lags the branch. Mirrors what
     // `core/docker/docker-compose.dev.yml` does for manual compose runs.
     const devBinds = buildDevSourceBinds();
     if (devBinds.length > 0) {
@@ -1002,9 +1002,9 @@ export class LocalDockerProvider implements SandboxProvider {
         ...(config.SANDBOX_NETWORK ? { NetworkMode: config.SANDBOX_NETWORK } : {}),
       },
       Labels: {
-        'kortix.sandbox': 'true',
-        'kortix.account': 'local',
-        'kortix.user': 'local',
+        'bapx.sandbox': 'true',
+        'bapx.account': 'local',
+        'bapx.user': 'local',
       },
     });
 
@@ -1055,11 +1055,11 @@ export class LocalDockerProvider implements SandboxProvider {
 
   /**
    * Wait for the sandbox to pass health checks.
-   * Polls GET /kortix/health until it returns 200 with status "ok".
+   * Polls GET /bapx/health until it returns 200 with status "ok".
    */
   private async waitForHealth(timeoutMs: number): Promise<void> {
     const start = Date.now();
-    const healthUrl = `http://localhost:${PORT_MAP['8000']}/kortix/health`;
+    const healthUrl = `http://localhost:${PORT_MAP['8000']}/bapx/health`;
 
     while (Date.now() - start < timeoutMs) {
       try {

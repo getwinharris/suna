@@ -1,10 +1,10 @@
 /**
- * Kortix Projects API
+ * Bapx Projects API
  *
- * Reads/writes from the shared .kortix/kortix.db (same DB the orchestrator plugin uses).
+ * Reads/writes from the shared .bapx/bapx.db (same DB the orchestrator plugin uses).
  * This is the frontend's source of truth for project data — NOT the OpenCode SDK.
  *
- * Mounted at /kortix/projects in kortix-master.
+ * Mounted at /bapx/projects in bapx-master.
  */
 
 import { Hono } from 'hono'
@@ -36,7 +36,7 @@ function getDb(): Database {
   const workspace = process.env.KORTIX_WORKSPACE?.trim()
     || process.env.OPENCODE_CONFIG_DIR?.replace(/\/opencode\/?$/, '')
     || '/workspace'
-  const dbPath = join(workspace, '.kortix', 'kortix.db')
+  const dbPath = join(workspace, '.bapx', 'bapx.db')
 
   if (!existsSync(dirname(dbPath))) {
     mkdirSync(dirname(dbPath), { recursive: true })
@@ -287,7 +287,7 @@ projectsRouter.post('/:id/pm-session', async (c) => {
       db.prepare('INSERT OR REPLACE INTO session_projects (session_id, project_id, set_at) VALUES ($sid, $pid, $now)')
         .run({ $sid: sessionId, $pid: project.id, $now: new Date().toISOString() })
     } catch {}
-    // Bind session ↔ PM in the kortix DB so ticketToolGateHook resolves
+    // Bind session ↔ PM in the bapx DB so ticketToolGateHook resolves
     // which tool_group applies when this session runs PM-dispatched tools.
     try {
       db.prepare('UPDATE project_agents SET session_id=$sid WHERE id=$id').run({ $sid: sessionId, $id: pm.id })
@@ -301,7 +301,7 @@ projectsRouter.post('/:id/pm-session', async (c) => {
 // Small/cheap tiers struggle on real engineering tickets (patchy diff edits,
 // dropped tool calls, weak QA evidence). PM should flag this in onboarding
 // so the human can opt up before the team is created.
-const SMALL_MODELS = new Set<string>(['kortix-yolo/think', 'kortix-yolo/code'])
+const SMALL_MODELS = new Set<string>(['bapx-yolo/think', 'bapx-yolo/code'])
 
 function buildOnboardingPrompt(name: string, handle: string, description: string, seededModel: string): string {
   // No `/autowork` wrapper — onboarding is a real back-and-forth, not a task
@@ -326,7 +326,7 @@ function buildOnboardingPrompt(name: string, handle: string, description: string
     'the human explicitly asks during onboarding — in which case use their',
     'pick verbatim.',
     isSmallSeed
-      ? `\n**MODEL ADVISORY** — the seeded model \`${seededModel}\` is a small/cheap tier and tends to misfire on real engineering work (dropped tool calls, patchy diff edits, weak QA evidence). Inside Q2 (stack), include ONE short sentence flagging this and offer a larger option (e.g. \`kortix/minimax-m27\`, \`anthropic/claude-sonnet-4-6\` if the human's API key is loaded). If they confirm the small model anyway, ship it — don't keep asking.`
+      ? `\n**MODEL ADVISORY** — the seeded model \`${seededModel}\` is a small/cheap tier and tends to misfire on real engineering work (dropped tool calls, patchy diff edits, weak QA evidence). Inside Q2 (stack), include ONE short sentence flagging this and offer a larger option (e.g. \`bapx/minimax-m27\`, \`anthropic/claude-sonnet-4-6\` if the human's API key is loaded). If they confirm the small model anyway, ship it — don't keep asking.`
       : null,
     '',
     'Copy the Communication discipline block from your persona into each',

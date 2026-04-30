@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { AUTO_TOPUP_DEFAULT_AMOUNT, AUTO_TOPUP_DEFAULT_THRESHOLD } from '@kortix/shared';
-import { supabaseAuth } from '../middleware/auth';
+import { AUTO_TOPUP_DEFAULT_AMOUNT, AUTO_TOPUP_DEFAULT_THRESHOLD } from '@bapx/shared';
+import { trailbaseAuth } from '../middleware/auth';
 import { config } from '../config';
 
 import { accountStateRouter } from './routes/account-state';
@@ -23,7 +23,7 @@ billingApp.use('*', async (c, next) => {
   if (c.req.path.includes('/webhook')) {
     return next();
   }
-  return supabaseAuth(c, next);
+  return trailbaseAuth(c, next);
 });
 
 // Account state — always available (returns unlimited mock when billing disabled)
@@ -125,7 +125,7 @@ billingApp.route('/', creditsRouter);
 billingApp.route('/account', accountDeletionRouter);
 
 // Backwards-compatible account deletion API (mounted at /v1/account/*)
-accountDeletionApp.use('*', supabaseAuth);
+accountDeletionApp.use('*', trailbaseAuth);
 accountDeletionApp.use('*', async (c, next) => {
   if (!config.KORTIX_BILLING_INTERNAL_ENABLED) {
     return c.json({ error: 'Billing is not enabled', billing_disabled: true }, 404);

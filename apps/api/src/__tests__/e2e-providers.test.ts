@@ -18,7 +18,7 @@ import { mkdirSync, writeFileSync, existsSync, rmSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 
 mock.module('../middleware/auth', () => ({
-  supabaseAuth: async (c: any, next: any) => {
+  trailbaseAuth: async (c: any, next: any) => {
     c.set('userId', '00000000-0000-0000-0000-000000000000');
     c.set('userEmail', 'test@example.com');
     await next();
@@ -29,7 +29,7 @@ const { providersApp } = await import('../providers/routes');
 const { setupApp } = await import('../setup');
 const { PROVIDER_REGISTRY } = await import('../providers/registry');
 
-const TEST_DIR = `/tmp/kortix-providers-test-${Date.now()}`;
+const TEST_DIR = `/tmp/bapx-providers-test-${Date.now()}`;
 
 // ─── Test app factory ───────────────────────────────────────────────────────
 
@@ -244,7 +244,7 @@ describe('PUT /v1/providers/:id/connect', () => {
       body: JSON.stringify({ keys: { ANTHROPIC_API_KEY: 'sk-ant-check' } }),
     });
     const content = readFileSync(resolve(TEST_DIR, 'core/docker/.env'), 'utf-8');
-    expect(content).toContain('KORTIX_API_URL=http://kortix-api:8008');
+    expect(content).toContain('KORTIX_API_URL=http://bapx-api:8008');
   });
 
   it('root .env gets ENV_MODE=local', async () => {

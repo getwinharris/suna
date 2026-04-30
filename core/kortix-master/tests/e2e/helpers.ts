@@ -71,9 +71,9 @@ export async function startDummyOpenCode(port: number): Promise<{ stop: () => Pr
   }
 }
 
-export async function startKortixMaster(port: number, fixture: RuntimeFixture, extraEnv: Record<string, string> = {}): Promise<StartedServer> {
+export async function startBapxMaster(port: number, fixture: RuntimeFixture, extraEnv: Record<string, string> = {}): Promise<StartedServer> {
   const proc = spawn('bun', ['run', 'src/index.ts'], {
-    cwd: '/Users/markokraemer/Projects/heyagi/computer/core/kortix-master',
+    cwd: '/Users/markokraemer/Projects/heyagi/computer/core/bapx-master',
     stdio: ['pipe', 'pipe', 'pipe'],
     env: {
       ...process.env,

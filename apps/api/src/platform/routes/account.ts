@@ -11,10 +11,10 @@
 
 import { Hono } from 'hono';
 import { eq, and, desc, inArray, sql } from 'drizzle-orm';
-import { sandboxes, type Database } from '@kortix/db';
+import { sandboxes, type Database } from '@bapx/db';
 import { db as defaultDb } from '../../shared/db';
 import { createApiKey } from '../../repositories/api-keys';
-import { supabaseAuth as authMiddleware } from '../../middleware/auth';
+import { trailbaseAuth as authMiddleware } from '../../middleware/auth';
 import {
   getProvider as defaultGetProvider,
   getDefaultProviderName as defaultGetDefaultProviderName,

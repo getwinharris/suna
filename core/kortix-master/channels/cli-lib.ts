@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * cli-lib.ts — Shared utilities for all Kortix CLI tools.
+ * cli-lib.ts — Shared utilities for all Bapx CLI tools.
  *
  * Provides:
  *   - Consistent JSON output
@@ -166,20 +166,20 @@ export function resolveDbPath(): string {
       : (process.env.HOME ? path.join(process.env.HOME, "") : process.cwd()))
 
   for (const candidate of [
-    path.join(root, ".kortix", "kortix.db"),
-    "/workspace/.kortix/kortix.db",
+    path.join(root, ".bapx", "bapx.db"),
+    "/workspace/.bapx/bapx.db",
   ]) {
     const dir = path.dirname(candidate)
     if (existsSync(dir)) return candidate
   }
 
-  const dbDir = path.join(root, ".kortix")
+  const dbDir = path.join(root, ".bapx")
   try {
     const { mkdirSync } = await import("node:fs")
     mkdirSync(dbDir, { recursive: true })
   } catch {}
 
-  return path.join(dbDir, "kortix.db")
+  return path.join(dbDir, "bapx.db")
 }
 
 // ─── Validation helpers ──────────────────────────────────────────────────────

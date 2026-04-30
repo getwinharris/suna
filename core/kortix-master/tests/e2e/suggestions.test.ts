@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
 import { mkdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startKortixMaster, type RuntimeFixture, type StartedServer } from './helpers'
+import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startBapxMaster, type RuntimeFixture, type StartedServer } from './helpers'
 
 describe('Session Suggestions', () => {
   const baseURL = 'http://localhost:8004'
@@ -10,19 +10,19 @@ describe('Session Suggestions', () => {
   let master: StartedServer | null = null
 
   beforeAll(async () => {
-    fixture = createRuntimeFixture('kortix-suggestions-')
-    mkdirSync(join(fixture.workspaceRoot, '.kortix'), { recursive: true })
-    writeFileSync(join(fixture.workspaceRoot, '.kortix', 'MEMORY.md'), [
+    fixture = createRuntimeFixture('bapx-suggestions-')
+    mkdirSync(join(fixture.workspaceRoot, '.bapx'), { recursive: true })
+    writeFileSync(join(fixture.workspaceRoot, '.bapx', 'MEMORY.md'), [
       '# Global Memory',
       '',
       '## Environment',
       '',
-      '- user is comparing Hermes and Kortix memory designs',
+      '- user is comparing Hermes and Bapx memory designs',
       '- focus on session tools and merged prompt memory files',
       '',
     ].join('\n'))
     opencode = await startDummyOpenCode(9004)
-    master = await startKortixMaster(8004, fixture, {
+    master = await startBapxMaster(8004, fixture, {
       KORTIX_TOKEN: 'suggestions-test-token',
       OPENCODE_PORT: '9004',
     })

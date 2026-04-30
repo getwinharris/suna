@@ -11,7 +11,7 @@ import { buildMergedSpec } from './services/spec-merger'
 import { proxyToOpenCode } from './services/proxy'
 import { SecretStore } from './services/secret-store'
 import { syncAuthToSecrets, startWatcher as startAuthWatcher } from './services/auth-sync'
-import { kortixUserContextMiddleware } from './services/kortix-user-middleware'
+import { bapxUserContextMiddleware } from './services/bapx-user-middleware'
 // REMOVED: opencode-hotreload watcher — it auto-disposed the OpenCode instance on
 // ANY .opencode/ file change, killing all active agent sessions mid-operation.
 // Dispose is now handled explicitly by:
@@ -49,10 +49,10 @@ import { HealthResponse, PortsResponse } from './schemas/common'
 // Prevent unhandled errors from silently killing the process or leaving it
 // in a broken state. Log and continue.
 process.on('uncaughtException', (err) => {
-  console.error('[Kortix Master] UNCAUGHT EXCEPTION:', err)
+  console.error('[Bapx Master] UNCAUGHT EXCEPTION:', err)
 })
 process.on('unhandledRejection', (reason) => {
-  console.error('[Kortix Master] UNHANDLED REJECTION:', reason)
+  console.error('[Bapx Master] UNHANDLED REJECTION:', reason)
 })
 
 const app = new Hono()
@@ -90,7 +90,7 @@ initShareStore()
       val = process.env.KORTIX_TOKEN
     }
     if (!val && key === 'KORTIX_YOLO_URL') {
-      val = 'https://api-yolo.kortix.com/v1'
+      val = 'https://api-yolo.bapx.in/v1'
     }
     // Ensure defaulted values are in process.env so saveBootstrapEnv() persists them
     // and downstream code (YOLO client, OpenCode config) can read them.
@@ -111,12 +111,12 @@ initShareStore()
           synced++
         }
       } catch (err) {
-        console.warn(`[Kortix Master] Failed to write ${key} to s6 env dir:`, err)
+        console.warn(`[Bapx Master] Failed to write ${key} to s6 env dir:`, err)
       }
     }
   }
   if (synced > 0) {
-    console.log(`[Kortix Master] Synced ${synced} core env var(s) to s6 env dir`)
+    console.log(`[Bapx Master] Synced ${synced} core env var(s) to s6 env dir`)
   }
   // Persist core vars so they survive across restarts even if Docker env is lost
   saveBootstrapEnv()
@@ -127,7 +127,7 @@ const authSyncDisabled = process.env.KORTIX_DISABLE_AUTH_SYNC === 'true'
 // Two-way sync: OpenCode auth.json ↔ SecretStore (provider API keys)
 if (!authSyncDisabled) {
   await syncAuthToSecrets(secretStore).catch(err =>
-    console.error('[Kortix Master] auth-sync boot error:', err)
+    console.error('[Bapx Master] auth-sync boot error:', err)
   )
   // File watcher: auto-sync when auth.json changes at runtime
   startAuthWatcher(secretStore)
@@ -139,12 +139,12 @@ if (!authSyncDisabled) {
 
 if (process.env.KORTIX_DISABLE_CORE_SUPERVISOR !== 'true') {
   void serviceManager.start().catch(err =>
-    console.error('[Kortix Master] service manager start error:', err)
+    console.error('[Bapx Master] service manager start error:', err)
   )
 }
 
 // Cron scheduling + webhook routing handled by unified triggers plugin.
-// TriggerManager starts cron jobs from .kortix/triggers.yaml + DB on boot —
+// TriggerManager starts cron jobs from .bapx/triggers.yaml + DB on boot —
 // but the plugin is project-scoped and opencode only loads it after the
 // first request bootstraps a project directory. On a container respawn
 // with no immediate user activity, hourly fires get silently skipped
@@ -153,7 +153,7 @@ if (process.env.KORTIX_DISABLE_CORE_SUPERVISOR !== 'true') {
 // Force a bootstrap for every known project so triggers register at boot.
 import { warmTriggerPluginForAllProjects } from './services/trigger-warmer'
 void warmTriggerPluginForAllProjects().catch((err) =>
-  console.warn('[Kortix Master] trigger warmup failed:', err),
+  console.warn('[Bapx Master] trigger warmup failed:', err),
 )
 
 // Global middleware
@@ -163,7 +163,7 @@ app.use('*', logger())
 // CORS_ALLOWED_ORIGINS can add extra origins (comma-separated).
 const defaultCorsOrigins = [
   'http://localhost:3000', 'http://127.0.0.1:3000',   // Frontend (local)
-  'http://localhost:8008', 'http://127.0.0.1:8008',   // kortix-api (local)
+  'http://localhost:8008', 'http://127.0.0.1:8008',   // bapx-api (local)
   'http://localhost:14000', 'http://127.0.0.1:14000', // Direct sandbox (dev)
 ]
 const extraCorsOrigins = process.env.CORS_ALLOWED_ORIGINS
@@ -173,12 +173,12 @@ const corsOrigins = [...new Set([...defaultCorsOrigins, ...extraCorsOrigins])]
 app.use('*', cors({ origin: corsOrigins }))
 
 // ─── Identity from preview proxy ─────────────────────────────────────────────
-// Parses the signed `X-Kortix-User-Context` header the Kortix API preview
+// Parses the signed `X-Bapx-User-Context` header the Bapx API preview
 // proxy attaches to every authenticated user request. Attaches the parsed
-// context to `c.get('kortixUser')` for downstream route handlers. Purely
+// context to `c.get('bapxUser')` for downstream route handlers. Purely
 // additive — missing/invalid header is treated as "no user identity" and
 // the existing service-key bearer auth remains the hard access gate.
-app.use('*', kortixUserContextMiddleware())
+app.use('*', bapxUserContextMiddleware())
 
 // ─── Timing-safe token comparison ─────────────────────────────────────────────
 // Hash both values so timingSafeEqual always compares equal-length buffers,
@@ -194,7 +194,7 @@ function verifyServiceKey(candidate: string): boolean {
 // ─── Localhost detection ─────────────────────────────────────────────────────
 // Requests originating from inside the container (localhost/loopback) skip auth.
 // This allows tools, scripts, and curl inside the sandbox to call the master
-// without needing INTERNAL_SERVICE_KEY. External callers (kortix-api, frontend
+// without needing INTERNAL_SERVICE_KEY. External callers (bapx-api, frontend
 // proxy) still must provide the key.
 const LOOPBACK_ADDRS = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1', 'localhost'])
 
@@ -210,7 +210,7 @@ function isLocalRequest(c: any): boolean {
 app.use('*', async (c, next) => {
   // Skip health endpoint — Docker health probes need unauthenticated access
   const pathname = new URL(c.req.url).pathname
-  if (pathname === '/kortix/health') return next()
+  if (pathname === '/bapx/health') return next()
   // Skip docs endpoints — API docs should be accessible without auth
   if (pathname === '/docs' || pathname === '/docs/openapi.json') return next()
   // [channels v2] Channel webhooks now use /hooks/telegram/<id> and /hooks/slack/<id>
@@ -220,7 +220,7 @@ app.use('*', async (c, next) => {
   // (UUID, not guessable). Events are forwarded to the triggers webhook server.
   if (pathname.startsWith('/events/pipedream/')) return next()
   // Skip auth for user-defined webhook triggers at /hooks/* — external callers
-  // authenticate via the X-Kortix-Trigger-Secret header (per-trigger secret).
+  // authenticate via the X-Bapx-Trigger-Secret header (per-trigger secret).
   if (pathname.startsWith('/hooks/')) return next()
   // Skip auth for share proxy at /s/{token}/* — the share token IS the auth.
   // Token validity + TTL is checked by the share-proxy route handler.
@@ -295,7 +295,7 @@ function inspectOpencodeState() {
     persistentRoot,
     persistentMode,
     opencodeLegacyLinked,
-    opencodeStateGuardAvailable: existsSync('/usr/local/bin/kortix-opencode-state'),
+    opencodeStateGuardAvailable: existsSync('/usr/local/bin/bapx-opencode-state'),
     opencodeSessionCount: live.sessionCount,
     opencodeShadowSessionCount: shadow.sessionCount,
     opencodeStateMismatch,
@@ -313,7 +313,7 @@ async function checkOpenCodeReady(): Promise<boolean> {
     })
     if (res.ok) {
       if (!openCodeReady) {
-        console.log('[Kortix Master] OpenCode is ready')
+        console.log('[Bapx Master] OpenCode is ready')
       }
       openCodeReady = true
       await res.arrayBuffer()
@@ -322,7 +322,7 @@ async function checkOpenCodeReady(): Promise<boolean> {
     await res.arrayBuffer().catch(() => {})
   } catch {}
   if (openCodeReady) {
-    console.warn('[Kortix Master] OpenCode is no longer reachable')
+    console.warn('[Bapx Master] OpenCode is no longer reachable')
   }
   openCodeReady = false
   void serviceManager.requestRecovery('opencode-serve', 'health-check')
@@ -333,18 +333,18 @@ await checkOpenCodeReady()
 
 // ─── API Documentation ──────────────────────────────────────────────────────
 
-// OpenAPI JSON spec endpoint — merges kortix-master + OpenCode specs at runtime
+// OpenAPI JSON spec endpoint — merges bapx-master + OpenCode specs at runtime
 app.get('/docs/openapi.json',
   describeRoute({ hide: true, responses: { 200: { description: 'OpenAPI spec' } } }),
   async (c) => {
-    // Generate kortix-master's own spec
-    const kortixSpec = await generateSpecs(app)
+    // Generate bapx-master's own spec
+    const bapxSpec = await generateSpecs(app)
     // Merge with OpenCode's spec (fetched from localhost, cached 30s)
-    const merged = await buildMergedSpec(kortixSpec as any)
+    const merged = await buildMergedSpec(bapxSpec as any)
 
     // Use the X-Forwarded-Prefix header injected by the platform proxy to set
     // the correct server URL for Scalar "Try It". This header contains the full
-    // public base URL (e.g. "http://localhost:8008/v1/p/kortix-sandbox/8000").
+    // public base URL (e.g. "http://localhost:8008/v1/p/bapx-sandbox/8000").
     // Without it, fall back to the placeholder from spec-merger.
     const forwardedPrefix = c.req.header('x-forwarded-prefix')
     if (forwardedPrefix) {
@@ -363,7 +363,7 @@ app.get('/docs',
   describeRoute({ hide: true, responses: { 200: { description: 'API docs UI' } } }),
   Scalar({
     url: 'docs/openapi.json',
-    pageTitle: 'Kortix Sandbox API',
+    pageTitle: 'Bapx Sandbox API',
   }),
 )
 
@@ -371,7 +371,7 @@ app.get('/docs',
 // Returns 200 when the agent runtime is reachable, 503 when it's still starting up.
 // This ensures Docker/orchestrators treat the container as unhealthy until
 // the core API backend (OpenCode) is ready to serve requests.
-app.get('/kortix/health',
+app.get('/bapx/health',
   describeRoute({
     tags: ['System'],
     summary: 'Health check',
@@ -404,7 +404,7 @@ app.get('/kortix/health',
 
 // Port mappings — returns container→host port map so the frontend
 // can use direct URLs instead of guessing proxy paths.
-app.get('/kortix/ports',
+app.get('/bapx/ports',
   describeRoute({
     tags: ['System'],
     summary: 'Port mappings',
@@ -418,8 +418,8 @@ app.get('/kortix/ports',
   },
 )
 
-// Update check — /kortix/update and /kortix/update/status
-app.route('/kortix/update', updateRouter)
+// Update check — /bapx/update and /bapx/update/status
+app.route('/bapx/update', updateRouter)
 
 // ENV management routes
 app.route('/env', envRouter)
@@ -432,71 +432,71 @@ app.route('/sessions', suggestionsRouter)
 
 // Deployment management (feature-flagged)
 if (config.KORTIX_DEPLOYMENTS_ENABLED) {
-  app.route('/kortix/deploy', deployRouter)
+  app.route('/bapx/deploy', deployRouter)
 }
 
 // Services — unified "what's running" for the frontend
-app.route('/kortix/services', servicesRouter)
+app.route('/bapx/services', servicesRouter)
 
 // Triggers — unified CRUD for all trigger types (cron, webhook, etc.)
-app.route('/kortix/triggers', triggersRouter)
-// Legacy compat: /kortix/cron/* → forwards to /kortix/triggers/*
-app.route('/kortix/cron', triggersRouter)
+app.route('/bapx/triggers', triggersRouter)
+// Legacy compat: /bapx/cron/* → forwards to /bapx/triggers/*
+app.route('/bapx/cron', triggersRouter)
 
 // Channels — SQLite-backed channel management (Telegram, Slack)
 import { channelsRouter } from './routes/channels'
-app.route('/kortix/channels', channelsRouter)
+app.route('/bapx/channels', channelsRouter)
 
 // Core supervisor management
-app.route('/kortix/core', coreRouter)
+app.route('/bapx/core', coreRouter)
 
 // Full reload — restarts OpenCode instance and optionally all services
-app.route('/kortix/reload', reloadRouter)
+app.route('/bapx/reload', reloadRouter)
 
 // Marketplace — skill/component install from registry
-app.route('/kortix/marketplace', marketplaceRouter)
+app.route('/bapx/marketplace', marketplaceRouter)
 
 // Preferences — default model management
-app.route('/kortix/preferences', preferencesRouter)
+app.route('/bapx/preferences', preferencesRouter)
 
-// Projects + Tasks — Kortix project management (frontend source of truth)
+// Projects + Tasks — Bapx project management (frontend source of truth)
 // Mount at both paths — Hono sub-routers don't match trailing slash from parent
-app.route('/kortix/projects', projectsRouter)
-app.route('/kortix/projects/', projectsRouter)
-app.route('/kortix/tasks', tasksRouter)
-app.route('/kortix/tasks/', tasksRouter)
+app.route('/bapx/projects', projectsRouter)
+app.route('/bapx/projects/', projectsRouter)
+app.route('/bapx/tasks', tasksRouter)
+app.route('/bapx/tasks/', tasksRouter)
 
 // v2 board — tickets, columns, fields, templates, project_agents
-// ticketProjectsRouter layers project-scoped config under /kortix/projects/:id/*
-// so it's mounted at /kortix/projects after the base projects router (last writer wins
+// ticketProjectsRouter layers project-scoped config under /bapx/projects/:id/*
+// so it's mounted at /bapx/projects after the base projects router (last writer wins
 // for path-specific handlers; base projects router has no sub-paths like /columns).
-app.route('/kortix/tickets', ticketsRouter)
-app.route('/kortix/tickets/', ticketsRouter)
-app.route('/kortix/projects', ticketProjectsRouter)
-app.route('/kortix/projects/', ticketProjectsRouter)
+app.route('/bapx/tickets', ticketsRouter)
+app.route('/bapx/tickets/', ticketsRouter)
+app.route('/bapx/projects', ticketProjectsRouter)
+app.route('/bapx/projects/', ticketProjectsRouter)
 
-// Milestones — outcome-level grouping under /kortix/projects/:projectId/milestones
-app.route('/kortix/projects', milestonesRouter)
-app.route('/kortix/projects/', milestonesRouter)
+// Milestones — outcome-level grouping under /bapx/projects/:projectId/milestones
+app.route('/bapx/projects', milestonesRouter)
+app.route('/bapx/projects/', milestonesRouter)
 
-// Project-scoped credentials under /kortix/projects/:projectId/credentials
-app.route('/kortix/projects', credentialsRouter)
-app.route('/kortix/projects/', credentialsRouter)
+// Project-scoped credentials under /bapx/projects/:projectId/credentials
+app.route('/bapx/projects', credentialsRouter)
+app.route('/bapx/projects/', credentialsRouter)
 
-// Public URL sharing — /kortix/share/:port returns the public URL for a sandbox port
-app.route('/kortix/share', shareRouter)
+// Public URL sharing — /bapx/share/:port returns the public URL for a sandbox port
+app.route('/bapx/share', shareRouter)
 
 import { Database as _ScopeDb } from 'bun:sqlite'
 import { getUserScopes } from './services/user-scope-cache'
 
-app.get('/kortix/internal/session-scopes/:sessionId', async (c) => {
+app.get('/bapx/internal/session-scopes/:sessionId', async (c) => {
   const sessionId = c.req.param('sessionId')
   try {
     const workspace =
       process.env.KORTIX_WORKSPACE?.trim() ||
       process.env.OPENCODE_CONFIG_DIR?.replace(/\/opencode\/?$/, '') ||
       '/workspace'
-    const dbPath = `${workspace}/.kortix/kortix.db`
+    const dbPath = `${workspace}/.bapx/bapx.db`
     const db = new _ScopeDb(dbPath, { readonly: true })
     try {
       const row = db
@@ -523,20 +523,20 @@ app.get('/kortix/internal/session-scopes/:sessionId', async (c) => {
 })
 
 // Connectors — SQLite-backed CRUD
-app.route('/kortix/connectors', connectorsRouter)
+app.route('/bapx/connectors', connectorsRouter)
 
-// Pipedream integration proxy — forwards to kortix-api
+// Pipedream integration proxy — forwards to bapx-api
 app.route('/api/pipedream', pipedreamRouter)
 
 // [channels v2] Channel webhooks — handles /hooks/telegram/<id> and /hooks/slack/<id>
-// directly in kortix-master. These are looked up in the channels SQLite DB,
+// directly in bapx-master. These are looked up in the channels SQLite DB,
 // verified, parsed, and dispatched to OpenCode sessions.
 // Must be mounted BEFORE the generic /hooks/* proxy to port 8099.
 import channelWebhooksRouter from './routes/channel-webhooks'
 app.route('', channelWebhooksRouter)
 
 // Webhook trigger proxy — forwards remaining /hooks/* to the triggers webhook server (port 8099).
-// Auth is skipped (see auth middleware) — per-trigger secret via X-Kortix-Trigger-Secret header.
+// Auth is skipped (see auth middleware) — per-trigger secret via X-Bapx-Trigger-Secret header.
 app.all('/hooks/*', async (c) => {
   const pathname = new URL(c.req.url).pathname
   try {
@@ -545,8 +545,8 @@ app.all('/hooks/*', async (c) => {
       'Content-Type': c.req.header('content-type') || 'application/json',
     }
     // Forward the trigger secret header
-    const secret = c.req.header('x-kortix-trigger-secret') ?? c.req.header('x-kortix-opencode-trigger-secret')
-    if (secret) headers['x-kortix-trigger-secret'] = secret
+    const secret = c.req.header('x-bapx-trigger-secret') ?? c.req.header('x-bapx-opencode-trigger-secret')
+    if (secret) headers['x-bapx-trigger-secret'] = secret
 
     const res = await fetch(`http://localhost:8099${pathname}`, {
       method: c.req.method,
@@ -557,7 +557,7 @@ app.all('/hooks/*', async (c) => {
     const data = await res.json()
     return c.json(data, res.status as any)
   } catch (err) {
-    console.error(`[Kortix Master] Webhook proxy error for ${pathname}:`, err)
+    console.error(`[Bapx Master] Webhook proxy error for ${pathname}:`, err)
     return c.json({ ok: false, error: 'Failed to forward webhook to trigger server' }, 502)
   }
 })
@@ -583,7 +583,7 @@ app.post('/events/pipedream/:listenerId', async (c) => {
     const data = await res.json()
     return c.json(data, res.status as any)
   } catch (err) {
-    console.error(`[Kortix Master] Pipedream event forward error for ${listenerId}:`, err)
+    console.error(`[Bapx Master] Pipedream event forward error for ${listenerId}:`, err)
     return c.json({ ok: false, error: 'Failed to forward event to triggers webhook server' }, 502)
   }
 })
@@ -624,7 +624,7 @@ import {
 
 app.get('/session', async (c) => {
   const upstream = await proxyToOpenCode(c)
-  const user = c.get('kortixUser')
+  const user = c.get('bapxUser')
   if (!user || upstream.status !== 200) return upstream
   const body = await upstream.json().catch(() => null)
   const list = Array.isArray(body) ? body : body?.data ?? []
@@ -647,7 +647,7 @@ app.get('/session', async (c) => {
 
 app.post('/session', async (c) => {
   const upstream = await proxyToOpenCode(c)
-  const user = c.get('kortixUser')
+  const user = c.get('bapxUser')
   if (!user || upstream.status >= 400) return upstream
 
   const raw = await upstream.text()
@@ -664,7 +664,7 @@ app.post('/session', async (c) => {
 })
 
 app.delete('/session/:id', async (c) => {
-  const user = c.get('kortixUser')
+  const user = c.get('bapxUser')
   if (user) {
     const sessionId = c.req.param('id')
     const canSeeLegacy =
@@ -692,15 +692,15 @@ app.all('*',
   },
 )
 
-console.log(`[Kortix Master] Starting on port ${config.PORT}`)
+console.log(`[Bapx Master] Starting on port ${config.PORT}`)
 
 // Push Pipedream creds to API after boot (async, non-blocking)
 setTimeout(() => pushPipedreamCredsToApi(), 5_000)
-// Reconcile Pipedream connectors from API into local kortix.db (self-heals
+// Reconcile Pipedream connectors from API into local bapx.db (self-heals
 // sandboxes that missed the fire-and-forget connector-sync call).
 setTimeout(() => syncExistingConnectorsFromApi(), 8_000)
-console.log(`[Kortix Master] Proxying to OpenCode at ${config.OPENCODE_HOST}:${config.OPENCODE_PORT}`)
-console.log(`[Kortix Master] API docs available at http://localhost:${config.PORT}/docs`)
+console.log(`[Bapx Master] Proxying to OpenCode at ${config.OPENCODE_HOST}:${config.OPENCODE_PORT}`)
+console.log(`[Bapx Master] API docs available at http://localhost:${config.PORT}/docs`)
 
 // ─── Blocked ports (same list as the HTTP proxy router) ──────────────────────
 const WS_BLOCKED_PORTS = new Set([config.PORT])
@@ -735,7 +735,7 @@ function clearWsTimers(data: WsProxyData) {
 function resetIdleTimer(ws: { data: WsProxyData; close: (code?: number, reason?: string) => void }) {
   if (ws.data.idleTimer) clearTimeout(ws.data.idleTimer)
   ws.data.idleTimer = setTimeout(() => {
-    console.warn(`[Kortix Master] WS idle timeout for port ${ws.data.targetPort}`)
+    console.warn(`[Bapx Master] WS idle timeout for port ${ws.data.targetPort}`)
     try { ws.close(1000, 'idle timeout') } catch {}
   }, WS_IDLE_TIMEOUT_MS)
 }
@@ -875,7 +875,7 @@ export default {
       // Connection timeout — if upstream doesn't connect in time, kill it
       ws.data.connectTimer = setTimeout(() => {
         if (ws.data.upstream?.readyState === WebSocket.CONNECTING) {
-          console.warn(`[Kortix Master] WS upstream connect timeout for port ${targetPort}`)
+          console.warn(`[Bapx Master] WS upstream connect timeout for port ${targetPort}`)
           try { ws.data.upstream.close() } catch {}
           try { ws.close(1011, 'upstream connect timeout') } catch {}
         }
@@ -922,13 +922,13 @@ export default {
         upstream.addEventListener('error', (e: Event) => {
           // Log the actual error for debugging — WS error events don't carry
           // details, but the close that follows will have the code/reason.
-          console.warn(`[Kortix Master] WS upstream error for port ${targetPort} (path: ${targetPath})`)
+          console.warn(`[Bapx Master] WS upstream error for port ${targetPort} (path: ${targetPath})`)
           if (!ws.data.closed) {
             try { ws.close(1011, 'upstream error') } catch { /* already closed */ }
           }
         })
       } catch (err) {
-        console.error(`[Kortix Master] WS proxy failed to connect to port ${targetPort}:`, err)
+        console.error(`[Bapx Master] WS proxy failed to connect to port ${targetPort}:`, err)
         try { ws.close(1011, 'upstream connection failed') } catch {}
       }
     },
@@ -945,7 +945,7 @@ export default {
         // Buffer until upstream is ready, with size limit
         const size = typeof message === 'string' ? message.length : (message as Buffer).byteLength
         if (ws.data.bufferBytes + size > WS_BUFFER_MAX_BYTES) {
-          console.warn(`[Kortix Master] WS buffer overflow for port ${ws.data.targetPort}, closing`)
+          console.warn(`[Bapx Master] WS buffer overflow for port ${ws.data.targetPort}, closing`)
           try { ws.close(1011, 'buffer overflow') } catch {}
           return
         }

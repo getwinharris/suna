@@ -74,7 +74,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { KortixLoader } from '@/components/ui/kortix-loader';
+import { BapxLoader } from '@/components/ui/bapx-loader';
 import { AnimatedThinkingText } from '@/components/ui/animated-thinking-text';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -114,17 +114,17 @@ import { getClient } from '@/lib/opencode-sdk';
 import { playSound } from '@/lib/sounds';
 import { cn } from '@/lib/utils';
 import {
-  stripKortixSystemTags,
+  stripBapxSystemTags,
   extractSessionReport,
-  extractKortixSystemMessages,
+  extractBapxSystemMessages,
   type SessionReport,
-  type KortixSystemMessage,
-} from '@/lib/utils/kortix-system-tags';
+  type BapxSystemMessage,
+} from '@/lib/utils/bapx-system-tags';
 import { SubSessionModal } from '@/components/session/sub-session-modal';
 import { ChatMinimap } from '@/components/session/chat-minimap';
 import { useMessageJumpStore } from '@/stores/message-jump-store';
 import { toast as sonnerToast } from 'sonner';
-import { useKortixComputerStore } from '@/stores/kortix-computer-store';
+import { useBapxComputerStore } from '@/stores/bapx-computer-store';
 import {
   useMessageQueueStore,
   selectSessionItems,
@@ -140,7 +140,7 @@ import { useSyncStore } from '@/stores/opencode-sync-store';
 import { useServerStore } from '@/stores/server-store';
 import { openTabAndNavigate, useTabStore } from '@/stores/tab-store';
 import { useSelectedProjectStore } from '@/stores/selected-project-store';
-import { useKortixProjects } from '@/hooks/kortix/use-kortix-projects';
+import { useBapxProjects } from '@/hooks/bapx/use-bapx-projects';
 import {
   appendProjectRefs,
   buildProjectRefsBlock,
@@ -351,13 +351,13 @@ function formatCommandError(errorLike: unknown): string {
 }
 
 // ============================================================================
-// System message indicator — subtle inline pill for kortix_system messages
+// System message indicator — subtle inline pill for bapx_system messages
 // ============================================================================
 
 function SystemMessageIndicator({
   messages,
 }: {
-  messages: KortixSystemMessage[];
+  messages: BapxSystemMessage[];
 }) {
   if (messages.length === 0) return null;
 
@@ -553,7 +553,7 @@ function HighlightMentions({
     return result;
   }, [cleanText, agentNames, projectNames, sessions, projects]);
 
-  // Uniform monochrome mention style — Kortix brand is strictly neutral, so
+  // Uniform monochrome mention style — Bapx brand is strictly neutral, so
   // every mention kind (file / agent / session / project) renders identically
   // as an underlined foreground chip. Kind is distinguished by click target.
   const mentionClass =
@@ -891,7 +891,7 @@ const DCP_LEGACY_ITEM_REGEX = /→\s+(\S+?):\s+(.+)/g;
 // Matches any XML block: <tag_name>...content...</tag_name>
 // No hardcoded tag names. Runs LAST in the parsing pipeline so all
 // other XML subsystems (file refs, session refs, reply context, DCP,
-// kortix_system) have already consumed their tags. Whatever remains
+// bapx_system) have already consumed their tags. Whatever remains
 // is a system notification.
 const XML_BLOCK_REGEX = /<([a-z][a-z0-9_-]*)>([\s\S]*?)<\/\1>/gi;
 
@@ -949,10 +949,10 @@ function parseSystemNotifications(text: string): {
 
 function stripSystemPtyText(text: string): string {
   if (!text) return '';
-  // Only strip kortix_system tags (backend-internal metadata).
+  // Only strip bapx_system tags (backend-internal metadata).
   // Notification XML is stripped later by parseSystemNotifications()
   // which runs last in the parsing pipeline.
-  return stripKortixSystemTags(text)
+  return stripBapxSystemTags(text)
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
@@ -1334,7 +1334,7 @@ function isNotificationOnlyMessage(parts: Part[]): boolean {
   if (textParts.length === 0) return false;
   const raw = textParts.map((p) => p.text || '').join('\n');
   const { cleanText, notifications } = parseSystemNotifications(
-    stripKortixSystemTags(raw),
+    stripBapxSystemTags(raw),
   );
   return notifications.length > 0 && !cleanText.trim();
 }
@@ -1359,7 +1359,7 @@ function NotificationTurn({ turn }: { turn: Turn }) {
   }, [turn.userMessage.parts]);
 
   const { notifications } = useMemo(
-    () => parseSystemNotifications(stripKortixSystemTags(rawText)),
+    () => parseSystemNotifications(stripBapxSystemTags(rawText)),
     [rawText],
   );
 
@@ -1685,7 +1685,7 @@ function UserMessageRow({
   commandInfo?: { name: string; args?: string };
   commands?: Command[];
 }) {
-  const openFileInComputer = useKortixComputerStore(
+  const openFileInComputer = useBapxComputerStore(
     (s) => s.openFileInComputer,
   );
   const openPreview = useFilePreviewStore((s) => s.openPreview);
@@ -2530,7 +2530,7 @@ function GroupedReasoningCard({
 
       <CollapsibleContent>
         <div className="ml-[18px] mt-0.5 mb-1.5 pl-3 border-l border-border/30">
-          <div className="space-y-2 text-muted-foreground/50 [&_.kortix-markdown]:italic [&_.kortix-markdown_div]:!text-[12px] [&_.kortix-markdown_div]:!leading-[1.5] [&_.kortix-markdown_div]:!text-muted-foreground/50 [&_.kortix-markdown_li]:!text-[12px] [&_.kortix-markdown_li]:!leading-[1.5] [&_.kortix-markdown_li]:!text-muted-foreground/50 [&_.kortix-markdown_strong]:!text-muted-foreground/60 [&_.kortix-markdown_em]:!text-muted-foreground/60">
+          <div className="space-y-2 text-muted-foreground/50 [&_.bapx-markdown]:italic [&_.bapx-markdown_div]:!text-[12px] [&_.bapx-markdown_div]:!leading-[1.5] [&_.bapx-markdown_div]:!text-muted-foreground/50 [&_.bapx-markdown_li]:!text-[12px] [&_.bapx-markdown_li]:!leading-[1.5] [&_.bapx-markdown_li]:!text-muted-foreground/50 [&_.bapx-markdown_strong]:!text-muted-foreground/60 [&_.bapx-markdown_em]:!text-muted-foreground/60">
             {nonEmptyParts.map((p, i) => (
               <div key={p.id ?? i}>
                 <ThrottledMarkdown content={p.text!} isStreaming={false} />
@@ -3129,12 +3129,12 @@ function SessionTurn({
   }, [turn.userMessage.parts]);
   const [sessionReportModalOpen, setSessionReportModalOpen] = useState(false);
 
-  // Extract kortix_system messages for inline rendering (autowork continuations, etc.)
-  const systemMessages = useMemo<KortixSystemMessage[]>(() => {
-    const msgs: KortixSystemMessage[] = [];
+  // Extract bapx_system messages for inline rendering (autowork continuations, etc.)
+  const systemMessages = useMemo<BapxSystemMessage[]>(() => {
+    const msgs: BapxSystemMessage[] = [];
     for (const p of turn.userMessage.parts) {
       if (isTextPart(p) && (p as TextPart).text) {
-        msgs.push(...extractKortixSystemMessages((p as TextPart).text!));
+        msgs.push(...extractBapxSystemMessages((p as TextPart).text!));
       }
     }
     return msgs;
@@ -3153,7 +3153,7 @@ function SessionTurn({
         isTextPart(p) &&
         !(p as TextPart).synthetic &&
         !(p as any).ignored &&
-        !!stripKortixSystemTags((p as TextPart).text || '').trim(),
+        !!stripBapxSystemTags((p as TextPart).text || '').trim(),
     );
     if (hasVisibleText) return true;
     // Has any attachment (image/PDF)?
@@ -3326,7 +3326,7 @@ function SessionTurn({
   //
   // Structure:
   //   1. User message + actions
-  //   2. Kortix logo
+  //   2. Bapx logo
   //   3. Steps trigger (spinner/chevron + status + duration) — if working || hasSteps
   //   4. Collapsible steps (if expanded): all parts EXCEPT response part
   //   5. Answered question parts (if collapsed + has answered questions)
@@ -3399,7 +3399,7 @@ function SessionTurn({
         </>
       )}
 
-      {/* ── System message indicator — shown for kortix_system-only messages ── */}
+      {/* ── System message indicator — shown for bapx_system-only messages ── */}
       {!hasVisibleUserContent && !sessionReport && systemMessages.length > 0 && (
         <SystemMessageIndicator messages={systemMessages} />
       )}
@@ -3475,13 +3475,13 @@ function SessionTurn({
         </div>
       )}
 
-      {/* Kortix logo header */}
+      {/* Bapx logo header */}
       {(working || hasSteps || hasReasoning) && (
         <div className="flex items-center gap-2 mt-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/kortix-logomark-white.svg"
-            alt="Kortix"
+            src="/bapx-logomark-white.svg"
+            alt="Bapx"
             className="dark:invert-0 invert flex-shrink-0 h-[14px] w-auto"
           />
         </div>
@@ -3740,7 +3740,7 @@ function SessionTurn({
           </div>
         )}
 
-      {/* Kortix logo — shown when there are no steps and not working (otherwise logo is already above the steps trigger) */}
+      {/* Bapx logo — shown when there are no steps and not working (otherwise logo is already above the steps trigger) */}
       {!hasSteps &&
         !hasReasoning &&
         !working &&
@@ -3748,8 +3748,8 @@ function SessionTurn({
           <div className="flex items-center gap-2 mt-3 mb-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/kortix-logomark-white.svg"
-              alt="Kortix"
+              src="/bapx-logomark-white.svg"
+              alt="Bapx"
               className="dark:invert-0 invert flex-shrink-0 h-[14px] w-auto"
             />
           </div>
@@ -4037,9 +4037,9 @@ export function SessionChat({
     window.getSelection()?.removeAllRanges();
   }, [selectionPopup]);
 
-  // ---- KortixComputer side panel ----
+  // ---- BapxComputer side panel ----
   const { isSidePanelOpen, setIsSidePanelOpen, openFileInComputer } =
-    useKortixComputerStore();
+    useBapxComputerStore();
   const openPreview = useFilePreviewStore((s) => s.openPreview);
   const handleTogglePanel = useCallback(() => {
     setIsSidePanelOpen(!isSidePanelOpen);
@@ -4074,16 +4074,16 @@ export function SessionChat({
   // a project preamble into the first message sent in this session.
   const selectedProjectId = useSelectedProjectStore((s) => s.projectId);
   const setSelectedProjectId = useSelectedProjectStore((s) => s.setProjectId);
-  const { data: kortixProjects } = useKortixProjects();
+  const { data: bapxProjects } = useBapxProjects();
   const selectedProject = useMemo(
-    () => kortixProjects?.find((p) => p.id === selectedProjectId) ?? null,
-    [kortixProjects, selectedProjectId],
+    () => bapxProjects?.find((p) => p.id === selectedProjectId) ?? null,
+    [bapxProjects, selectedProjectId],
   );
   useEffect(() => {
-    if (selectedProjectId && kortixProjects && !selectedProject) {
+    if (selectedProjectId && bapxProjects && !selectedProject) {
       setSelectedProjectId(null);
     }
-  }, [selectedProjectId, kortixProjects, selectedProject, setSelectedProjectId]);
+  }, [selectedProjectId, bapxProjects, selectedProject, setSelectedProjectId]);
 
   // Default the agent picker to whichever agent owns the latest assistant
   // turn in this session. Catches PM onboarding sessions (first turn was PM),
@@ -6062,7 +6062,7 @@ export function SessionChat({
       {/* Content area — loading, not-found, or actual messages */}
       {isDataLoading ? (
         <div className="flex-1 flex items-center justify-center min-h-0">
-          <KortixLoader size="small" />
+          <BapxLoader size="small" />
         </div>
       ) : isNotFound ? (
         <div className="flex-1 flex flex-col items-center justify-center min-h-0 gap-3 text-center px-6">
@@ -6201,8 +6201,8 @@ export function SessionChat({
                     <div className="flex items-center gap-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src="/kortix-logomark-white.svg"
-                        alt="Kortix"
+                        src="/bapx-logomark-white.svg"
+                        alt="Bapx"
                         className="dark:invert-0 invert flex-shrink-0 h-[14px] w-auto"
                       />
                       {isRetrying && (
@@ -6229,8 +6229,8 @@ export function SessionChat({
                     <div className="flex items-center gap-3">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src="/kortix-logomark-white.svg"
-                        alt="Kortix"
+                        src="/bapx-logomark-white.svg"
+                        alt="Bapx"
                         className="dark:invert-0 invert flex-shrink-0 h-[14px] w-auto"
                       />
                       <div className="text-sm text-muted-foreground">
@@ -6308,8 +6308,8 @@ export function SessionChat({
                   <div className="flex items-center gap-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src="/kortix-logomark-white.svg"
-                      alt="Kortix"
+                      src="/bapx-logomark-white.svg"
+                      alt="Bapx"
                       className="dark:invert-0 invert flex-shrink-0 h-[14px] w-auto"
                     />
                   </div>

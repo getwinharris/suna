@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useCallback, useRef, useSyncExternalStore } from 'react';
 import { WallpaperBackground } from '@/components/ui/wallpaper-background';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/trailbase/client';
 
-const SLEEP_KEY = 'kortix-sleep-active-v1';
+const SLEEP_KEY = 'bapx-sleep-active-v1';
 
 const listeners = new Set<() => void>();
 

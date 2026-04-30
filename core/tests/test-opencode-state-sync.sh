@@ -24,11 +24,11 @@ db.commit()
 db.close()
 PY
 
-python3 core/scripts/kortix-opencode-state sync >/dev/null
+python3 core/scripts/bapx-opencode-state sync >/dev/null
 
 python3 - <<'PY'
 import json, os, subprocess
-out = subprocess.check_output(['python3', 'core/scripts/kortix-opencode-state', 'status'], text=True)
+out = subprocess.check_output(['python3', 'core/scripts/bapx-opencode-state', 'status'], text=True)
 data = json.loads(out)
 assert data['shadow']['sessions'] == 1, data
 assert data['shadow']['messages'] == 1, data
@@ -43,11 +43,11 @@ db.commit()
 db.close()
 PY
 
-python3 core/scripts/kortix-opencode-state guard >/dev/null
+python3 core/scripts/bapx-opencode-state guard >/dev/null
 
 python3 - <<'PY'
 import json, subprocess
-out = subprocess.check_output(['python3', 'core/scripts/kortix-opencode-state', 'status'], text=True)
+out = subprocess.check_output(['python3', 'core/scripts/bapx-opencode-state', 'status'], text=True)
 data = json.loads(out)
 assert data['live']['sessions'] == 1, data
 assert data['live']['messages'] == 1, data
@@ -61,11 +61,11 @@ db.commit()
 db.close()
 PY
 
-python3 core/scripts/kortix-opencode-state guard >/dev/null
+python3 core/scripts/bapx-opencode-state guard >/dev/null
 
 python3 - <<'PY'
 import json, subprocess
-out = subprocess.check_output(['python3', 'core/scripts/kortix-opencode-state', 'status'], text=True)
+out = subprocess.check_output(['python3', 'core/scripts/bapx-opencode-state', 'status'], text=True)
 data = json.loads(out)
 assert data['live']['sessions'] == 1, data
 assert data['live']['messages'] == 1, data

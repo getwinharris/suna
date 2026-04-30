@@ -3,7 +3,7 @@ import { spawn } from "child_process";
 import { promisify } from "util";
 import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
-import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startKortixMaster, type RuntimeFixture } from "./helpers";
+import { cleanupRuntimeFixture, createRuntimeFixture, startDummyOpenCode, startBapxMaster, type RuntimeFixture } from "./helpers";
 
 const execAsync = promisify(spawn);
 
@@ -11,14 +11,14 @@ describe("Cross-Language Environment Variable Access", () => {
   const baseURL = "http://localhost:8001"; // Use different port for E2E
   const scriptsPath = join(import.meta.dir, "../fixtures/test-scripts");
   
-  let serverProcess: Awaited<ReturnType<typeof startKortixMaster>> | null = null;
+  let serverProcess: Awaited<ReturnType<typeof startBapxMaster>> | null = null;
   let opencode: Awaited<ReturnType<typeof startDummyOpenCode>> | null = null;
   let fixture: RuntimeFixture;
 
   beforeAll(async () => {
-    fixture = createRuntimeFixture("kortix-cross-language-");
+    fixture = createRuntimeFixture("bapx-cross-language-");
     opencode = await startDummyOpenCode(9001);
-    serverProcess = await startKortixMaster(8001, fixture, {
+    serverProcess = await startBapxMaster(8001, fixture, {
       KORTIX_TOKEN: "e2e-test-token",
       OPENCODE_PORT: "9001",
     });

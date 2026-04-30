@@ -109,7 +109,7 @@ export async function proxyToOpenCode(c: Context): Promise<Response> {
         // Try to extract a meaningful error message from JSON response
         const parsed = JSON.parse(text)
         const errMsg = parsed?.data?.message || parsed?.message || parsed?.error || text.slice(0, 200)
-        console.error(`[Kortix Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: ${errMsg}`)
+        console.error(`[Bapx Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: ${errMsg}`)
       } catch {
         const text = new TextDecoder().decode(body).slice(0, 200)
         // Check for Bun's HTML error fallback (module resolution errors, etc.)
@@ -117,12 +117,12 @@ export async function proxyToOpenCode(c: Context): Promise<Response> {
           // Extract the base64 error from Bun's fallback page
           const b64Match = new TextDecoder().decode(body).match(/type="binary\/peechy">\s*([\w+/=]+)\s*</)
           if (b64Match) {
-            console.error(`[Kortix Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: Bun startup crash (module resolution or compile error — check OpenCode logs)`)
+            console.error(`[Bapx Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: Bun startup crash (module resolution or compile error — check OpenCode logs)`)
           } else {
-            console.error(`[Kortix Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: Bun error page returned (check OpenCode logs)`)
+            console.error(`[Bapx Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: Bun error page returned (check OpenCode logs)`)
           }
         } else {
-          console.error(`[Kortix Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: ${text || '(empty response)'}`)
+          console.error(`[Bapx Master] OpenCode ${response.status} on ${c.req.method} ${url.pathname}: ${text || '(empty response)'}`)
         }
       }
     }
@@ -143,7 +143,7 @@ export async function proxyToOpenCode(c: Context): Promise<Response> {
         }
         note(
           `timeout:${c.req.method}:${url.pathname}`,
-          `[Kortix Master] OpenCode timeout on ${c.req.method} ${url.pathname} after ${FETCH_TIMEOUT_MS / 1000}s`,
+          `[Bapx Master] OpenCode timeout on ${c.req.method} ${url.pathname} after ${FETCH_TIMEOUT_MS / 1000}s`,
         )
         return c.json({ error: 'OpenCode not responding', details: `${url.pathname} timed out after ${FETCH_TIMEOUT_MS / 1000}s — OpenCode may still be starting` }, 504)
       }
@@ -155,7 +155,7 @@ export async function proxyToOpenCode(c: Context): Promise<Response> {
     if (isConnRefused) {
       note(
         `unreachable:${c.req.method}:${url.pathname}`,
-        `[Kortix Master] OpenCode unreachable on ${c.req.method} ${url.pathname}: ${errMsg} — is OpenCode running on ${config.OPENCODE_HOST}:${config.OPENCODE_PORT}?`,
+        `[Bapx Master] OpenCode unreachable on ${c.req.method} ${url.pathname}: ${errMsg} — is OpenCode running on ${config.OPENCODE_HOST}:${config.OPENCODE_PORT}?`,
       )
       const recovered = recover(url.pathname)
         ? !!(await serviceManager.requestRecovery('opencode-serve', `proxy-connect:${url.pathname}`))?.ok
@@ -182,7 +182,7 @@ export async function proxyToOpenCode(c: Context): Promise<Response> {
           const retryMsg = retryError instanceof Error ? retryError.message : String(retryError)
           note(
             `retry:${c.req.method}:${url.pathname}`,
-            `[Kortix Master] OpenCode retry after recovery failed on ${c.req.method} ${url.pathname}: ${retryMsg}`,
+            `[Bapx Master] OpenCode retry after recovery failed on ${c.req.method} ${url.pathname}: ${retryMsg}`,
           )
           return c.json({ error: 'Failed to proxy to OpenCode after recovery attempt', details: retryMsg }, 502)
         }
@@ -190,7 +190,7 @@ export async function proxyToOpenCode(c: Context): Promise<Response> {
     } else {
       note(
         `proxy:${c.req.method}:${url.pathname}`,
-        `[Kortix Master] Proxy error on ${c.req.method} ${url.pathname}: ${errMsg}`,
+        `[Bapx Master] Proxy error on ${c.req.method} ${url.pathname}: ${errMsg}`,
       )
     }
     return c.json({ error: 'Failed to proxy to OpenCode', details: errMsg }, 502)

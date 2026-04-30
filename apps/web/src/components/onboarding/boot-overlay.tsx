@@ -10,7 +10,7 @@ const SYMBOL =
 const BIOS_LINES: { text: string; bold?: boolean }[] = [
   { text: 'KORTIX BIOS v2.0.1', bold: true },
   { text: '' },
-  { text: 'CPU: Kortix Inference Engine X1 @ 3.80 GHz' },
+  { text: 'CPU: Bapx Inference Engine X1 @ 3.80 GHz' },
   { text: 'Memory test................. OK' },
   { text: 'Neural cores............... 8/8 online' },
   { text: 'Agent runtime.............. initialized' },
@@ -38,7 +38,7 @@ export function BootOverlay({ onComplete }: BootOverlayProps) {
 
   // Boot sound
   useEffect(() => {
-    const audio = new Audio('/sounds/kortix/startup.mp3');
+    const audio = new Audio('/sounds/bapx/startup.mp3');
     audio.volume = 0.6;
     audio.preload = 'auto';
     audioRef.current = audio;

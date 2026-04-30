@@ -6,7 +6,7 @@
  * handled here instead of proxying to OpenCode, giving us full control
  * over binary content handling and sandbox-wide filesystem access.
  *
- * Mounted at /file in kortix-master (e.g. GET /file/raw?path=...).
+ * Mounted at /file in bapx-master (e.g. GET /file/raw?path=...).
  *
  * Security: all paths are resolved to absolute and validated against
  * ALLOWED_ROOTS before any filesystem operation.
@@ -278,7 +278,7 @@ filesRouter.get('/status',
   describeRoute({
     tags: ['Files'],
     summary: 'Git file status',
-    description: 'Returns the git status of changed files for the current workspace using a fast local implementation in kortix-master.',
+    description: 'Returns the git status of changed files for the current workspace using a fast local implementation in bapx-master.',
     responses: {
       200: {
         description: 'Changed files',

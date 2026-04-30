@@ -14,7 +14,7 @@ function resolveAuthCookieName() {
     process.env.NEXT_PUBLIC_URL ||
     process.env.PUBLIC_URL;
 
-  if (!appUrl) return 'sb-kortix-auth-token';
+  if (!appUrl) return 'sb-bapx-auth-token';
 
   try {
     const url = new URL(appUrl);
@@ -22,13 +22,13 @@ function resolveAuthCookieName() {
     const port = url.port;
 
     if (isLocalhost && port) {
-      return `sb-kortix-auth-token-${port}`;
+      return `sb-bapx-auth-token-${port}`;
     }
   } catch {
     // Fall back to the historical cookie name.
   }
 
-  return 'sb-kortix-auth-token';
+  return 'sb-bapx-auth-token';
 }
 
 export const KORTIX_SUPABASE_AUTH_COOKIE = resolveAuthCookieName();
