@@ -276,33 +276,36 @@ export default async function RootLayout({
                   {children}
                 </IntegrationConnectProvider>
                 <Toaster />
+                {/* Analytics - lazy loaded inside AuthProvider for access to useAuth */}
+                <Suspense fallback={null}>
+                  <Analytics />
+                </Suspense>
+                {process.env.NEXT_PUBLIC_GTM_ID && (
+                  <Suspense fallback={null}>
+                    <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
+                  </Suspense>
+                )}
+                <Suspense fallback={null}>
+                  <SpeedInsights />
+                </Suspense>
+                <Suspense fallback={null}>
+                  <PostHogIdentify />
+                </Suspense>
+                <Suspense fallback={null}>
+                  <RouteChangeTracker />
+                </Suspense>
+                <Suspense fallback={null}>
+                  <AuthEventTracker />
+                </Suspense>
+                <Suspense fallback={null}>
+                  <AnnouncementDialog />
+                </Suspense>
+                <Suspense fallback={null}>
+                  <LocalhostLinkInterceptor />
+                </Suspense>
               </ReactQueryProvider>
             </I18nProvider>
           </AuthProvider>
-          {/* Analytics - lazy loaded to not block FCP */}
-          <Suspense fallback={null}>
-            <Analytics />
-          </Suspense>
-          {process.env.NEXT_PUBLIC_GTM_ID && (
-            <Suspense fallback={null}>
-              <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
-            </Suspense>
-          )}
-          <Suspense fallback={null}>
-            <SpeedInsights />
-          </Suspense>
-          <Suspense fallback={null}>
-            <PostHogIdentify />
-          </Suspense>
-          <Suspense fallback={null}>
-            <RouteChangeTracker />
-          </Suspense>
-          <Suspense fallback={null}>
-            <AuthEventTracker />
-          </Suspense>
-          <Suspense fallback={null}>
-            <LocalhostLinkInterceptor />
-          </Suspense>
         </ThemeProvider>
       </body>
     </html>

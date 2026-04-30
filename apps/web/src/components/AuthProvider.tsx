@@ -32,12 +32,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const getInitialSession = async () => {
       try {
+        if (!trailbase?.auth) return;
+        
         const currentUser = await trailbase.auth.getUser();
 
         if (currentUser) {
           setUser(currentUser);
-          setSession({ user: currentUser, access_token: trailbase.auth.getToken() });
-          setCachedAuthToken(trailbase.auth.getToken());
+          const token = trailbase.auth.getToken();
+          setSession({ user: currentUser, access_token: token });
+          setCachedAuthToken(token);
         }
       } catch (error) {
         console.error('[AuthProvider] Init error:', error);

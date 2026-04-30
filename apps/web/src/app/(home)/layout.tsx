@@ -17,12 +17,14 @@ export default function HomeLayout({
 }>) {
   return (
     <div className="w-full min-h-dvh relative">
-      <div className="fixed top-0 left-0 right-0 z-50">
+      <div key="home-navbar-wrapper" className="fixed top-0 left-0 right-0 z-50">
         <Navbar isAbsolute />
       </div>
-      {children}
-      <SimpleFooter />
-      <GlobalNewInstanceModal />
+      <main key="home-main-content">
+        {children}
+      </main>
+      <SimpleFooter key="home-footer" />
+      <GlobalNewInstanceModal key="home-new-instance-modal" />
     </div>
   );
 }

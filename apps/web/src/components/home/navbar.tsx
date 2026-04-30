@@ -72,6 +72,7 @@ function PowerButton({ href, onClick, label = 'Launch Bapx Media Hub' }: { href?
       <AnimatePresence>
         {hovered && (
           <motion.span
+            key="tooltip"
             className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] text-foreground bg-background border border-border rounded-md px-2 py-0.5 pointer-events-none z-50 shadow-sm"
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
@@ -328,9 +329,10 @@ export function Navbar({ isAbsolute = false }: NavbarProps) {
       </div>
 
       {/* Mobile Drawer - Full Screen */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isDrawerOpen && (
           <motion.div
+            key="mobile-drawer"
             className="fixed inset-0 bg-background z-50 flex flex-col pt-4"
             initial="hidden"
             animate="visible"
