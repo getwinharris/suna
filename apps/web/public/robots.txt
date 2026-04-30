@@ -1,4 +1,4 @@
-# Kortix Robots.txt
+# Bapx Media Hub Robots.txt
 User-agent: *
 Allow: /
 

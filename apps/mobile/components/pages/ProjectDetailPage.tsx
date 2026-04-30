@@ -906,7 +906,7 @@ export function ProjectDetailPage({
                   paddingHorizontal: 20,
                   lineHeight: 17,
                 }}>
-                Create tasks so Kortix knows what to work on next.
+                Create tasks so Bapx Media Hub knows what to work on next.
               </RNText>
               <TouchableOpacity
                 onPress={openNewTaskSheet}

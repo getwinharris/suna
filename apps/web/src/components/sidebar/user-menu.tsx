@@ -125,7 +125,7 @@ export function UserMenu({ user }: UserMenuProps) {
               align="start"
               sideOffset={4}
             >
-              {/* Slack-style instance switcher — Kortix-neutral styling */}
+              {/* Slack-style instance switcher — Bapx Media Hub-neutral styling */}
               <InstanceSwitcherList
                 onAfterSelect={() => setMenuOpen(false)}
                 onOpenSettings={setInstanceSettingsTarget}

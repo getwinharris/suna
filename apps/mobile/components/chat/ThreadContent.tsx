@@ -271,7 +271,7 @@ const MarkdownContent = React.memo(function MarkdownContent({
               <View className="flex-row items-start gap-2.5 rounded-xl border border-border bg-muted/40 px-3 py-2.5 dark:bg-muted/20">
                 <Icon as={Info} size={16} className="mt-0.5 flex-shrink-0 text-muted-foreground" />
                 <Text className="flex-1 font-roobert text-sm leading-relaxed text-muted-foreground">
-                  Kortix will automatically continue working once you provide your response.
+                  Bapx Media Hub will automatically continue working once you provide your response.
                 </Text>
               </View>
 
@@ -717,7 +717,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = React.memo(
     streamHookStatus = 'idle',
     sandboxId,
     sandboxUrl,
-    agentName = 'Kortix',
+    agentName = 'Bapx Media Hub',
     onPromptFill,
     isSendingMessage = false,
     onRequestScroll,
@@ -805,11 +805,11 @@ export const ThreadContent: React.FC<ThreadContentProps> = React.memo(
 
     // Helper to render agent indicator based on agent type
     const renderAgentIndicator = useCallback((agentId: string | null | undefined) => {
-      // Default Kortix agent or no agent ID - show full logomark
+      // Default Bapx Media Hub agent or no agent ID - show full logomark
       const isKortixDefault = isKortixDefaultAgentId(agentId, agents);
       
       if (isKortixDefault) {
-        // Full Kortix logomark (icon + text) - same height as symbol+text combo
+        // Full Bapx Media Hub logomark (icon + text) - same height as symbol+text combo
         return <KortixLogo size={14} variant="logomark" color={isDark ? 'dark' : 'light'} />;
       }
       
@@ -1475,7 +1475,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = React.memo(
 
             return (
               <View key={group.key} className="mb-6">
-                {/* Reasoning section with integrated Kortix icon (like frontend) */}
+                {/* Reasoning section with integrated Bapx Media Hub icon (like frontend) */}
                 {reasoningSectionElement}
                 {/* Show agent header only when reasoning section is NOT displayed */}
                 {!reasoningSectionElement && (
@@ -1976,7 +1976,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = React.memo(
           return (
             <View className="mb-6">
               {/* Show agent header only when reasoning section is NOT displayed */}
-              {/* ReasoningSection has its own Kortix logo, so we hide the header when showing reasoning */}
+              {/* ReasoningSection has its own Bapx Media Hub logo, so we hide the header when showing reasoning */}
               {!showReasoning && (
                 <View className="mb-3 flex-row items-center">
                   {renderAgentIndicator(null)}

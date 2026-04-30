@@ -3,13 +3,13 @@
 import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Coins, 
-  Clock, 
-  Infinity, 
-  Zap, 
-  Gift, 
-  RefreshCw, 
+import {
+  Coins,
+  Clock,
+  Infinity,
+  Zap,
+  Gift,
+  RefreshCw,
   DollarSign,
   Mail,
   MessageCircle,
@@ -39,14 +39,14 @@ export default function CreditsPage() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">What are credits?</h2>
           <p className="text-lg mb-8">
-            Credits are Kortix's standard unit of measurement for platform usage. Think of them as tokens that power your AI agents - the more complex or lengthy the task, the more credits it requires.
+            Credits are Bapx Media Hub's standard unit of measurement for platform usage. Think of them as tokens that power your AI agents - the more complex or lengthy the task, the more credits it requires.
           </p>
         </section>
 
         <section>
           <h2 className="text-2xl font-semibold mb-4">Types of Credits</h2>
           <p className="mb-6">
-            Kortix uses two types of credits to give you flexibility in how you manage your usage:
+            Bapx Media Hub uses two types of credits to give you flexibility in how you manage your usage:
           </p>
 
           <div className="grid gap-4 md:grid-cols-2 mb-8">
@@ -66,8 +66,8 @@ export default function CreditsPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  These credits are included with your paid subscription and are renewed automatically each month 
-                  on your subscription date. They expire at the end of each billing cycle and are always consumed 
+                  These credits are included with your paid subscription and are renewed automatically each month
+                  on your subscription date. They expire at the end of each billing cycle and are always consumed
                   first before any non-expiring credits.
                 </p>
               </CardContent>
@@ -89,8 +89,8 @@ export default function CreditsPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  These credits never expire and carry over month to month. They include top-up purchases, 
-                  refunds, and promotional grants. Non-expiring credits are only used after your expiring 
+                  These credits never expire and carry over month to month. They include top-up purchases,
+                  refunds, and promotional grants. Non-expiring credits are only used after your expiring
                   credits have been depleted.
                 </p>
               </CardContent>
@@ -100,7 +100,7 @@ export default function CreditsPage() {
           <Alert className="mb-8">
             <Info className="h-4 w-4" />
             <AlertDescription>
-              <strong>Credit Priority:</strong> When you use Kortix, expiring credits are consumed first. 
+              <strong>Credit Priority:</strong> When you use Bapx Media Hub, expiring credits are consumed first.
               Only after your expiring credits run out will non-expiring credits be used.
             </AlertDescription>
           </Alert>
@@ -129,8 +129,8 @@ export default function CreditsPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Different AI models have different costs based on their capabilities and token usage. 
-                  Credits are consumed for input tokens (your prompts and context), output tokens (agent responses), 
+                  Different AI models have different costs based on their capabilities and token usage.
+                  Credits are consumed for input tokens (your prompts and context), output tokens (agent responses),
                   and vary by model tier (GPT-4, Claude, etc.).
                 </p>
               </CardContent>
@@ -153,7 +153,7 @@ export default function CreditsPage() {
               <CardContent>
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    We apply a markup on top of provider costs to cover platform infrastructure, 
+                    We apply a markup on top of provider costs to cover platform infrastructure,
                     security, and ongoing development. Rates vary by service type:
                   </p>
                   <ul className="space-y-2 text-sm text-muted-foreground">
@@ -183,7 +183,7 @@ export default function CreditsPage() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">Getting More Credits</h2>
           <p className="mb-6">
-            There are several ways to obtain credits in Kortix:
+            There are several ways to obtain credits in Bapx Media Hub:
           </p>
 
           <div className="space-y-4 mb-8">
@@ -352,7 +352,7 @@ export default function CreditsPage() {
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription>
-              We're committed to fair and transparent billing. If you believe there's an error in your 
+              We're committed to fair and transparent billing. If you believe there's an error in your
               credit usage, please contact our support team and we'll investigate promptly.
             </AlertDescription>
           </Alert>

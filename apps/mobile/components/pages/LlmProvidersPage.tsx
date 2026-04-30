@@ -68,7 +68,7 @@ import { useThemeColors, getSheetBg, getToggleTrackBg, getToggleActiveBg } from 
 
 const PROVIDER_LABELS: Record<string, string> = {
   anthropic: 'Anthropic', openai: 'OpenAI', google: 'Google', xai: 'xAI',
-  kortix: 'Kortix', openrouter: 'OpenRouter', 'github-copilot': 'GitHub Copilot',
+  kortix: 'Bapx Media Hub', openrouter: 'OpenRouter', 'github-copilot': 'GitHub Copilot',
   vercel: 'Vercel', groq: 'Groq', deepseek: 'DeepSeek', mistral: 'Mistral',
   cohere: 'Cohere', huggingface: 'Hugging Face', cerebras: 'Cerebras',
   togetherai: 'Together AI', fireworks: 'Fireworks', deepinfra: 'DeepInfra',

@@ -5,7 +5,7 @@
  * - InstancesTopBar: a consistent top bar (logo + account menu) used by
  *   both the listing and nested routes like /instances/[id]/backups.
  * - UserMenu: avatar-triggered account dropdown (settings + log out).
- * - ComputerHeroCard: the empty-state / claim card showing the Kortix
+ * - ComputerHeroCard: the empty-state / claim card showing the Bapx Media Hub
  *   computer image, title, description, CTA and a feature strip.
  */
 
@@ -97,7 +97,7 @@ export function InstancesTopBar({
   leading,
 }: {
   user: User;
-  /** Optional slot rendered to the left, next to the Kortix logo (e.g. a back button). */
+  /** Optional slot rendered to the left, next to the Bapx Media Hub logo (e.g. a back button). */
   leading?: React.ReactNode;
 }) {
   const router = useRouter();
@@ -168,7 +168,7 @@ export function ComputerHeroCard({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/kortix-computer.png"
-        alt="Kortix Computer"
+        alt="Bapx Media Hub Computer"
         className="h-40 w-40 object-contain select-none pointer-events-none"
         draggable={false}
       />

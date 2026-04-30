@@ -704,7 +704,7 @@ export const FilesPage = forwardRef<FilesPageRef, FilesPageProps>(function Files
                 }}
                 className={`text-sm ${isAtRoot ? 'font-roobert-medium' : 'font-roobert'}`}
               >
-                My Kortix
+                My Bapx Media Hub
               </Text>
             </Pressable>
 
@@ -1104,7 +1104,7 @@ export const FilesPage = forwardRef<FilesPageRef, FilesPageProps>(function Files
                 }}
                 numberOfLines={1}
               >
-                {currentPath === '/workspace' ? 'My Kortix' : currentPath.split('/').pop()}
+                {currentPath === '/workspace' ? 'My Bapx Media Hub' : currentPath.split('/').pop()}
               </Text>
             </View>
           </View>

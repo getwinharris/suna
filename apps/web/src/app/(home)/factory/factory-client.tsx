@@ -66,8 +66,8 @@ export default function FactoryPageClient() {
 
         <Reveal delay={0.1}>
           <p className="text-base text-muted-foreground leading-relaxed max-w-xl">
-            Not tools. Not agents. Not workflows. Companies — with engineering departments, 
-            operations teams, finance functions, customer support, growth engines — that run 
+            Not tools. Not agents. Not workflows. Companies — with engineering departments,
+            operations teams, finance functions, customer support, growth engines — that run
             themselves. Agents doing the actual work, 24/7, without a human touching every task.
           </p>
         </Reveal>
@@ -90,9 +90,9 @@ export default function FactoryPageClient() {
 
         <Reveal delay={0.1}>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
-            This is not a forecast. It is our operating target — the ratio we run ourselves at today, 
-            and the ratio we build toward with every company we work with. Humans are not removed. 
-            They are elevated. They set direction, review outputs, make final calls on things that 
+            This is not a forecast. It is our operating target — the ratio we run ourselves at today,
+            and the ratio we build toward with every company we work with. Humans are not removed.
+            They are elevated. They set direction, review outputs, make final calls on things that
             matter. Agents handle the rest.
           </p>
         </Reveal>
@@ -108,16 +108,16 @@ export default function FactoryPageClient() {
 
         <Reveal delay={0.05}>
           <p className="text-base text-muted-foreground leading-relaxed max-w-xl mb-5">
-            A factory is a system for turning inputs into outputs at scale, reliably, repeatedly, 
+            A factory is a system for turning inputs into outputs at scale, reliably, repeatedly,
             without depending on any individual person being present. That is what we build for companies.
           </p>
         </Reveal>
 
         <Reveal delay={0.1}>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
-            You feed the factory your goals, your tools, your context, your standards. 
-            The factory produces: shipped code, closed tickets, drafted contracts, reconciled books, 
-            outbound campaigns, synthesized research, recruited candidates. Every day. Whether you 
+            You feed the factory your goals, your tools, your context, your standards.
+            The factory produces: shipped code, closed tickets, drafted contracts, reconciled books,
+            outbound campaigns, synthesized research, recruited candidates. Every day. Whether you
             are in the office or asleep.
           </p>
         </Reveal>
@@ -175,16 +175,16 @@ export default function FactoryPageClient() {
 
         <Reveal delay={0.05}>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xl mb-4">
-            We run our own company on Kortix. Every day. Our engineering, our operations, our 
-            growth — agents doing the work, humans governing the system. We eat our own output 
+            We run our own company on Bapx Media Hub. Every day. Our engineering, our operations, our
+            growth — agents doing the work, humans governing the system. We eat our own output
             before we ship it to anyone else.
           </p>
         </Reveal>
 
         <Reveal delay={0.1}>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
-            This is not a product demo. It is how we operate. The credibility of the playbook 
-            comes from the fact that we are living inside it. Every failure we encounter, we fix. 
+            This is not a product demo. It is how we operate. The credibility of the playbook
+            comes from the fact that we are living inside it. Every failure we encounter, we fix.
             Every edge case we hit, we document. The factory improves itself.
           </p>
         </Reveal>
@@ -200,22 +200,22 @@ export default function FactoryPageClient() {
 
         <Reveal delay={0.05}>
           <p className="text-base text-muted-foreground leading-relaxed max-w-xl mb-5">
-            Kortix is infrastructure. The platform is not the point.
+            Bapx Media Hub is infrastructure. The platform is not the point.
           </p>
         </Reveal>
 
         <Reveal delay={0.1}>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xl mb-4">
-            The point is the migration — from human-operated to AI-operated. From companies that 
-            require constant human attention to keep running, to companies that run themselves and 
+            The point is the migration — from human-operated to AI-operated. From companies that
+            require constant human attention to keep running, to companies that run themselves and
             only require human judgment to keep improving.
           </p>
         </Reveal>
 
         <Reveal delay={0.15}>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
-            We think every serious company will make this migration in the next few years. 
-            The ones that move early will be operating at a cost base and execution speed 
+            We think every serious company will make this migration in the next few years.
+            The ones that move early will be operating at a cost base and execution speed
             that latecomers cannot catch. We are building the path — and walking it first.
           </p>
         </Reveal>
@@ -225,8 +225,8 @@ export default function FactoryPageClient() {
         {/* ── Closing ── */}
         <Reveal>
           <p className="text-base text-muted-foreground leading-relaxed max-w-xl mb-5">
-            We are a small team. We care that the playbook is real, that it works, and that 
-            every company we help run this way comes out the other side faster and leaner than 
+            We are a small team. We care that the playbook is real, that it works, and that
+            every company we help run this way comes out the other side faster and leaner than
             when they started.
           </p>
         </Reveal>

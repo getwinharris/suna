@@ -76,3 +76,6 @@ core/kortix-master/opencode/.kortix/
 .pulumi
 .pulumi/
 .vercel
+
+# Knowledge Graph output (auto-generated)
+kg-output/

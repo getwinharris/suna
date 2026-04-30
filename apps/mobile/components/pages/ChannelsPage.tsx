@@ -1081,7 +1081,7 @@ const BOT_NAMES = [
 ];
 
 function randomBotName(): string {
-  return `Kortix ${BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)]}`;
+  return `Bapx Media Hub ${BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)]}`;
 }
 
 function SlackWizard({
@@ -1181,7 +1181,7 @@ function SlackWizard({
           <BottomSheetTextInput
             value={botName}
             onChangeText={setBotName}
-            placeholder="Kortix Agent"
+            placeholder="Bapx Media Hub Agent"
             placeholderTextColor={isDark ? 'rgba(248,248,248,0.25)' : 'rgba(18,18,21,0.3)'}
             style={{ ...inputStyle, marginBottom: 4 }}
           />

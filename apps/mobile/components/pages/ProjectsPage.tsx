@@ -1,5 +1,5 @@
 /**
- * ProjectsPage — Lists all Kortix projects.
+ * ProjectsPage — Lists all Bapx Media Hub projects.
  * Ported from web's /workspace page project list.
  */
 
