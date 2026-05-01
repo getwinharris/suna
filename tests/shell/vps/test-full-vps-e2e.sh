@@ -33,7 +33,7 @@ BLUE=$'\033[0;34m'; CYAN=$'\033[0;36m'; BOLD=$'\033[1m'
 DIM=$'\033[2m'; NC=$'\033[0m'
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${KORTIX_HOME:-$HOME/.bapx}"
+INSTALL_DIR="${BAPX_HOME:-$HOME/.bapx}"
 OWNER_EMAIL="${OWNER_EMAIL:-e2e@bapx.ai}"
 OWNER_PASSWORD="${OWNER_PASSWORD:-e2e-test-pass-42}"
 INSTALLER_URL="${INSTALLER_URL:-https://raw.githubusercontent.com/bapx-ai/bapX/main/scripts/get-bapx.sh}"
@@ -180,7 +180,7 @@ if [ "$SKIP_INSTALL" = "false" ]; then
   # Verify .env contents
   run_test ".env has DEPLOY_MODE=vps" "grep -q 'DEPLOY_MODE=vps' '$INSTALL_DIR/.env'"
   run_test ".env has DB_MODE=docker" "grep -q 'DB_MODE=docker' '$INSTALL_DIR/.env'"
-  run_test ".env has correct version" "grep -q 'KORTIX_VERSION=' '$INSTALL_DIR/.env'"
+  run_test ".env has correct version" "grep -q 'BAPX_VERSION=' '$INSTALL_DIR/.env'"
   ENV_PERMS=$(stat -c '%a' "$INSTALL_DIR/.env" 2>/dev/null || stat -f '%Lp' "$INSTALL_DIR/.env" 2>/dev/null || echo "unknown")
   if [ "$ENV_PERMS" = "600" ]; then
     pass ".env permissions are 600"
@@ -530,11 +530,11 @@ if [ "$KEEP_INSTALL" = "false" ]; then
   # Verify uninstall
   run_test "Install directory removed" "[ ! -d '$INSTALL_DIR' ]"
 
-  KORTIX_CONTAINERS=$(docker ps -a --format '{{.Names}}' 2>/dev/null | grep -c 'bapx-' || true)
-  if [ "${KORTIX_CONTAINERS:-0}" -eq 0 ] 2>/dev/null; then
+  BAPX_CONTAINERS=$(docker ps -a --format '{{.Names}}' 2>/dev/null | grep -c 'bapx-' || true)
+  if [ "${BAPX_CONTAINERS:-0}" -eq 0 ] 2>/dev/null; then
     pass "All bapx containers removed"
   else
-    fail "Bapx containers still exist ($KORTIX_CONTAINERS)"
+    fail "Bapx containers still exist ($BAPX_CONTAINERS)"
   fi
 
   run_test "CLI removed from PATH" "! which bapx 2>/dev/null"

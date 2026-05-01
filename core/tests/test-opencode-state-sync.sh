@@ -4,10 +4,10 @@ set -euo pipefail
 ROOT="$(mktemp -d)"
 trap 'rm -rf "$ROOT"' EXIT
 
-export KORTIX_PERSISTENT_ROOT="$ROOT/persistent"
-export OPENCODE_STORAGE_BASE="$KORTIX_PERSISTENT_ROOT/opencode"
-export OPENCODE_SHADOW_STORAGE_BASE="$KORTIX_PERSISTENT_ROOT/opencode-shadow"
-export KORTIX_OPENCODE_ARCHIVE_DIR="$KORTIX_PERSISTENT_ROOT/opencode-archive"
+export BAPX_PERSISTENT_ROOT="$ROOT/persistent"
+export OPENCODE_STORAGE_BASE="$BAPX_PERSISTENT_ROOT/opencode"
+export OPENCODE_SHADOW_STORAGE_BASE="$BAPX_PERSISTENT_ROOT/opencode-shadow"
+export BAPX_OPENCODE_ARCHIVE_DIR="$BAPX_PERSISTENT_ROOT/opencode-archive"
 
 mkdir -p "$OPENCODE_STORAGE_BASE"
 

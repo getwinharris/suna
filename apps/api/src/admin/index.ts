@@ -152,7 +152,7 @@ function writeEnvFile(path: string, data: Record<string, string>): void {
 
 function getMasterUrlCandidates(): string[] {
   const candidates: string[] = [];
-  const explicit = process.env.KORTIX_MASTER_URL;
+  const explicit = process.env.BAPX_MASTER_URL;
   if (explicit && explicit.trim()) candidates.push(explicit.trim());
   candidates.push('http://sandbox:8000');
   candidates.push(`http://localhost:${config.SANDBOX_PORT_BASE || 14000}`);
@@ -1371,11 +1371,11 @@ adminApp.get('/api/status', async (c) => {
   const root = getProjectRoot();
   return c.json({
     envMode: config.ENV_MODE,
-    internalEnv: config.INTERNAL_KORTIX_ENV,
+    internalEnv: config.INTERNAL_BAPX_ENV,
     port: config.PORT,
     sandboxVersion: (await import('../config')).SANDBOX_VERSION,
     allowedProviders: config.ALLOWED_SANDBOX_PROVIDERS,
-    billingEnabled: config.KORTIX_BILLING_INTERNAL_ENABLED,
+    billingEnabled: config.BAPX_BILLING_INTERNAL_ENABLED,
     daytonaEnabled: config.isDaytonaEnabled(),
     localDockerEnabled: config.isLocalDockerEnabled(),
     databaseConfigured: !!config.DATABASE_URL,

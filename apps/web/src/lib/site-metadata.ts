@@ -2,7 +2,7 @@
  * Site metadata configuration - SIMPLE AND WORKING
  */
 
-const baseUrl = process.env.KORTIX_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_URL || 'https://www.bapx.in';
+const baseUrl = process.env.BAPX_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_URL || 'https://www.bapx.in';
 
 export const siteMetadata = {
   name: 'Bapx Media Hub',

@@ -170,7 +170,7 @@ export function TaskDetailView({
               <div className="shrink-0 flex items-center gap-2 px-5 h-12 border-b border-border/50">
                 <div className="flex items-center gap-2 text-[13px] min-w-0">
                   <span className="font-semibold text-foreground tracking-tight truncate">
-                    {projectName || 'KORTIX'}
+                    {projectName || 'BAPX'}
                   </span>
                   <span className="text-muted-foreground/40 shrink-0">›</span>
                   <button

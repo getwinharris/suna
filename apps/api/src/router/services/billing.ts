@@ -71,7 +71,7 @@ export async function deductToolCredits(
   // are running their own dev stack (no Stripe, no real subscriptions),
   // and billing on a $0 balance just stalls everything with
   // InsufficientCreditsError. Cloud mode (ENV_MODE=cloud) still bills.
-  if (!config.KORTIX_BILLING_INTERNAL_ENABLED) {
+  if (!config.BAPX_BILLING_INTERNAL_ENABLED) {
     return { success: true, cost: 0, newBalance: 0 };
   }
 
@@ -121,7 +121,7 @@ export async function deductLLMCredits(
   }
 
   // Skip deduction in local mode (see deductToolCredits for full rationale).
-  if (!config.KORTIX_BILLING_INTERNAL_ENABLED) {
+  if (!config.BAPX_BILLING_INTERNAL_ENABLED) {
     return { success: true, cost: 0, newBalance: 0 };
   }
 

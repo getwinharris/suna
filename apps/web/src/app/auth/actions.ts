@@ -8,6 +8,13 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { BAPX_TRAILBASE_AUTH_COOKIE } from '@/lib/trailbase/client';
 
+function requireTrailbaseToken(token: string | null): string {
+  if (!token) {
+    throw new Error('TrailBase did not return an auth token');
+  }
+  return token;
+}
+
 export async function signIn(prevState: any, formData: FormData) {
   const email = formData.get('email') as string;
   const returnUrl = sanitizeAuthReturnUrl(formData.get('returnUrl') as string | undefined);
@@ -22,9 +29,10 @@ export async function signIn(prevState: any, formData: FormData) {
 
   try {
     await trailbase.auth.signIn(normalizedEmail, password);
+    const token = requireTrailbaseToken(trailbase.auth.getToken());
     
     const cookieStore = await cookies();
-    cookieStore.set(BAPX_TRAILBASE_AUTH_COOKIE, trailbase.auth.getToken(), {
+    cookieStore.set(BAPX_TRAILBASE_AUTH_COOKIE, token, {
       path: '/',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -56,9 +64,10 @@ export async function signUp(prevState: any, formData: FormData) {
 
   try {
     await trailbase.auth.signUp(normalizedEmail, password);
+    const token = requireTrailbaseToken(trailbase.auth.getToken());
     
     const cookieStore = await cookies();
-    cookieStore.set(BAPX_TRAILBASE_AUTH_COOKIE, trailbase.auth.getToken(), {
+    cookieStore.set(BAPX_TRAILBASE_AUTH_COOKIE, token, {
       path: '/',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -81,7 +90,7 @@ export async function selfHostedSignIn(prevState: any, formData: FormData) {
 
   try {
     await trailbase.auth.signIn(normalizedEmail, password);
-    const token = trailbase.auth.getToken();
+    const token = requireTrailbaseToken(trailbase.auth.getToken());
     
     const cookieStore = await cookies();
     cookieStore.set(BAPX_TRAILBASE_AUTH_COOKIE, token, {
@@ -112,7 +121,7 @@ export async function installOwner(prevState: any, formData: FormData) {
   try {
     // For self-hosted, we treat the first signup as the owner installation
     await trailbase.auth.signUp(normalizedEmail, password);
-    const token = trailbase.auth.getToken();
+    const token = requireTrailbaseToken(trailbase.auth.getToken());
     
     const cookieStore = await cookies();
     cookieStore.set(BAPX_TRAILBASE_AUTH_COOKIE, token, {
@@ -146,7 +155,7 @@ export async function signInWithPassword(prevState: any, formData: FormData) {
 
   try {
     await trailbase.auth.signIn(normalizedEmail, password);
-    const token = trailbase.auth.getToken();
+    const token = requireTrailbaseToken(trailbase.auth.getToken());
     
     const cookieStore = await cookies();
     cookieStore.set(BAPX_TRAILBASE_AUTH_COOKIE, token, {
@@ -186,7 +195,7 @@ export async function verifyOtp(prevState: any, formData: FormData) {
   const trailbase = await createClient();
   try {
     await trailbase.auth.verifyOtp(email.trim().toLowerCase(), token);
-    const jwt = trailbase.auth.getToken();
+    const jwt = requireTrailbaseToken(trailbase.auth.getToken());
 
     const cookieStore = await cookies();
     cookieStore.set(BAPX_TRAILBASE_AUTH_COOKIE, jwt, {

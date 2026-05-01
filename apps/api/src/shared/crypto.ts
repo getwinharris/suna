@@ -50,7 +50,7 @@ export function generateApiKeyPair(): { publicKey: string; secretKey: string } {
 
 /**
  * Generate a public/secret key pair for a sandbox-managed key.
- * Secret key: bapx_sb_<32 chars>  (injected as KORTIX_TOKEN into sandbox)
+ * Secret key: bapx_sb_<32 chars>  (injected as BAPX_TOKEN into sandbox)
  * Public key: pk_<32 chars>          (safe to store/display)
  */
 export function generateSandboxKeyPair(): { publicKey: string; secretKey: string } {

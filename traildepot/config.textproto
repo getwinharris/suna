@@ -1,7 +1,7 @@
-# Kortix TrailBase Configuration
+# Bapx Media Hub TrailBase Configuration
 email {}
 server {
-  application_name: "Kortix Media Hub"
+  application_name: "Bapx Media Hub"
   logs_retention_sec: 604800
 }
 auth {

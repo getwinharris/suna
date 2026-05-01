@@ -29,7 +29,7 @@ export const SANDBOX_PORTS = {
   DESKTOP_HTTPS: '6081',
   PRESENTATION_VIEWER: '3210',
   STATIC_FILE_SERVER: '3211',
-  KORTIX_MASTER: '8000',
+  BAPX_MASTER: '8000',
   BROWSER_STREAM: '9223',
   BROWSER_VIEWER: '9224',
   SSH: '22',
@@ -200,7 +200,7 @@ export function getSandboxUrl(sandbox: SandboxInfo): string {
     );
   }
 
-  return `${getPlatformUrl()}/p/${sandbox.external_id}/${SANDBOX_PORTS.KORTIX_MASTER}`;
+  return `${getPlatformUrl()}/p/${sandbox.external_id}/${SANDBOX_PORTS.BAPX_MASTER}`;
 }
 
 /**

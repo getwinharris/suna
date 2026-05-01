@@ -12,7 +12,7 @@
  *   - provider resolution: getProviderFromRequest with all 3 tiers
  *   - e2e flow: sandbox pushes creds → API stores → frontend resolves
  *
- * Requires TEST_DATABASE_URL + KORTIX_TEST_DB_CONFIRM for DB-backed cases.
+ * Requires TEST_DATABASE_URL + BAPX_TEST_DB_CONFIRM for DB-backed cases.
  */
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'bun:test';
 import { Hono } from 'hono';

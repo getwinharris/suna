@@ -2,7 +2,7 @@
 
 Audit scope:
 - every folder under `core/bapx-master/opencode/skills/GENERAL-KNOWLEDGE-WORKER/`
-- every folder under `core/bapx-master/opencode/skills/KORTIX-system/`
+- every folder under `core/bapx-master/opencode/skills/BAPX-system/`
 
 Method used:
 - walked the full skill tree (64 skills)
@@ -10,7 +10,7 @@ Method used:
 - extracted explicit CLI/package references and code imports
 - separated **bake into image** deps from **external API/env** deps and **project-local/app deps**
 
-KORTIX-system note:
+BAPX-system note:
 - some dependencies are intentionally **host-only** and cannot be meaningfully baked into this Linux container (for example Xcode, macOS accessibility tooling, or local-machine `agent-click` installs performed over Agent Tunnel)
 - those are still captured below so they are not missed, but they are classified as host-only rather than image deps
 
@@ -89,7 +89,7 @@ KORTIX-system note:
 - Noto CJK fonts for PDF/report generation notes that explicitly mention CJK fallback
 - Noto Emoji only if the image/browser stack needs consistent emoji rendering
 
-### Host-only / non-container requirements discovered in KORTIX-system
+### Host-only / non-container requirements discovered in BAPX-system
 - `agent-click` on the **user's macOS machine** via Agent Tunnel
 - `Appium` for iOS automation flows
 - `Xcode` / iOS simulator tooling for iOS browser automation
@@ -213,7 +213,7 @@ After a full-folder audit, the heavy guaranteed dependencies are concentrated in
 
 Most of the remaining skills are knowledge/process frameworks and do **not** introduce additional local runtime packages.
 
-## KORTIX-system walkthrough
+## BAPX-system walkthrough
 
 | Skill | Bake into image | Host-only / external | Notes |
 |---|---|---|---|

@@ -14,7 +14,7 @@ import * as Sentry from '@sentry/bun';
 // ─── Configuration ──────────────────────────────────────────────────────────
 
 const SENTRY_DSN = process.env.BETTERSTACK_API_SENTRY_DSN;
-const ENV = process.env.INTERNAL_KORTIX_ENV || 'dev';
+const ENV = process.env.INTERNAL_BAPX_ENV || 'dev';
 const VERSION = process.env.SANDBOX_VERSION || 'dev';
 
 // ─── Initialize ─────────────────────────────────────────────────────────────

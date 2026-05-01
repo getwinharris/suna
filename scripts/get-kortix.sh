@@ -65,7 +65,7 @@ dots_done() { printf "${GREEN}done${NC}\n"; }
 dots_ok()   { printf "${GREEN}✓${NC}\n"; }
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${KORTIX_HOME:-$HOME/.bapx}"
+INSTALL_DIR="${BAPX_HOME:-$HOME/.bapx}"
 
 # Resolve the latest released version from GitHub Releases API.
 # Falls back to the 'latest' Docker tag if the API is unreachable.
@@ -85,11 +85,11 @@ resolve_latest_version() {
 
 # Allow explicit override via env var or --version flag; otherwise leave empty
 # and resolve dynamically after parse_args
-KORTIX_VERSION="${KORTIX_VERSION:-}"
-KORTIX_LOCAL_IMAGES="${KORTIX_LOCAL_IMAGES:-0}"
-KORTIX_LOCAL_TAG="${KORTIX_LOCAL_TAG:-latest}"
-KORTIX_BUILD_LOCAL_IMAGES="${KORTIX_BUILD_LOCAL_IMAGES:-0}"
-KORTIX_PULL_PARALLELISM="${KORTIX_PULL_PARALLELISM:-4}"
+BAPX_VERSION="${BAPX_VERSION:-}"
+BAPX_LOCAL_IMAGES="${BAPX_LOCAL_IMAGES:-0}"
+BAPX_LOCAL_TAG="${BAPX_LOCAL_TAG:-latest}"
+BAPX_BUILD_LOCAL_IMAGES="${BAPX_BUILD_LOCAL_IMAGES:-0}"
+BAPX_PULL_PARALLELISM="${BAPX_PULL_PARALLELISM:-4}"
 # Always prefer /dev/tty for interactive reads — critical for
 # `curl URL | bash` where stdin is the pipe, not the terminal.
 TTY_AVAILABLE="0"
@@ -103,7 +103,7 @@ if [ -n "$SCRIPT_SOURCE" ] && [ "$SCRIPT_SOURCE" != "bash" ] && [ -f "$SCRIPT_SO
   SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_SOURCE")" && pwd)"
   REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 fi
-KORTIX_LOCAL_REPO_ROOT="${KORTIX_LOCAL_REPO_ROOT:-$REPO_ROOT}"
+BAPX_LOCAL_REPO_ROOT="${BAPX_LOCAL_REPO_ROOT:-$REPO_ROOT}"
 
 resolve_node_bin() {
   local nvm_latest
@@ -139,7 +139,7 @@ parse_query_param() {
     local value="${pair#*=}"
     case "$key" in
       v|version|tag)
-        [ -n "$value" ] && KORTIX_VERSION="$value"
+        [ -n "$value" ] && BAPX_VERSION="$value"
         ;;
     esac
   done
@@ -149,32 +149,32 @@ parse_args() {
   while [ "$#" -gt 0 ]; do
     case "$1" in
       --local)
-        KORTIX_LOCAL_IMAGES=1
+        BAPX_LOCAL_IMAGES=1
         shift
         ;;
       --build-local)
-        KORTIX_LOCAL_IMAGES=1
-        KORTIX_BUILD_LOCAL_IMAGES=1
+        BAPX_LOCAL_IMAGES=1
+        BAPX_BUILD_LOCAL_IMAGES=1
         shift
         ;;
       --local-tag)
         [ "$#" -ge 2 ] || fatal "--local-tag requires a value"
-        KORTIX_LOCAL_IMAGES=1
-        KORTIX_LOCAL_TAG="$2"
+        BAPX_LOCAL_IMAGES=1
+        BAPX_LOCAL_TAG="$2"
         shift 2
         ;;
       --local-tag=*)
-        KORTIX_LOCAL_IMAGES=1
-        KORTIX_LOCAL_TAG="${1#*=}"
+        BAPX_LOCAL_IMAGES=1
+        BAPX_LOCAL_TAG="${1#*=}"
         shift
         ;;
       --version)
         [ "$#" -ge 2 ] || fatal "--version requires a value"
-        KORTIX_VERSION="$2"
+        BAPX_VERSION="$2"
         shift 2
         ;;
       --version=*)
-        KORTIX_VERSION="${1#*=}"
+        BAPX_VERSION="${1#*=}"
         shift
         ;;
       --query)
@@ -211,7 +211,7 @@ Examples:
   bash get-bapx.sh --local --local-tag latest
   bash get-bapx.sh --version 0.7.14
   bash get-bapx.sh --query "v=0.7.14"
-  KORTIX_VERSION=0.7.15 bash get-bapx.sh
+  BAPX_VERSION=0.7.15 bash get-bapx.sh
 EOF
         exit 0
         ;;
@@ -225,28 +225,28 @@ EOF
 parse_args "$@"
 
 # If version wasn't explicitly set, resolve the latest from GitHub Releases API.
-if [ -z "$KORTIX_VERSION" ] && [ "$KORTIX_LOCAL_IMAGES" != "1" ]; then
-  KORTIX_VERSION=$(resolve_latest_version)
+if [ -z "$BAPX_VERSION" ] && [ "$BAPX_LOCAL_IMAGES" != "1" ]; then
+  BAPX_VERSION=$(resolve_latest_version)
 fi
-# Ensure KORTIX_VERSION always has a value (fallback to 'latest' tag)
-KORTIX_VERSION="${KORTIX_VERSION:-latest}"
+# Ensure BAPX_VERSION always has a value (fallback to 'latest' tag)
+BAPX_VERSION="${BAPX_VERSION:-latest}"
 
-IMAGE_TAG="$KORTIX_VERSION"
+IMAGE_TAG="$BAPX_VERSION"
 SANDBOX_IMAGE_REPO="bapx/computer"
-if [ "$KORTIX_LOCAL_IMAGES" = "1" ]; then
-  IMAGE_TAG="$KORTIX_LOCAL_TAG"
+if [ "$BAPX_LOCAL_IMAGES" = "1" ]; then
+  IMAGE_TAG="$BAPX_LOCAL_TAG"
   SANDBOX_IMAGE_REPO="bapx/computer"
 fi
 
-FRONTEND_IMAGE="${KORTIX_FRONTEND_IMAGE:-bapx/bapx-frontend:${IMAGE_TAG}}"
-API_IMAGE="${KORTIX_API_IMAGE:-bapx/bapx-api:${IMAGE_TAG}}"
-SANDBOX_IMAGE="${KORTIX_SANDBOX_IMAGE:-${SANDBOX_IMAGE_REPO}:${IMAGE_TAG}}"
+FRONTEND_IMAGE="${BAPX_FRONTEND_IMAGE:-bapx/bapx-frontend:${IMAGE_TAG}}"
+API_IMAGE="${BAPX_API_IMAGE:-bapx/bapx-api:${IMAGE_TAG}}"
+SANDBOX_IMAGE="${BAPX_SANDBOX_IMAGE:-${SANDBOX_IMAGE_REPO}:${IMAGE_TAG}}"
 FRONTEND_IMAGE_OVERRIDDEN="0"
 API_IMAGE_OVERRIDDEN="0"
 SANDBOX_IMAGE_OVERRIDDEN="0"
-[ -n "${KORTIX_FRONTEND_IMAGE:-}" ] && FRONTEND_IMAGE_OVERRIDDEN="1"
-[ -n "${KORTIX_API_IMAGE:-}" ] && API_IMAGE_OVERRIDDEN="1"
-[ -n "${KORTIX_SANDBOX_IMAGE:-}" ] && SANDBOX_IMAGE_OVERRIDDEN="1"
+[ -n "${BAPX_FRONTEND_IMAGE:-}" ] && FRONTEND_IMAGE_OVERRIDDEN="1"
+[ -n "${BAPX_API_IMAGE:-}" ] && API_IMAGE_OVERRIDDEN="1"
+[ -n "${BAPX_SANDBOX_IMAGE:-}" ] && SANDBOX_IMAGE_OVERRIDDEN="1"
 SUPABASE_POSTGRES_IMAGE="supabase/postgres:15.8.1.085"
 SUPABASE_GOTRUE_IMAGE="supabase/gotrue:v2.186.0"
 SUPABASE_KONG_IMAGE="kong:2.8.1"
@@ -362,18 +362,18 @@ verify_local_image() {
 }
 
 ensure_local_build_requirements() {
-  [ -d "$KORTIX_LOCAL_REPO_ROOT/apps/web" ] || fatal "Local repo root not found at ${KORTIX_LOCAL_REPO_ROOT}."
+  [ -d "$BAPX_LOCAL_REPO_ROOT/apps/web" ] || fatal "Local repo root not found at ${BAPX_LOCAL_REPO_ROOT}."
   [ -x "$PNPM_BIN" ] || fatal "pnpm is required for --build-local."
 }
 
 rebuild_local_images() {
   ensure_local_build_requirements
-  local build_script="$KORTIX_LOCAL_REPO_ROOT/scripts/build-local-images.sh"
+  local build_script="$BAPX_LOCAL_REPO_ROOT/scripts/build-local-images.sh"
   [ -f "$build_script" ] || fatal "Local build script not found: ${build_script}"
 
-  info "Rebuilding local installer images from ${KORTIX_LOCAL_REPO_ROOT}"
+  info "Rebuilding local installer images from ${BAPX_LOCAL_REPO_ROOT}"
   echo ""
-  bash "$build_script" --tag "$KORTIX_LOCAL_TAG"
+  bash "$build_script" --tag "$BAPX_LOCAL_TAG"
   success "Local images rebuilt"
 }
 
@@ -408,9 +408,9 @@ docker_manifest_exists() {
 }
 
 resolve_release_images() {
-  [ "$KORTIX_LOCAL_IMAGES" = "1" ] && return 0
+  [ "$BAPX_LOCAL_IMAGES" = "1" ] && return 0
 
-  dots "Resolving images for v${KORTIX_VERSION}"
+  dots "Resolving images for v${BAPX_VERSION}"
 
   if ! docker_manifest_exists "$FRONTEND_IMAGE"; then
     if [ "$FRONTEND_IMAGE_OVERRIDDEN" = "1" ]; then
@@ -421,7 +421,7 @@ resolve_release_images() {
       warn "Frontend image ${FRONTEND_IMAGE} not found; falling back to ${fallback_frontend}"
       FRONTEND_IMAGE="$fallback_frontend"
     else
-      fatal "Frontend image not found for ${KORTIX_VERSION}, and latest fallback is unavailable."
+      fatal "Frontend image not found for ${BAPX_VERSION}, and latest fallback is unavailable."
     fi
   fi
 
@@ -434,7 +434,7 @@ resolve_release_images() {
       warn "API image ${API_IMAGE} not found; falling back to ${fallback_api}"
       API_IMAGE="$fallback_api"
     else
-      fatal "API image not found for ${KORTIX_VERSION}, and latest fallback is unavailable."
+      fatal "API image not found for ${BAPX_VERSION}, and latest fallback is unavailable."
     fi
   fi
 
@@ -447,7 +447,7 @@ resolve_release_images() {
       warn "Sandbox image ${SANDBOX_IMAGE} not found; falling back to ${fallback_sandbox}"
       SANDBOX_IMAGE="$fallback_sandbox"
     else
-      fatal "Sandbox image not found for ${KORTIX_VERSION}, and latest fallback is unavailable."
+      fatal "Sandbox image not found for ${BAPX_VERSION}, and latest fallback is unavailable."
     fi
   fi
 
@@ -459,7 +459,7 @@ pull_images_parallel() {
   [ ${#images[@]} -gt 0 ] || return 0
 
   printf '%s\n' "${images[@]}" | python3 -c 'import sys; print("\n".join(sorted(set(line.strip() for line in sys.stdin if line.strip()))))' \
-    | xargs -r -n1 -P "$KORTIX_PULL_PARALLELISM" docker pull
+    | xargs -r -n1 -P "$BAPX_PULL_PARALLELISM" docker pull
 }
 
 # Free ports used by Bapx (local mode)
@@ -539,7 +539,7 @@ EOF
   printf "${NC}\n"
   printf "    ${WHITE}The Autonomous Company Operating System${NC}\n"
   printf "\n"
-  printf "    ${FADED}v${KORTIX_VERSION}  ·  One-Click Installer  ·  Local or VPS${NC}\n"
+  printf "    ${FADED}v${BAPX_VERSION}  ·  One-Click Installer  ·  Local or VPS${NC}\n"
   printf "\n"
 }
 
@@ -830,7 +830,7 @@ ALTER ROLE supabase_admin WITH PASSWORD 'POSTGRES_PASSWORD_PLACEHOLDER';
 ROLESEOF
 
   # Bapx extensions and schemas
-  cat > "$INSTALL_DIR/volumes/db/bapx.sql" << 'KORTIXEOF'
+  cat > "$INSTALL_DIR/volumes/db/bapx.sql" << 'BAPXEOF'
 -- Bapx bootstrap: extensions and schemas
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 CREATE EXTENSION IF NOT EXISTS pg_net;
@@ -863,7 +863,7 @@ GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
-KORTIXEOF
+BAPXEOF
 
   dots "Writing DB init scripts"; dots_done
 }
@@ -1011,13 +1011,13 @@ ${supabase_ports}
     # Both modes use the same HTTP-based pattern: Kong is exposed on host port
     # 13740 via the bind address. The frontend container uses extra_hosts to
     # resolve localhost to the host gateway.
-    frontend_supabase_env="      - KORTIX_PUBLIC_SUPABASE_URL=\${SUPABASE_PUBLIC_URL}
-      - KORTIX_PUBLIC_SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
-      - KORTIX_PUBLIC_BACKEND_URL=\${API_PUBLIC_URL}/v1
-      - KORTIX_PUBLIC_BILLING_ENABLED=false
-      - KORTIX_PUBLIC_ENV_MODE=local
-      - KORTIX_PUBLIC_APP_URL=\${PUBLIC_URL}
-      - KORTIX_PUBLIC_SANDBOX_ID=\${SANDBOX_CONTAINER_NAME}
+    frontend_supabase_env="      - BAPX_PUBLIC_SUPABASE_URL=\${SUPABASE_PUBLIC_URL}
+      - BAPX_PUBLIC_SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
+      - BAPX_PUBLIC_BACKEND_URL=\${API_PUBLIC_URL}/v1
+      - BAPX_PUBLIC_BILLING_ENABLED=false
+      - BAPX_PUBLIC_ENV_MODE=local
+      - BAPX_PUBLIC_APP_URL=\${PUBLIC_URL}
+      - BAPX_PUBLIC_SANDBOX_ID=\${SANDBOX_CONTAINER_NAME}
       - SUPABASE_URL=\${SUPABASE_PUBLIC_URL}
       - SUPABASE_SERVER_URL=http://supabase-kong:8000
       - SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
@@ -1029,13 +1029,13 @@ ${supabase_ports}
   else
     # External mode — no Supabase containers
     api_depends="    # External Supabase — no local dependencies"
-    frontend_supabase_env="      - KORTIX_PUBLIC_SUPABASE_URL=\${SUPABASE_URL}
-      - KORTIX_PUBLIC_SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
-      - KORTIX_PUBLIC_BACKEND_URL=\${API_PUBLIC_URL}/v1
-      - KORTIX_PUBLIC_BILLING_ENABLED=false
-      - KORTIX_PUBLIC_ENV_MODE=local
-      - KORTIX_PUBLIC_APP_URL=\${PUBLIC_URL}
-      - KORTIX_PUBLIC_SANDBOX_ID=\${SANDBOX_CONTAINER_NAME}
+    frontend_supabase_env="      - BAPX_PUBLIC_SUPABASE_URL=\${SUPABASE_URL}
+      - BAPX_PUBLIC_SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
+      - BAPX_PUBLIC_BACKEND_URL=\${API_PUBLIC_URL}/v1
+      - BAPX_PUBLIC_BILLING_ENABLED=false
+      - BAPX_PUBLIC_ENV_MODE=local
+      - BAPX_PUBLIC_APP_URL=\${PUBLIC_URL}
+      - BAPX_PUBLIC_SANDBOX_ID=\${SANDBOX_CONTAINER_NAME}
       - SUPABASE_URL=\${SUPABASE_URL}
       - SUPABASE_ANON_KEY=\${SUPABASE_ANON_KEY}
       - BACKEND_URL=\${API_PUBLIC_URL}/v1"
@@ -1070,19 +1070,19 @@ ${supabase_url_env}
 ${supabase_db_env}
       - SUPABASE_SERVICE_ROLE_KEY=\${SUPABASE_SERVICE_ROLE_KEY}
       - ALLOWED_SANDBOX_PROVIDERS=local_docker
-      - KORTIX_LOCAL_IMAGES=\${KORTIX_LOCAL_IMAGES}
+      - BAPX_LOCAL_IMAGES=\${BAPX_LOCAL_IMAGES}
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - KORTIX_URL=http://bapx-api:8008/v1/router
+      - BAPX_URL=http://bapx-api:8008/v1/router
       - SANDBOX_NETWORK=${SANDBOX_NETWORK}
       - INTERNAL_SERVICE_KEY=\${INTERNAL_SERVICE_KEY}
       - FRONTEND_URL=\${PUBLIC_URL}
       - API_KEY_SECRET=\${API_KEY_SECRET}
       - CORS_ALLOWED_ORIGINS=\${PUBLIC_URL}
       - SANDBOX_IMAGE=\${SANDBOX_IMAGE}
-      - SANDBOX_VERSION=\${KORTIX_VERSION}
+      - SANDBOX_VERSION=\${BAPX_VERSION}
       - TUNNEL_SIGNING_SECRET=\${TUNNEL_SIGNING_SECRET}
-      - KORTIX_ROUTER_INTERNAL_ENABLED=false
-      - KORTIX_BILLING_INTERNAL_ENABLED=false
+      - BAPX_ROUTER_INTERNAL_ENABLED=false
+      - BAPX_BILLING_INTERNAL_ENABLED=false
     env_file:
       - .env
     volumes:
@@ -1109,9 +1109,9 @@ write_env() {
 DEPLOY_MODE=${DEPLOY_MODE}
 DB_MODE=${DB_MODE}
 COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
-KORTIX_LOCAL_IMAGES=${KORTIX_LOCAL_IMAGES}
-KORTIX_LOCAL_TAG=${KORTIX_LOCAL_TAG}
-KORTIX_LOCAL_REPO_ROOT=${KORTIX_LOCAL_REPO_ROOT}
+BAPX_LOCAL_IMAGES=${BAPX_LOCAL_IMAGES}
+BAPX_LOCAL_TAG=${BAPX_LOCAL_TAG}
+BAPX_LOCAL_REPO_ROOT=${BAPX_LOCAL_REPO_ROOT}
 
 # ─── URLs ────────────────────────────────────────────────────────────────────
 PUBLIC_URL=${PUBLIC_URL}
@@ -1144,14 +1144,14 @@ SLACK_CLIENT_SECRET=${SLACK_CLIENT_SECRET}
 SLACK_SIGNING_SECRET=${SLACK_SIGNING_SECRET}
 
 # ─── Sandbox ─────────────────────────────────────────────────────────────────
-KORTIX_VERSION=${KORTIX_VERSION}
+BAPX_VERSION=${BAPX_VERSION}
 FRONTEND_IMAGE=${FRONTEND_IMAGE}
 API_IMAGE=${API_IMAGE}
 SANDBOX_IMAGE=${SANDBOX_IMAGE}
 SANDBOX_NETWORK=${SANDBOX_NETWORK}
 SANDBOX_CONTAINER_NAME=${SANDBOX_CONTAINER_NAME}
 SANDBOX_PORT_BASE=${SANDBOX_PORT_BASE}
-KORTIX_SANDBOX_VERSION=${KORTIX_VERSION}
+BAPX_SANDBOX_VERSION=${BAPX_VERSION}
 ENVEOF
 
   chmod 600 "$INSTALL_DIR/.env"
@@ -1177,8 +1177,8 @@ DATABASE_URL=${host_database_url}
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 DOCKER_HOST=${host_docker_host}
 ALLOWED_SANDBOX_PROVIDERS=local_docker
-KORTIX_LOCAL_IMAGES=${KORTIX_LOCAL_IMAGES}
-KORTIX_URL=${API_PUBLIC_URL}/v1/router
+BAPX_LOCAL_IMAGES=${BAPX_LOCAL_IMAGES}
+BAPX_URL=${API_PUBLIC_URL}/v1/router
 SANDBOX_NETWORK=${host_sandbox_network}
 INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY}
 ENVEOF
@@ -1240,14 +1240,14 @@ prompt_read() {
 }
 
 # Installed release metadata is persisted in .env so updates stay pinned.
-VERSION=$(grep -m1 '^KORTIX_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
+VERSION=$(grep -m1 '^BAPX_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
 FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/bapx-frontend:${VERSION}")
 API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/bapx-api:${VERSION}")
 SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/computer:${VERSION}")
 SANDBOX_NAME=$(grep -m1 '^SANDBOX_CONTAINER_NAME=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx-hosted-sandbox")
-LOCAL_IMAGES=$(grep -m1 '^KORTIX_LOCAL_IMAGES=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "0")
-LOCAL_TAG=$(grep -m1 '^KORTIX_LOCAL_TAG=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "latest")
-LOCAL_REPO_ROOT=$(grep -m1 '^KORTIX_LOCAL_REPO_ROOT=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "")
+LOCAL_IMAGES=$(grep -m1 '^BAPX_LOCAL_IMAGES=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "0")
+LOCAL_TAG=$(grep -m1 '^BAPX_LOCAL_TAG=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "latest")
+LOCAL_REPO_ROOT=$(grep -m1 '^BAPX_LOCAL_REPO_ROOT=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "")
 
 _resolve_latest_version() {
   local gh_version
@@ -1282,7 +1282,7 @@ PY
 }
 
 _refresh_state_from_env() {
-  VERSION=$(grep -m1 '^KORTIX_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
+  VERSION=$(grep -m1 '^BAPX_VERSION=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "unknown")
   FRONTEND_IMAGE=$(grep -m1 '^FRONTEND_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/bapx-frontend:${VERSION}")
   API_IMAGE=$(grep -m1 '^API_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/bapx-api:${VERSION}")
   SANDBOX_IMAGE=$(grep -m1 '^SANDBOX_IMAGE=' "$DIR/.env" 2>/dev/null | cut -d= -f2- || echo "bapx/computer:${VERSION}")
@@ -1439,7 +1439,7 @@ _using_local_images() {
 }
 
 _rebuild_local_images() {
-  [ -n "$LOCAL_REPO_ROOT" ] || { _err "KORTIX_LOCAL_REPO_ROOT is not set"; exit 1; }
+  [ -n "$LOCAL_REPO_ROOT" ] || { _err "BAPX_LOCAL_REPO_ROOT is not set"; exit 1; }
   local build_script="$LOCAL_REPO_ROOT/scripts/build-local-images.sh"
   [ -f "$build_script" ] || { _err "Build script not found: ${build_script}"; exit 1; }
   bash "$build_script" --tag "$LOCAL_TAG"
@@ -1598,8 +1598,8 @@ case "${1:-help}" in
         FRONTEND_IMAGE="bapx/bapx-frontend:${VERSION}"
         API_IMAGE="bapx/bapx-api:${VERSION}"
         SANDBOX_IMAGE="bapx/computer:${VERSION}"
-        _env_set KORTIX_VERSION "$VERSION"
-        _env_set KORTIX_SANDBOX_VERSION "$VERSION"
+        _env_set BAPX_VERSION "$VERSION"
+        _env_set BAPX_SANDBOX_VERSION "$VERSION"
         _env_set FRONTEND_IMAGE "$FRONTEND_IMAGE"
         _env_set API_IMAGE "$API_IMAGE"
         _env_set SANDBOX_IMAGE "$SANDBOX_IMAGE"
@@ -1714,8 +1714,8 @@ pull_and_start() {
 
   section "Docker Images"
 
-  if [ "$KORTIX_LOCAL_IMAGES" = "1" ]; then
-    if [ "$KORTIX_BUILD_LOCAL_IMAGES" = "1" ]; then
+  if [ "$BAPX_LOCAL_IMAGES" = "1" ]; then
+    if [ "$BAPX_BUILD_LOCAL_IMAGES" = "1" ]; then
       rebuild_local_images
     fi
     info "Using local images (skipping registry)"

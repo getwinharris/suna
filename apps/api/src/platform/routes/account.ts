@@ -115,7 +115,7 @@ export function createAccountRouter(
       // In cloud billing mode, managed VPS provisioning is paid-only.
       // Free/new accounts must complete billing setup first (or connect custom instance).
       const targetProvider = requestedProvider || getDefaultProviderName();
-      if (config.KORTIX_BILLING_INTERNAL_ENABLED && targetProvider === 'justavps') {
+      if (config.BAPX_BILLING_INTERNAL_ENABLED && targetProvider === 'justavps') {
         const [{ getCreditAccount }, { isPaidTier }] = await Promise.all([
           import('../../billing/repositories/credit-accounts'),
           import('../../billing/services/tiers'),
@@ -298,7 +298,7 @@ export function createAccountRouter(
             accountId,
             userId,
             name: sandboxName,
-            envVars: { KORTIX_TOKEN: sandboxKey.secretKey },
+            envVars: { BAPX_TOKEN: sandboxKey.secretKey },
           });
         } catch (createErr) {
           const message = createErr instanceof Error ? createErr.message : String(createErr);
@@ -373,7 +373,7 @@ export function createAccountRouter(
             accountId,
             userId,
             name: sandboxName,
-            envVars: { KORTIX_TOKEN: sandboxKey.secretKey },
+            envVars: { BAPX_TOKEN: sandboxKey.secretKey },
           });
 
           await db

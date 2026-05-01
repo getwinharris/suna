@@ -488,7 +488,7 @@ function tokenize(code: string): { text: string; color: string }[] {
     if (li > 0) tokens.push({ text: '\n', color: TOKEN_COLORS.default });
     const line = lines[li];
 
-    // Heredoc delimiter lines (e.g. KORTIX_KEY, KORTIX_SSH_CONFIG)
+    // Heredoc delimiter lines (e.g. BAPX_KEY, BAPX_SSH_CONFIG)
     if (/^[A-Z_]+$/.test(line.trim())) {
       tokens.push({ text: line, color: TOKEN_COLORS.string });
       continue;

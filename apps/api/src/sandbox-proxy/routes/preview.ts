@@ -10,7 +10,7 @@ import {
 } from '../../shared/preview-ownership';
 import {
   encodeBapxUserContext,
-  KORTIX_USER_CONTEXT_HEADER,
+  BAPX_USER_CONTEXT_HEADER,
 } from '../../shared/bapx-user-context';
 
 interface PreviewProxyContext {
@@ -190,7 +190,7 @@ export async function proxyToDaytona(
       if (previewToken) {
         headers.set('X-Daytona-Preview-Token', previewToken);
       }
-      // Authenticate to the sandbox using the stored service key (= KORTIX_TOKEN).
+      // Authenticate to the sandbox using the stored service key (= BAPX_TOKEN).
       // This replaces the user's Supabase JWT with the sandbox's INTERNAL_SERVICE_KEY.
       if (serviceKey) {
         headers.set('Authorization', `Bearer ${serviceKey}`);
@@ -205,7 +205,7 @@ export async function proxyToDaytona(
         const payload = await resolvePreviewUserContext(sandboxId, userId);
         if (payload) {
           const signed = encodeBapxUserContext(payload, serviceKey);
-          headers.set(KORTIX_USER_CONTEXT_HEADER, signed);
+          headers.set(BAPX_USER_CONTEXT_HEADER, signed);
           console.log(
             `[PREVIEW] signing X-Bapx-User-Context user=${userId} sandbox=${sandboxId} role=${payload.sandboxRole} tokenPrefix=${signed.slice(0, 16)}`,
           );

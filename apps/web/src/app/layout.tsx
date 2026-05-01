@@ -116,7 +116,7 @@ export default async function RootLayout({
             Docker images get correct env vars regardless of build-time defaults. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.__KORTIX_RUNTIME_CONFIG=${JSON.stringify(runtimeEnv)};window.__RUNTIME_ENV=window.__KORTIX_RUNTIME_CONFIG;`,
+            __html: `window.__BAPX_RUNTIME_CONFIG=${JSON.stringify(runtimeEnv)};window.__RUNTIME_ENV=window.__BAPX_RUNTIME_CONFIG;`,
           }}
         />
 

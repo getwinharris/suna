@@ -30,7 +30,7 @@ export interface QueuedMessagePersisted {
 
 function getDataDir(): string {
   // Prefer explicit env var, otherwise default to <cwd>/.bapx-data/queue
-  const base = process.env.KORTIX_DATA_DIR || resolve(process.cwd(), '.bapx-data');
+  const base = process.env.BAPX_DATA_DIR || resolve(process.cwd(), '.bapx-data');
   const dir = resolve(base, 'queue');
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });

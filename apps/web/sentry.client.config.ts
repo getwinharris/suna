@@ -18,7 +18,7 @@ function isBrowserNoiseEvent(event: Sentry.ErrorEvent): boolean {
 if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
-    environment: process.env.NEXT_PUBLIC_KORTIX_ENV || 'dev',
+    environment: process.env.NEXT_PUBLIC_BAPX_ENV || 'dev',
 
     // Capture 100% of errors
     // Sample 10% of page loads for performance (keep low on client)

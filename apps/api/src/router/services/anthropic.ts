@@ -1,4 +1,4 @@
-import { config, KORTIX_MARKUP } from '../../config';
+import { config, BAPX_MARKUP } from '../../config';
 import type { ModelConfig } from '../config/models';
 
 const ANTHROPIC_VERSION = '2023-06-01';
@@ -73,7 +73,7 @@ export function extractAnthropicUsage(responseBody: any): AnthropicUsage | null 
 export function calculateAnthropicCost(
   modelConfig: ModelConfig,
   usage: AnthropicUsage,
-  markup: number = KORTIX_MARKUP,
+  markup: number = BAPX_MARKUP,
 ): number {
   const { inputTokens, outputTokens, cacheCreationInputTokens, cacheReadInputTokens } = usage;
 

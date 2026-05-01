@@ -282,7 +282,7 @@ export function createCloudSandboxRouter(
       const sandboxName = await generateSandboxName(accountId, customName);
 
       // Managed VPS sandboxes are billed independently as their own Stripe subscriptions.
-      if (isManagedVpsProvider(providerName) && config.KORTIX_BILLING_INTERNAL_ENABLED) {
+      if (isManagedVpsProvider(providerName) && config.BAPX_BILLING_INTERNAL_ENABLED) {
         const { getCustomerByAccountId } = await import('../../billing/repositories/customers');
         const { getOrCreateStripeCustomer } = await import('../../billing/services/subscriptions');
         const { getComputeProductId, getComputeDisplayPriceCents, getComputeDescription, COMPUTE_PRICE_MARKUP } = await import('../../billing/services/tiers');
@@ -484,7 +484,7 @@ export function createCloudSandboxRouter(
         serverType: requestedServerType,
         location: requestedLocation,
         envVars: {
-          KORTIX_TOKEN: sandboxKey.secretKey,
+          BAPX_TOKEN: sandboxKey.secretKey,
         },
       };
 
@@ -1040,7 +1040,7 @@ export function createCloudSandboxRouter(
       let cancelAt: string | null = null;
 
       const stripeSubId = existingMeta.stripe_subscription_id as string | undefined;
-      if (stripeSubId && config.KORTIX_BILLING_INTERNAL_ENABLED) {
+      if (stripeSubId && config.BAPX_BILLING_INTERNAL_ENABLED) {
         try {
           const { getStripe } = await import('../../shared/stripe');
           const stripe = getStripe();
@@ -1115,7 +1115,7 @@ export function createCloudSandboxRouter(
       }
 
       const stripeSubId = existingMeta.stripe_subscription_id as string | undefined;
-      if (stripeSubId && config.KORTIX_BILLING_INTERNAL_ENABLED) {
+      if (stripeSubId && config.BAPX_BILLING_INTERNAL_ENABLED) {
         try {
           const { getStripe } = await import('../../shared/stripe');
           const stripe = getStripe();

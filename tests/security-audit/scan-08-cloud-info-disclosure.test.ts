@@ -89,8 +89,8 @@ describe('Cloud Scan: Information Disclosure', () => {
       const hasInternalDetails =
         changelogStr.includes('localhost') ||
         changelogStr.includes('OpenCode') ||
-        changelogStr.includes('KORTIX_TOKEN') ||
-        changelogStr.includes('KORTIX_API_URL');
+        changelogStr.includes('BAPX_TOKEN') ||
+        changelogStr.includes('BAPX_API_URL');
       // The changelog reveals internal env var names and architecture
       expect(hasInternalDetails).toBe(true);
     });

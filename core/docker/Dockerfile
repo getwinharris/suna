@@ -132,7 +132,7 @@ RUN apt-get update \
 
 # ── Skill system dependencies ────────────────────────────────────────────────
 # Tools referenced by skills in opencode/skills/GENERAL-KNOWLEDGE-WORKER/
-# and opencode/skills/KORTIX-system/. Installed here so they're baked into
+# and opencode/skills/BAPX-system/. Installed here so they're baked into
 # the image rather than downloaded at runtime.
 # poppler-utils: pdftotext, pdftoppm, pdfimages (pdf skill)
 # qpdf: PDF merge/split/encrypt/repair (pdf skill)
@@ -270,7 +270,7 @@ RUN mkdir -p /workspace/.browser-profile \
     && git config --system --add safe.directory '*' \
     && echo "abc ALL=(root) NOPASSWD: /usr/bin/s6-svc, /bin/s6-svc, /usr/sbin/s6-svc, /usr/bin/s6-rc, /bin/s6-rc" >> /etc/sudoers
 WORKDIR /workspace
-ENV KORTIX_WORKSPACE=/workspace
+ENV BAPX_WORKSPACE=/workspace
 
 # NOTE: Persistent package ENVs (PYTHONUSERBASE, PIP_USER, NPM_CONFIG_PREFIX)
 # are set AFTER the build step — see "Runtime persistence" section below.
@@ -360,8 +360,8 @@ RUN set -eo pipefail && echo "[docker] Building sandbox runtime v${SANDBOX_VERSI
     # ── 1b. Install Bapx CLI wrappers into /usr/local/bin ── \
     /ephemeral/bapx-master/scripts/install-channel-clis.sh && \
     \
-    # ── 2. skills shipped in-tree under skills/KORTIX-system/ (recursive discovery) ── \
-    echo "[docker] skills: agent-tunnel, agent-browser, presentations in /ephemeral/bapx-master/opencode/skills/KORTIX-system/" && \
+    # ── 2. skills shipped in-tree under skills/BAPX-system/ (recursive discovery) ── \
+    echo "[docker] skills: agent-tunnel, agent-browser, presentations in /ephemeral/bapx-master/opencode/skills/BAPX-system/" && \
     \
     # ── 4. Agent browser viewer ── \
     mkdir -p /ephemeral/agent-browser-viewer && \
@@ -425,11 +425,11 @@ ENV AGENT_BROWSER_USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb
 ENV AGENT_BROWSER_IDLE_TIMEOUT_MS=0
 ENV AGENT_BROWSER_STREAM_PORT=9223
 ENV OPENCODE_CONFIG_DIR=/ephemeral/bapx-master/opencode
-ENV KORTIX_PERSISTENT_ROOT=/persistent
+ENV BAPX_PERSISTENT_ROOT=/persistent
 ENV OPENCODE_STORAGE_BASE=/persistent/opencode
 ENV OPENCODE_SHADOW_STORAGE_BASE=/persistent/opencode-shadow
-ENV KORTIX_OPENCODE_ARCHIVE_DIR=/persistent/opencode-archive
-ENV KORTIX_OPENCODE_CACHE_DIR=/persistent/opencode-cache
+ENV BAPX_OPENCODE_ARCHIVE_DIR=/persistent/opencode-archive
+ENV BAPX_OPENCODE_CACHE_DIR=/persistent/opencode-cache
 ENV AUTH_JSON_PATH=/persistent/opencode/auth.json
 ENV SECRET_FILE_PATH=/persistent/secrets/.secrets.json
 ENV SALT_FILE_PATH=/persistent/secrets/.salt

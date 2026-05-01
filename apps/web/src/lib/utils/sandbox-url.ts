@@ -82,7 +82,7 @@ const SUBDOMAIN_URL_REGEX =
 const EXCLUDED_PORTS = new Set([
   22, // SSH daemon — never preview/probe as HTTP
   4096, // OpenCode API (proxied by Bapx Master)
-  parseInt(SANDBOX_PORTS.KORTIX_MASTER, 10), // Bapx Master itself
+  parseInt(SANDBOX_PORTS.BAPX_MASTER, 10), // Bapx Master itself
 ]);
 
 // ── Internal helpers ─────────────────────────────────────────────────────────
@@ -146,7 +146,7 @@ function extractLocalhostCandidate(text: string): string | null {
  * The agent inside the sandbox sees these URLs; the frontend needs to
  * extract the real service port and remaining path.
  */
-const KORTIX_MASTER_PROXY_REGEX = /^\/proxy\/(\d{1,5})(\/.*)?$/;
+const BAPX_MASTER_PROXY_REGEX = /^\/proxy\/(\d{1,5})(\/.*)?$/;
 
 /**
  * Known frontend app route prefixes. URLs with these pathnames on
@@ -209,9 +209,9 @@ export function parseLocalhostUrl(
 
     // Special case: localhost:8000/proxy/{port}/... (Bapx Master proxy URL).
     // Extract the real port and remaining path so detection/rewriting works.
-    const bapxMasterPort = parseInt(SANDBOX_PORTS.KORTIX_MASTER, 10);
+    const bapxMasterPort = parseInt(SANDBOX_PORTS.BAPX_MASTER, 10);
     if (port === bapxMasterPort) {
-      const proxyMatch = parsed.pathname.match(KORTIX_MASTER_PROXY_REGEX);
+      const proxyMatch = parsed.pathname.match(BAPX_MASTER_PROXY_REGEX);
       if (proxyMatch) {
         const realPort = parseInt(proxyMatch[1], 10);
         if (realPort >= 1 && realPort <= 65535) {
@@ -580,7 +580,7 @@ export function buildWebProxyUrl(
     const scheme = parsed.protocol.replace(':', '');
     const proxyPath = `${WEB_PROXY_PATH_PREFIX}${scheme}/${parsed.host}${parsed.pathname}${parsed.search}${parsed.hash}`;
 
-    const kmPort = parseInt(SANDBOX_PORTS.KORTIX_MASTER, 10); // 8000
+    const kmPort = parseInt(SANDBOX_PORTS.BAPX_MASTER, 10); // 8000
     const baseUrl = rewriteLocalhostUrl(kmPort, '/', subdomainOpts);
     return `${baseUrl.replace(/\/$/, '')}${proxyPath}`;
   } catch {

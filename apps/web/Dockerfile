@@ -46,7 +46,7 @@ RUN rm -f /app/apps/web/.env /app/apps/web/.env.local /app/apps/web/.env.product
 COPY apps/web/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-# In local mode (no KORTIX_PUBLIC_URL), runs as nextjs user via CMD.
+# In local mode (no BAPX_PUBLIC_URL), runs as nextjs user via CMD.
 # In VPS mode, entrypoint does sed as root, then exec's node as nextjs.
 USER nextjs
 

@@ -43,22 +43,22 @@ export class DaytonaProvider implements SandboxProvider {
 
     const daytona = getDaytona();
 
-    // Use KORTIX_TOKEN as INTERNAL_SERVICE_KEY — one key for both directions.
-    // KORTIX_TOKEN (sandbox → api) is already in opts.envVars.
+    // Use BAPX_TOKEN as INTERNAL_SERVICE_KEY — one key for both directions.
+    // BAPX_TOKEN (sandbox → api) is already in opts.envVars.
     // INTERNAL_SERVICE_KEY (api → sandbox) is the same value so the proxy can auth.
-    const serviceKey = opts.envVars?.KORTIX_TOKEN || '';
+    const serviceKey = opts.envVars?.BAPX_TOKEN || '';
 
     // Strip /v1/router suffix — opencode.jsonc appends it already.
-    // KORTIX_URL may be "https://new-api.bapx.in/v1/router" but the
+    // BAPX_URL may be "https://new-api.bapx.in/v1/router" but the
     // sandbox expects the base: "https://new-api.bapx.in".
-    const sandboxApiBase = config.KORTIX_URL.replace(/\/v1\/router\/?$/, '');
+    const sandboxApiBase = config.BAPX_URL.replace(/\/v1\/router\/?$/, '');
     const routerBase = `${sandboxApiBase}/v1/router`;
 
     const daytonaSandbox = await daytona.create(
       {
         snapshot,
         envVars: {
-          KORTIX_API_URL: sandboxApiBase,
+          BAPX_API_URL: sandboxApiBase,
           ENV_MODE: 'cloud',
           INTERNAL_SERVICE_KEY: serviceKey,
           TUNNEL_API_URL: sandboxApiBase,
@@ -79,7 +79,7 @@ export class DaytonaProvider implements SandboxProvider {
     );
 
     const externalId = daytonaSandbox.id;
-    const apiBase = config.KORTIX_URL.replace(/\/v1\/router\/?$/, '').replace(/\/v1\/?$/, '');
+    const apiBase = config.BAPX_URL.replace(/\/v1\/router\/?$/, '').replace(/\/v1\/?$/, '');
     const baseUrl = `${apiBase}/v1/p/${externalId}/8000`;
 
     return {

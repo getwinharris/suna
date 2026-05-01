@@ -8,11 +8,11 @@
  * - extractSessionReport: parses session-report tags into structured data
  */
 
-const KORTIX_SYSTEM_RE = /<bapx_system[^>]*>[\s\S]*?<\/bapx_system>/gi
+const BAPX_SYSTEM_RE = /<bapx_system[^>]*>[\s\S]*?<\/bapx_system>/gi
 
 export function stripBapxSystemTags(text: string): string {
 	if (!text) return ""
-	return text.replace(KORTIX_SYSTEM_RE, "").trim()
+	return text.replace(BAPX_SYSTEM_RE, "").trim()
 }
 
 // ── Session Report extraction ────────────────────────────────────────────────
@@ -65,7 +65,7 @@ export interface BapxSystemMessage {
 	detail?: string
 }
 
-const KORTIX_SYSTEM_EXTRACT_RE = /<bapx_system[^>]*?\btype="([^"]*)"[^>]*?\bsource="([^"]*)"[^>]*>([\s\S]*?)<\/bapx_system>/gi
+const BAPX_SYSTEM_EXTRACT_RE = /<bapx_system[^>]*?\btype="([^"]*)"[^>]*?\bsource="([^"]*)"[^>]*>([\s\S]*?)<\/bapx_system>/gi
 
 /**
  * Extract structured info from bapx_system tags for inline UI rendering.
@@ -75,7 +75,7 @@ export function extractBapxSystemMessages(text: string): BapxSystemMessage[] {
 	if (!text) return []
 	const results: BapxSystemMessage[] = []
 	let match: RegExpExecArray | null
-	const re = new RegExp(KORTIX_SYSTEM_EXTRACT_RE.source, "gi")
+	const re = new RegExp(BAPX_SYSTEM_EXTRACT_RE.source, "gi")
 	while ((match = re.exec(text)) !== null) {
 		const type = match[1]
 		const source = match[2]

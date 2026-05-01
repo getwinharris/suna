@@ -1,6 +1,6 @@
 # Development & Release Guide
 
-> How Suna is developed, built, and released.
+> How Bapx is developed, built, and released.
 
 ---
 

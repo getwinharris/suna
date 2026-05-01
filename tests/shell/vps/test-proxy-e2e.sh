@@ -28,7 +28,7 @@
 set -uo pipefail
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-INSTALL_DIR="${KORTIX_HOME:-$HOME/.bapx}"
+INSTALL_DIR="${BAPX_HOME:-$HOME/.bapx}"
 OWNER_EMAIL="${OWNER_EMAIL:-e2e@bapx.ai}"
 OWNER_PASSWORD="${OWNER_PASSWORD:-e2e-test-pass-42}"
 PUBLIC_URL="${PUBLIC_URL:-}"

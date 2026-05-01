@@ -210,7 +210,7 @@ app.use('*', async (c, next) => {
 });
 
 // Pretty JSON in dev mode for easier debugging
-if (config.INTERNAL_KORTIX_ENV === 'dev') {
+if (config.INTERNAL_BAPX_ENV === 'dev') {
   app.use('*', prettyJSON());
 }
 
@@ -362,7 +362,7 @@ app.route('/v1/router', router);        // /v1/router/chat/completions, /v1/rout
 app.route('/v1/billing', billingApp);   // /v1/billing/account-state, /v1/billing/webhooks/*, /v1/billing/setup/*
 app.route('/v1/account', accountDeletionApp); // account deletion status/request/cancel/immediate
 app.route('/v1/platform', platformApp); // /v1/platform/providers, /v1/platform/sandbox/*, /v1/platform/sandbox/version
-if (config.KORTIX_DEPLOYMENTS_ENABLED) {
+if (config.BAPX_DEPLOYMENTS_ENABLED) {
   const { deploymentsApp } = await import('./deployments');
   app.route('/v1/deployments', deploymentsApp); // /v1/deployments/*
 }
@@ -529,7 +529,7 @@ app.notFound((c) => {
 // ─── Auto-register local Docker sandbox in DB ──────────────────────────────
 
 /**
- * Ensure a valid KORTIX_TOKEN exists in the DB and is synced to the sandbox.
+ * Ensure a valid BAPX_TOKEN exists in the DB and is synced to the sandbox.
  *
  * Architecture:
  *   Source of truth: bapx.api_keys table (hash) + sandboxes.config.serviceKey (plaintext)
@@ -570,7 +570,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
   };
 
   // Resolve how sandbox reaches bapx-api
-  const rawUrl = (config.KORTIX_URL || '').replace(/\/v1\/router\/?$/, '');
+  const rawUrl = (config.BAPX_URL || '').replace(/\/v1\/router\/?$/, '');
   let bapxApiUrl = `http://host.docker.internal:${config.PORT}`;
   try {
     const parsed = new URL(rawUrl || `http://localhost:${config.PORT}`);
@@ -595,10 +595,10 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
     const validation = await validateSecretKey(existingServiceKey).catch(() => ({ isValid: false }));
     if (validation.isValid) {
       token = existingServiceKey;
-      console.log('[startup] Reusing existing valid KORTIX_TOKEN from sandbox config');
+      console.log('[startup] Reusing existing valid BAPX_TOKEN from sandbox config');
     } else {
       // Key exists in config but not valid in DB — re-issue
-      console.log('[startup] Existing KORTIX_TOKEN invalid in DB — re-issuing');
+      console.log('[startup] Existing BAPX_TOKEN invalid in DB — re-issuing');
       const [oldKey] = await db.select().from(bapxApiKeys)
         .where(and(eq(bapxApiKeys.sandboxId, sandboxId), eq(bapxApiKeys.type, 'sandbox')));
       if (oldKey) await db.delete(bapxApiKeys).where(eq(bapxApiKeys.keyId, oldKey.keyId));
@@ -610,7 +610,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
     }
   } else {
     // No key at all — first provision
-    console.log('[startup] No KORTIX_TOKEN in sandbox config — creating');
+    console.log('[startup] No BAPX_TOKEN in sandbox config — creating');
     const newKey = await createApiKey({ sandboxId, accountId, title: 'Sandbox Token', type: 'sandbox' });
     token = newKey.secretKey;
     await db.update(sandboxes)
@@ -638,20 +638,20 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
   };
 
   // ─── Check if sandbox already has the correct token ─────────────────────
-  // Read the sandbox's current KORTIX_TOKEN via its /env API. If it already
+  // Read the sandbox's current BAPX_TOKEN via its /env API. If it already
   // matches, skip the sync entirely — no restart, no downtime.
-  const sandboxAlreadyHasToken = async (): Promise<boolean> => (await readSandboxEnvValue('KORTIX_TOKEN')) === token;
+  const sandboxAlreadyHasToken = async (): Promise<boolean> => (await readSandboxEnvValue('BAPX_TOKEN')) === token;
 
-  // Also check KORTIX_API_URL
-  const sandboxAlreadyHasUrl = async (): Promise<boolean> => (await readSandboxEnvValue('KORTIX_API_URL')) === bapxApiUrl;
+  // Also check BAPX_API_URL
+  const sandboxAlreadyHasUrl = async (): Promise<boolean> => (await readSandboxEnvValue('BAPX_API_URL')) === bapxApiUrl;
   const sandboxAlreadyHasInboundKey = async (): Promise<boolean> => (await readSandboxEnvValue('INTERNAL_SERVICE_KEY')) === token;
   const sandboxAlreadyHasYoloKey = async (): Promise<boolean> => {
     if (config.ENV_MODE !== 'cloud') return true;
-    return (await readSandboxEnvValue('KORTIX_YOLO_API_KEY')) === token;
+    return (await readSandboxEnvValue('BAPX_YOLO_API_KEY')) === token;
   };
   const sandboxAlreadyHasYoloUrl = async (): Promise<boolean> => {
     if (config.ENV_MODE !== 'cloud') return true;
-    return (await readSandboxEnvValue('KORTIX_YOLO_URL')) === config.KORTIX_YOLO_URL;
+    return (await readSandboxEnvValue('BAPX_YOLO_URL')) === config.BAPX_YOLO_URL;
   };
 
   // Fast path: if the sandbox already has the correct token AND URL, skip sync.
@@ -697,12 +697,12 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
   // NOTE: The /env POST handler is now idempotent — it won't restart
   // OpenCode if the values are unchanged (belt-and-suspenders with the check above).
   const keysToSync: Record<string, string> = {
-    KORTIX_TOKEN: token,
+    BAPX_TOKEN: token,
     INTERNAL_SERVICE_KEY: token,
     TUNNEL_TOKEN: token,
-    KORTIX_API_URL: bapxApiUrl,
+    BAPX_API_URL: bapxApiUrl,
     TUNNEL_API_URL: bapxApiUrl,
-    ...(config.ENV_MODE === 'cloud' ? { KORTIX_YOLO_API_KEY: token, KORTIX_YOLO_URL: config.KORTIX_YOLO_URL } : {}),
+    ...(config.ENV_MODE === 'cloud' ? { BAPX_YOLO_API_KEY: token, BAPX_YOLO_URL: config.BAPX_YOLO_URL } : {}),
     ...(config.SANDBOX_NETWORK ? { ONBOARDING_COMPLETE: 'true' } : {}),
   };
 
@@ -719,7 +719,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
       });
       if (res.ok) {
         const result = await res.json() as { restarted?: boolean };
-        console.log(`[startup] KORTIX_TOKEN synced via /env API (restarted=${result?.restarted ?? 'unknown'})`);
+        console.log(`[startup] BAPX_TOKEN synced via /env API (restarted=${result?.restarted ?? 'unknown'})`);
         return true;
       }
       console.warn(`[startup] /env API returned ${res.status} for primary auth candidate — trying fallback candidates`);
@@ -735,7 +735,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
         });
         if (retry.ok) {
           const result = await retry.json() as { restarted?: boolean };
-          console.log(`[startup] KORTIX_TOKEN synced via /env API fallback (restarted=${result?.restarted ?? 'unknown'})`);
+          console.log(`[startup] BAPX_TOKEN synced via /env API fallback (restarted=${result?.restarted ?? 'unknown'})`);
           return true;
         }
       }
@@ -756,11 +756,11 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
         );
         rawExecSync(
           `docker exec ${shellQuote(config.SANDBOX_CONTAINER_NAME)} bash -c ${shellQuote(buildBootstrapUpdateCommand({
-            KORTIX_TOKEN: token,
-            KORTIX_API_URL: bapxApiUrl,
+            BAPX_TOKEN: token,
+            BAPX_API_URL: bapxApiUrl,
             INTERNAL_SERVICE_KEY: token,
             TUNNEL_TOKEN: token,
-            ...(config.ENV_MODE === 'cloud' ? { KORTIX_YOLO_API_KEY: token, KORTIX_YOLO_URL: config.KORTIX_YOLO_URL } : {}),
+            ...(config.ENV_MODE === 'cloud' ? { BAPX_YOLO_API_KEY: token, BAPX_YOLO_URL: config.BAPX_YOLO_URL } : {}),
           }))}`,
           { stdio: 'pipe', timeout: 15_000, env: dockerEnv },
         ).toString();
@@ -769,7 +769,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
       }
       // No restart — getEnv() reads from s6 env dir live. OpenCode picks up
       // the new values on the next tool call without a process restart.
-      console.log('[startup] KORTIX_TOKEN synced via docker exec fallback + bootstrap file');
+      console.log('[startup] BAPX_TOKEN synced via docker exec fallback + bootstrap file');
       return true;
     } catch (e: any) {
       console.error(`[startup] docker exec fallback failed: ${e?.message}`);
@@ -789,7 +789,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
     if (config.SANDBOX_NETWORK) return null;
     try {
       const raw = rawExecSync(
-        `docker exec ${shellQuote(config.SANDBOX_CONTAINER_NAME)} python3 -c ${shellQuote("from pathlib import Path; import json; keys=['KORTIX_TOKEN','INTERNAL_SERVICE_KEY','TUNNEL_TOKEN']; print(json.dumps({k:(Path('/run/s6/container_environment')/k).read_text() for k in keys}))")}`,
+        `docker exec ${shellQuote(config.SANDBOX_CONTAINER_NAME)} python3 -c ${shellQuote("from pathlib import Path; import json; keys=['BAPX_TOKEN','INTERNAL_SERVICE_KEY','TUNNEL_TOKEN']; print(json.dumps({k:(Path('/run/s6/container_environment')/k).read_text() for k in keys}))")}`,
         { stdio: 'pipe', timeout: 15_000, env: dockerEnv },
       ).toString();
       return JSON.parse(raw) as Record<string, string>;
@@ -801,7 +801,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
   // Try /env API first, fall back to docker exec
   const synced = await syncViaEnvApi() || syncViaDockerExec();
   if (!synced) {
-    console.error('[startup] FATAL: Could not sync KORTIX_TOKEN to sandbox. LLM calls will fail with 401.');
+    console.error('[startup] FATAL: Could not sync BAPX_TOKEN to sandbox. LLM calls will fail with 401.');
     return token;
   }
 
@@ -812,7 +812,7 @@ async function injectSandboxToken(sandboxId: string, accountId: string): Promise
         forceLocalDockerAuthBundle();
         const bundle = readLocalDockerAuthBundle();
         if (
-          bundle?.KORTIX_TOKEN === token &&
+          bundle?.BAPX_TOKEN === token &&
           bundle?.INTERNAL_SERVICE_KEY === token &&
           bundle?.TUNNEL_TOKEN === token
         ) {
@@ -983,7 +983,7 @@ console.log(`
 ║    /v1/router     (search, LLM, proxy)                    ║
 ║    /v1/billing    (subscriptions, credits, webhooks)       ║
 ║    /v1/platform   (sandbox lifecycle)                      ║
-${config.KORTIX_DEPLOYMENTS_ENABLED ? '║    /v1/deployments (deploy lifecycle)                      ║\n' : ''}║    /v1/pipedream   (Pipedream OAuth integrations)           ║
+${config.BAPX_DEPLOYMENTS_ENABLED ? '║    /v1/deployments (deploy lifecycle)                      ║\n' : ''}║    /v1/pipedream   (Pipedream OAuth integrations)           ║
 ║    /v1/setup      (setup & env management)                 ║
 ║    /v1/queue      (persistent message queue)               ║
 ║    /v1/tunnel     (reverse-tunnel to local machines)         ║
@@ -992,7 +992,7 @@ ${config.KORTIX_DEPLOYMENTS_ENABLED ? '║    /v1/deployments (deploy lifecycle)
 ║  Database:   ${config.DATABASE_URL ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
 ║  Supabase:   ${config.SUPABASE_URL ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
 ║  Stripe:     ${config.STRIPE_SECRET_KEY ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
-║  Billing:    ${(config.KORTIX_BILLING_INTERNAL_ENABLED ? 'ENABLED' : 'DISABLED').padEnd(42)}║
+║  Billing:    ${(config.BAPX_BILLING_INTERNAL_ENABLED ? 'ENABLED' : 'DISABLED').padEnd(42)}║
 ║  Tunnel:     ${(config.TUNNEL_ENABLED ? 'ENABLED' : 'DISABLED').padEnd(42)}║
 ║  Providers:  ${config.ALLOWED_SANDBOX_PROVIDERS.join(', ').padEnd(42)}║
 ╚═══════════════════════════════════════════════════════════╝

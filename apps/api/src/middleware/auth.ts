@@ -3,7 +3,7 @@ import { HTTPException } from 'hono/http-exception';
 import { validateSecretKey } from '../repositories/api-keys';
 import { isBapxToken } from '../shared/crypto';
 import { canAccessPreviewSandbox } from '../shared/preview-ownership';
-import { getTrailbase } from '../shared/trailbase';
+import { getTrailbaseUser } from '../shared/trailbase';
 import { verifyTrailbaseJwt } from '../shared/jwt-verify';
 import { config } from '../config';
 import { setSentryUser } from '../lib/sentry';
@@ -117,8 +117,7 @@ export async function trailbaseAuth(c: Context, next: Next) {
   }
 
   try {
-    const trailbase = getTrailbase();
-    const user = await trailbase.auth.getUser(token);
+    const user = await getTrailbaseUser(token);
 
     if (!user) {
       throw new HTTPException(401, { message: 'Invalid or expired token' });
@@ -259,8 +258,7 @@ export async function combinedAuth(c: Context, next: Next) {
 
   // JWKS not yet loaded — fall back to network getUser() call
   try {
-    const trailbase = getTrailbase();
-    const user = await trailbase.auth.getUser(token);
+    const user = await getTrailbaseUser(token);
 
     if (!user) {
       throw new HTTPException(401, { message: 'Invalid or expired token' });

@@ -999,7 +999,7 @@
       "title": "System Prompt",
       "description": "Define how your worker should behave and what it should do",
       "loading": "Loading instructions...",
-      "cannotEditSuna": "bapX's system prompt is managed centrally and cannot be edited.",
+      "cannotEditBapx": "bapX's system prompt is managed centrally and cannot be edited.",
       "cannotEdit": "This system prompt cannot be edited.",
       "placeholder": "Define how your worker should behave...",
       "saving": "Saving...",

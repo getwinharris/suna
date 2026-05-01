@@ -10,7 +10,7 @@ export * from './hooks';
 export { agentKeys, useAgents, useAgent, useCreateAgent, useUpdateAgent, useDeleteAgent } from './hooks';
 
 /**
- * Check if an agent is the default Bapx/SUNA agent
+ * Check if an agent is the default Bapx/BAPX agent
  * Uses metadata and name checks - no hardcoded IDs
  */
 export const isBapxDefaultAgent = (agent?: { 

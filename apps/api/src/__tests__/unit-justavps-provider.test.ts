@@ -101,7 +101,7 @@ describe('JustAVPS provider bootstrap script resolution', () => {
       accountId: 'acc12345-0000-4000-a000-000000000001',
       userId: 'user-1',
       name: 'Recovered sandbox',
-      envVars: { KORTIX_TOKEN: 'bapx_sb_test' },
+      envVars: { BAPX_TOKEN: 'bapx_sb_test' },
     } as any);
 
     expect(result.externalId).toBe('machine-recovered');

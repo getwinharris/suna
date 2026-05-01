@@ -66,10 +66,10 @@ describe('sandbox container port config', () => {
     const config = buildContainerConfig({ image: 'bapx/computer:0.8.20', envFile: JUSTAVPS_ENV_FILE, containerName: 'justavps-workload' });
     const script = buildManagedServiceStartScript(config);
     expect(script).toContain('Reusing persisted env file');
-    expect(script).toContain('grep -Eq "^(INTERNAL_SERVICE_KEY|KORTIX_TOKEN|KORTIX_API_URL)="');
+    expect(script).toContain('grep -Eq "^(INTERNAL_SERVICE_KEY|BAPX_TOKEN|BAPX_API_URL)="');
     expect(script).toContain('exec docker run --rm');
     expect(script).toContain('--privileged');
-    expect(script).toContain('KORTIX_ENABLE_INNER_DOCKER=0');
+    expect(script).toContain('BAPX_ENABLE_INNER_DOCKER=0');
     expect(script).toContain(JUSTAVPS_STARTUP_PATCH_MOUNT);
   });
 });

@@ -87,7 +87,7 @@ Verifies all route categories respond correctly with valid auth.
 
 Routes tested: `/env/list`, `/bapx/ports`, `/session`, `/agent`, `/file/content`, `/lss/search`, `/memory/search`, `/bapx/update/status`
 
-### Section 4: KORTIX_TOKEN (Sandbox → API)
+### Section 4: BAPX_TOKEN (Sandbox → API)
 Tests the sandbox-to-API authentication token (`bapx_sb_*` prefix).
 
 | # | Test | Expected |
@@ -174,7 +174,7 @@ Static source code checks for WebSocket authentication.
 ```
 Frontend ──[Supabase JWT]──→ bapx-api ──[INTERNAL_SERVICE_KEY]──→ sandbox
 CLI/API  ──[bapx_ key]───→ bapx-api ──[INTERNAL_SERVICE_KEY]──→ sandbox
-Sandbox  ──[KORTIX_TOKEN]──→ bapx-api ──→ LLM providers / integrations
+Sandbox  ──[BAPX_TOKEN]──→ bapx-api ──→ LLM providers / integrations
 ```
 
 ### Token Types

@@ -185,7 +185,7 @@ export function NewTaskDialog({
         <div className="flex items-center gap-2 px-5 pt-4 pb-2">
           <div className="flex items-center gap-2 text-sm">
             <span className="font-semibold text-foreground tracking-tight">
-              {projectName || 'KORTIX'}
+              {projectName || 'BAPX'}
             </span>
             <span className="text-muted-foreground/40">›</span>
             <span className="text-muted-foreground">New task</span>

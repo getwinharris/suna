@@ -2,7 +2,7 @@
  * E2E tests for the platform (sandbox lifecycle) routes.
  *
  * Uses mock providers via DI — no Docker or Daytona needed.
- * Requires TEST_DATABASE_URL + KORTIX_TEST_DB_CONFIRM for sandbox CRUD tests.
+ * Requires TEST_DATABASE_URL + BAPX_TEST_DB_CONFIRM for sandbox CRUD tests.
  *
  * Routes tested (sandbox-cloud router mounted at /v1/platform/sandbox):
  *   GET    /v1/platform/providers
@@ -235,7 +235,7 @@ describe.skipIf(!HAS_DB)('Platform — Sandbox Lifecycle', () => {
 
       expect(justavpsProvider.calls.create.length).toBe(1);
       expect(justavpsProvider.calls.create[0]?.accountId).toBe(TEST_USER_ID);
-      expect(justavpsProvider.calls.create[0]?.envVars?.KORTIX_TOKEN).toBe('bapx_sb_retry_test');
+      expect(justavpsProvider.calls.create[0]?.envVars?.BAPX_TOKEN).toBe('bapx_sb_retry_test');
       expect(justavpsProvider.calls.create[0]?.serverType).toBe('cpx32');
       expect(justavpsProvider.calls.create[0]?.location).toBe('nbg1');
 

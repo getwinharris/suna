@@ -74,7 +74,7 @@ const TEST_DB_CONFIRMATION = 'I_UNDERSTAND_THIS_DELETES_TEST_DATA';
 
 export const HAS_SAFE_TEST_DB = Boolean(
   process.env.TEST_DATABASE_URL
-  && process.env.KORTIX_TEST_DB_CONFIRM === TEST_DB_CONFIRMATION,
+  && process.env.BAPX_TEST_DB_CONFIRM === TEST_DB_CONFIRMATION,
 );
 
 function getSafeTestDbUrl(): string {
@@ -83,11 +83,11 @@ function getSafeTestDbUrl(): string {
     throw new Error('TEST_DATABASE_URL must be set for integration tests');
   }
 
-  if (process.env.KORTIX_TEST_DB_CONFIRM !== TEST_DB_CONFIRMATION) {
-    throw new Error(`KORTIX_TEST_DB_CONFIRM must equal ${TEST_DB_CONFIRMATION}`);
+  if (process.env.BAPX_TEST_DB_CONFIRM !== TEST_DB_CONFIRMATION) {
+    throw new Error(`BAPX_TEST_DB_CONFIRM must equal ${TEST_DB_CONFIRMATION}`);
   }
 
-  if (process.env.INTERNAL_KORTIX_ENV === 'prod') {
+  if (process.env.INTERNAL_BAPX_ENV === 'prod') {
     throw new Error('Refusing to run integration tests against prod environment');
   }
 

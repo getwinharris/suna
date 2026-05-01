@@ -9,7 +9,7 @@
  */
 function resolveAuthCookieName() {
   const appUrl =
-    process.env.KORTIX_PUBLIC_APP_URL ||
+    process.env.BAPX_PUBLIC_APP_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.NEXT_PUBLIC_URL ||
     process.env.PUBLIC_URL;
@@ -31,4 +31,4 @@ function resolveAuthCookieName() {
   return 'sb-bapx-auth-token';
 }
 
-export const KORTIX_SUPABASE_AUTH_COOKIE = resolveAuthCookieName();
+export const BAPX_SUPABASE_AUTH_COOKIE = resolveAuthCookieName();

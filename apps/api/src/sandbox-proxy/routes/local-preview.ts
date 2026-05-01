@@ -18,7 +18,7 @@ import { execSync } from 'child_process';
 import { buildCanonicalSandboxAuthCommand } from '../../platform/services/sandbox-auth';
 import { invalidateProviderCache } from '..';
 
-const KORTIX_MASTER_PORT = 8000;
+const BAPX_MASTER_PORT = 8000;
 const FETCH_TIMEOUT_MS = 30_000;
 
 function shellQuote(value: string): string {
@@ -93,7 +93,7 @@ function trySyncServiceKey(serviceKey: string): boolean {
 
     console.log(`[LOCAL-PREVIEW] Syncing sandbox auth bundle to container (attempt ${_syncAttemptsForCurrentKey}/${MAX_SYNC_ATTEMPTS_PER_KEY})...`);
     execSync(
-      `docker exec ${shellQuote(config.SANDBOX_CONTAINER_NAME)} bash -c ${shellQuote(buildCanonicalSandboxAuthCommand(serviceKey, config.KORTIX_URL.replace(/\/v1\/router\/?$/, '') || `http://host.docker.internal:${config.PORT}`))}`,
+      `docker exec ${shellQuote(config.SANDBOX_CONTAINER_NAME)} bash -c ${shellQuote(buildCanonicalSandboxAuthCommand(serviceKey, config.BAPX_URL.replace(/\/v1\/router\/?$/, '') || `http://host.docker.internal:${config.PORT}`))}`,
       { timeout: 15_000, stdio: 'pipe', env },
     );
     _lastSyncedKey = serviceKey;
@@ -106,7 +106,7 @@ function trySyncServiceKey(serviceKey: string): boolean {
 }
 
 /**
- * Read the bapx-master process's currently-loaded KORTIX_TOKEN by
+ * Read the bapx-master process's currently-loaded BAPX_TOKEN by
  * cat-ing `/workspace/.secrets/.bootstrap-env.json` from inside the
  * container. This is the source of truth for what the running process
  * actually accepts (bootstrap-env.ts overrides process.env at startup
@@ -123,7 +123,7 @@ function readContainerBootstrapKey(): string | null {
       { timeout: 5_000, stdio: ['pipe', 'pipe', 'pipe'], env },
     ).toString('utf8');
     const json = JSON.parse(out);
-    return typeof json.KORTIX_TOKEN === 'string' && json.KORTIX_TOKEN.length > 0 ? json.KORTIX_TOKEN : null;
+    return typeof json.BAPX_TOKEN === 'string' && json.BAPX_TOKEN.length > 0 ? json.BAPX_TOKEN : null;
   } catch {
     return null;
   }
@@ -206,7 +206,7 @@ export async function proxyToSandbox(
   extraHeaders?: Record<string, string>,
 ): Promise<Response> {
   const sandboxBaseUrl = baseUrlOverride || getSandboxBaseUrl(sandboxId);
-  const targetUrl = port === KORTIX_MASTER_PORT
+  const targetUrl = port === BAPX_MASTER_PORT
     ? `${sandboxBaseUrl}${path}${queryString}`
     : `${sandboxBaseUrl}/proxy/${port}${path}${queryString}`;
 
@@ -279,7 +279,7 @@ export async function proxyToSandbox(
   //       NEXT process spawn, not the currently-running bapx-master that
   //       loaded X at start. So syncing+retrying with the same Y still 401s.
   //   (b) The DB / our cache is fine but bootstrap-env.ts inside the
-  //       container loaded an older KORTIX_TOKEN from a stale persistent
+  //       container loaded an older BAPX_TOKEN from a stale persistent
   //       /workspace/.secrets/.bootstrap-env.json.
   //
   // The container's bootstrap file is the source of truth for what the
@@ -393,7 +393,7 @@ export async function proxyToSandbox(
   // For path-based routing (OpenCode API at port 8000), there's no /proxy/ prefix, so
   // this is a no-op.
   const location = respHeaders.get('location');
-  if (location && port !== KORTIX_MASTER_PORT) {
+  if (location && port !== BAPX_MASTER_PORT) {
     const proxyPrefix = `/proxy/${port}`;
     if (location.startsWith(proxyPrefix)) {
       respHeaders.set('location', location.slice(proxyPrefix.length) || '/');

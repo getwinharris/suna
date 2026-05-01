@@ -313,8 +313,8 @@ export function createApiKeysRouter(
   //   1. Revoke old key in DB
   //   2. Create new bapx_sb_ key in DB
   //   3. Resolve sandbox endpoint via provider
-  //   4. Read all secrets from sandbox (decrypted with old KORTIX_TOKEN)
-  //   5. Update KORTIX_TOKEN in sandbox (changes encryption key derivation)
+  //   4. Read all secrets from sandbox (decrypted with old BAPX_TOKEN)
+  //   5. Update BAPX_TOKEN in sandbox (changes encryption key derivation)
   //   6. Re-write all secrets (re-encrypted with new key)
   //   7. Restart sandbox services
 
@@ -411,7 +411,7 @@ export function createApiKeysRouter(
           }
 
           sandboxUpdated = true;
-          console.log(`[API-KEYS] Pushed new KORTIX_TOKEN to sandbox ${sandbox.externalId}`);
+          console.log(`[API-KEYS] Pushed new BAPX_TOKEN to sandbox ${sandbox.externalId}`);
         } catch (err) {
           // Sandbox may be stopped or unreachable — that's OK.
           // The new key is in the DB; sandbox will need a restart.

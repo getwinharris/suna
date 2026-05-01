@@ -31,7 +31,7 @@ interface AvatarProps extends ViewProps {
   /** Show border (default: true) */
   showBorder?: boolean;
   
-  /** Use Bapx symbol instead of icon (for SUNA agent) */
+  /** Use Bapx symbol instead of icon (for BAPX agent) */
   useBapxSymbol?: boolean;
   
   /** Fallback text (first letter shown if no icon) */

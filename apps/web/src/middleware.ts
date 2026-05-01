@@ -319,11 +319,11 @@ export async function middleware(request: NextRequest) {
 
     // ── Instance detail pages (/instances, /instances/:id, /instances/:id/onboarding) ──
     if (isInstanceDetailRoute || pathname === '/instances') {
-      return supabaseResponse;
+      return trailbaseResponse;
     }
     if (instanceRoute?.instanceId && instanceRoute.innerPath === '/onboarding') {
-      supabaseResponse.cookies.set(ACTIVE_INSTANCE_COOKIE, instanceRoute.instanceId, { path: '/', sameSite: 'lax' });
-      return supabaseResponse;
+      trailbaseResponse.cookies.set(ACTIVE_INSTANCE_COOKIE, instanceRoute.instanceId, { path: '/', sameSite: 'lax' });
+      return trailbaseResponse;
     }
 
     // ── Bare app routes (/dashboard, /files, ...) ────────────────────────
@@ -337,13 +337,13 @@ export async function middleware(request: NextRequest) {
 
     // ── Billing-related routes (subscription, activate-trial, etc.) ──────
     if (BILLING_ROUTES.some(route => pathname.startsWith(route))) {
-      return supabaseResponse;
+      return trailbaseResponse;
     }
 
-    return supabaseResponse;
+    return trailbaseResponse;
   } catch (error) {
     console.error('Middleware error:', error);
-    return supabaseResponse;
+    return trailbaseResponse;
   }
 }
 

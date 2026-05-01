@@ -317,7 +317,7 @@ export default function GlobalError({
       viewport,
       online: typeof nav?.onLine === 'boolean' ? (nav.onLine ? 'yes' : 'no') : EMPTY,
       env:
-        process.env.NEXT_PUBLIC_KORTIX_ENV ||
+        process.env.NEXT_PUBLIC_BAPX_ENV ||
         process.env.NEXT_PUBLIC_ENV_MODE ||
         'dev',
       sentryEventId: eventId || EMPTY,

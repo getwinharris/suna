@@ -96,7 +96,7 @@ mock.module('../config', () => ({
   config: {
     JUSTAVPS_DEFAULT_LOCATION: 'ash',
     JUSTAVPS_DEFAULT_SERVER_TYPE: 'starter',
-    KORTIX_BILLING_INTERNAL_ENABLED: false,
+    BAPX_BILLING_INTERNAL_ENABLED: false,
     isJustAVPSEnabled: () => true,
   },
 }));

@@ -1,0 +1,29 @@
+import { afterEach, describe, expect, test } from "bun:test"
+
+const savedStorageBase = process.env.OPENCODE_STORAGE_BASE
+const savedPersistentRoot = process.env.BAPX_PERSISTENT_ROOT
+
+afterEach(() => {
+	if (savedStorageBase === undefined) delete process.env.OPENCODE_STORAGE_BASE
+	else process.env.OPENCODE_STORAGE_BASE = savedStorageBase
+	if (savedPersistentRoot === undefined) delete process.env.BAPX_PERSISTENT_ROOT
+	else process.env.BAPX_PERSISTENT_ROOT = savedPersistentRoot
+})
+
+describe("opencode storage path helpers", () => {
+	test("explicit OPENCODE_STORAGE_BASE wins", async () => {
+		process.env.OPENCODE_STORAGE_BASE = "/tmp/opencode-explicit"
+		delete process.env.BAPX_PERSISTENT_ROOT
+		const mod = await import(`./opencode-storage-paths.ts?explicit=${Date.now()}`)
+		expect(mod.getOpencodeStorageBase()).toBe("/tmp/opencode-explicit")
+		expect(mod.getOpencodeDbPath()).toBe("/tmp/opencode-explicit/opencode.db")
+	})
+
+	test("persistent root maps to /opencode storage dir", async () => {
+		delete process.env.OPENCODE_STORAGE_BASE
+		process.env.BAPX_PERSISTENT_ROOT = "/tmp/bapx-persistent"
+		const mod = await import(`./opencode-storage-paths.ts?persistent=${Date.now()}`)
+		expect(mod.getOpencodeStorageBase()).toBe("/tmp/bapx-persistent/opencode")
+		expect(mod.getOpencodeStoragePath("workspace", "abc")).toBe("/tmp/bapx-persistent/opencode/workspace/abc")
+	})
+})

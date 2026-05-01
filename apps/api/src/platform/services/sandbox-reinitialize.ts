@@ -48,7 +48,7 @@ export async function reprovisionFailedJustAvpsSandbox(opts: {
     serverType: typeof existingMeta.serverType === 'string' ? existingMeta.serverType : undefined,
     location: typeof existingMeta.location === 'string' ? existingMeta.location : undefined,
     envVars: {
-      KORTIX_TOKEN: serviceKey,
+      BAPX_TOKEN: serviceKey,
     },
   }, {
     onAttemptStart: async (attempt) => {

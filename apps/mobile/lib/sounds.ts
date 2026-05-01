@@ -7,14 +7,14 @@ import { useSoundStore, type SoundEvent } from '@/stores/sound-store';
 // The opencode pack has no files yet, so it falls back to bapx.
 // ---------------------------------------------------------------------------
 
-const KORTIX_ASSETS: Partial<Record<SoundEvent, AVPlaybackSource>> = {
+const BAPX_ASSETS: Partial<Record<SoundEvent, AVPlaybackSource>> = {
   completion: require('@/assets/sounds/bapx/completion.mp3'),
   send: require('@/assets/sounds/bapx/send.mp3'),
 };
 
 function resolveAsset(pack: string, event: SoundEvent): AVPlaybackSource | null {
   if (pack === 'bapx') {
-    return KORTIX_ASSETS[event] ?? KORTIX_ASSETS.completion ?? null;
+    return BAPX_ASSETS[event] ?? BAPX_ASSETS.completion ?? null;
   }
   // opencode pack has no files yet — returns null (no sound)
   return null;

@@ -186,7 +186,7 @@ function buildDockerRunCommandWithMode(config: ContainerConfig, detached: boolea
   const imageTag = config.image.includes(':') ? config.image.split(':').pop() : 'unknown';
   args.push(`-e SANDBOX_VERSION=${sq(imageTag!)}`);
   if (isJustAVPSManagedConfig(config)) {
-    args.push('-e KORTIX_ENABLE_INNER_DOCKER=0');
+    args.push('-e BAPX_ENABLE_INNER_DOCKER=0');
   }
   if (config.privileged) args.push('--privileged');
 
@@ -223,7 +223,7 @@ export function buildManagedServiceStartScript(config: ContainerConfig): string 
     '    if [ "$ENV_MTIME" -gt "$BOOT_TIME" ]; then',
     '      break',
     '    fi',
-    '    if grep -Eq "^(INTERNAL_SERVICE_KEY|KORTIX_TOKEN|KORTIX_API_URL)=" "$ENV_FILE" 2>/dev/null; then',
+    '    if grep -Eq "^(INTERNAL_SERVICE_KEY|BAPX_TOKEN|BAPX_API_URL)=" "$ENV_FILE" 2>/dev/null; then',
     '      echo "[bapx] Reusing persisted env file $ENV_FILE"',
     '      break',
     '    fi',

@@ -32,33 +32,33 @@ WORKSPACE_GID="$(id -g abc 2>/dev/null || echo 911)"
 
 echo "[startup] Preparing Bapx sandbox..."
 
-export KORTIX_PERSISTENT_ROOT=/persistent
-export OPENCODE_STORAGE_BASE="${OPENCODE_STORAGE_BASE:-${KORTIX_PERSISTENT_ROOT}/opencode}"
-export OPENCODE_SHADOW_STORAGE_BASE="${OPENCODE_SHADOW_STORAGE_BASE:-${KORTIX_PERSISTENT_ROOT}/opencode-shadow}"
-export KORTIX_OPENCODE_ARCHIVE_DIR="${KORTIX_OPENCODE_ARCHIVE_DIR:-${KORTIX_PERSISTENT_ROOT}/opencode-archive}"
-export KORTIX_OPENCODE_CACHE_DIR="${KORTIX_OPENCODE_CACHE_DIR:-${KORTIX_PERSISTENT_ROOT}/opencode-cache}"
-export SECRET_FILE_PATH="${SECRET_FILE_PATH:-${KORTIX_PERSISTENT_ROOT}/secrets/.secrets.json}"
-export SALT_FILE_PATH="${SALT_FILE_PATH:-${KORTIX_PERSISTENT_ROOT}/secrets/.salt}"
-export ENCRYPTION_KEY_PATH="${ENCRYPTION_KEY_PATH:-${KORTIX_PERSISTENT_ROOT}/secrets/.encryption-key}"
+export BAPX_PERSISTENT_ROOT=/persistent
+export OPENCODE_STORAGE_BASE="${OPENCODE_STORAGE_BASE:-${BAPX_PERSISTENT_ROOT}/opencode}"
+export OPENCODE_SHADOW_STORAGE_BASE="${OPENCODE_SHADOW_STORAGE_BASE:-${BAPX_PERSISTENT_ROOT}/opencode-shadow}"
+export BAPX_OPENCODE_ARCHIVE_DIR="${BAPX_OPENCODE_ARCHIVE_DIR:-${BAPX_PERSISTENT_ROOT}/opencode-archive}"
+export BAPX_OPENCODE_CACHE_DIR="${BAPX_OPENCODE_CACHE_DIR:-${BAPX_PERSISTENT_ROOT}/opencode-cache}"
+export SECRET_FILE_PATH="${SECRET_FILE_PATH:-${BAPX_PERSISTENT_ROOT}/secrets/.secrets.json}"
+export SALT_FILE_PATH="${SALT_FILE_PATH:-${BAPX_PERSISTENT_ROOT}/secrets/.salt}"
+export ENCRYPTION_KEY_PATH="${ENCRYPTION_KEY_PATH:-${BAPX_PERSISTENT_ROOT}/secrets/.encryption-key}"
 export AUTH_JSON_PATH="${AUTH_JSON_PATH:-${OPENCODE_STORAGE_BASE}/auth.json}"
-export LSS_DIR="${LSS_DIR:-${KORTIX_PERSISTENT_ROOT}/lss}"
-export KORTIX_BROWSER_PROFILE_DIR="${KORTIX_BROWSER_PROFILE_DIR:-${KORTIX_PERSISTENT_ROOT}/browser-profile}"
-export KORTIX_AGENT_BROWSER_DIR="${KORTIX_AGENT_BROWSER_DIR:-${KORTIX_PERSISTENT_ROOT}/agent-browser}"
-export KORTIX_KORTIX_STATE_DIR="${KORTIX_KORTIX_STATE_DIR:-${KORTIX_PERSISTENT_ROOT}/bapx-state}"
-export KORTIX_XDG_DIR="${KORTIX_XDG_DIR:-${KORTIX_PERSISTENT_ROOT}/xdg}"
+export LSS_DIR="${LSS_DIR:-${BAPX_PERSISTENT_ROOT}/lss}"
+export BAPX_BROWSER_PROFILE_DIR="${BAPX_BROWSER_PROFILE_DIR:-${BAPX_PERSISTENT_ROOT}/browser-profile}"
+export BAPX_AGENT_BROWSER_DIR="${BAPX_AGENT_BROWSER_DIR:-${BAPX_PERSISTENT_ROOT}/agent-browser}"
+export BAPX_BAPX_STATE_DIR="${BAPX_BAPX_STATE_DIR:-${BAPX_PERSISTENT_ROOT}/bapx-state}"
+export BAPX_XDG_DIR="${BAPX_XDG_DIR:-${BAPX_PERSISTENT_ROOT}/xdg}"
 
 PERSIST_BACKING_DIR="/workspace/.persistent-system"
 mkdir -p "$PERSIST_BACKING_DIR"
-if [ -L "$KORTIX_PERSISTENT_ROOT" ]; then
-  if [ "$(readlink "$KORTIX_PERSISTENT_ROOT" 2>/dev/null || true)" != "$PERSIST_BACKING_DIR" ]; then
-    rm -f "$KORTIX_PERSISTENT_ROOT"
-    ln -s "$PERSIST_BACKING_DIR" "$KORTIX_PERSISTENT_ROOT"
+if [ -L "$BAPX_PERSISTENT_ROOT" ]; then
+  if [ "$(readlink "$BAPX_PERSISTENT_ROOT" 2>/dev/null || true)" != "$PERSIST_BACKING_DIR" ]; then
+    rm -f "$BAPX_PERSISTENT_ROOT"
+    ln -s "$PERSIST_BACKING_DIR" "$BAPX_PERSISTENT_ROOT"
   fi
-elif [ -d "$KORTIX_PERSISTENT_ROOT" ] && [ -z "$(ls -A "$KORTIX_PERSISTENT_ROOT" 2>/dev/null)" ]; then
-  rmdir "$KORTIX_PERSISTENT_ROOT" 2>/dev/null || true
-  ln -s "$PERSIST_BACKING_DIR" "$KORTIX_PERSISTENT_ROOT"
-elif [ ! -e "$KORTIX_PERSISTENT_ROOT" ]; then
-  ln -s "$PERSIST_BACKING_DIR" "$KORTIX_PERSISTENT_ROOT"
+elif [ -d "$BAPX_PERSISTENT_ROOT" ] && [ -z "$(ls -A "$BAPX_PERSISTENT_ROOT" 2>/dev/null)" ]; then
+  rmdir "$BAPX_PERSISTENT_ROOT" 2>/dev/null || true
+  ln -s "$PERSIST_BACKING_DIR" "$BAPX_PERSISTENT_ROOT"
+elif [ ! -e "$BAPX_PERSISTENT_ROOT" ]; then
+  ln -s "$PERSIST_BACKING_DIR" "$BAPX_PERSISTENT_ROOT"
 fi
 
 migrate_dir_to_persistent() {
@@ -115,23 +115,23 @@ mkdir -p \
   "$OPENCODE_STORAGE_BASE/workspace" \
   "$OPENCODE_STORAGE_BASE/delegations" \
   "$OPENCODE_SHADOW_STORAGE_BASE" \
-  "$KORTIX_OPENCODE_ARCHIVE_DIR" \
-  "$KORTIX_OPENCODE_CACHE_DIR" \
+  "$BAPX_OPENCODE_ARCHIVE_DIR" \
+  "$BAPX_OPENCODE_CACHE_DIR" \
   "$(dirname "$SECRET_FILE_PATH")" \
   "$LSS_DIR" \
-  "$KORTIX_BROWSER_PROFILE_DIR" \
-  "$KORTIX_AGENT_BROWSER_DIR" \
-  "$KORTIX_KORTIX_STATE_DIR" \
-  "$KORTIX_XDG_DIR"
+  "$BAPX_BROWSER_PROFILE_DIR" \
+  "$BAPX_AGENT_BROWSER_DIR" \
+  "$BAPX_BAPX_STATE_DIR" \
+  "$BAPX_XDG_DIR"
 
 migrate_dir_to_persistent /workspace/.local/share/opencode "$OPENCODE_STORAGE_BASE"
-migrate_dir_to_persistent /workspace/.cache/opencode "$KORTIX_OPENCODE_CACHE_DIR"
+migrate_dir_to_persistent /workspace/.cache/opencode "$BAPX_OPENCODE_CACHE_DIR"
 migrate_dir_to_persistent /workspace/.secrets "$(dirname "$SECRET_FILE_PATH")"
 migrate_dir_to_persistent /workspace/.lss "$LSS_DIR"
-migrate_dir_to_persistent /workspace/.browser-profile "$KORTIX_BROWSER_PROFILE_DIR"
-migrate_dir_to_persistent /workspace/.agent-browser "$KORTIX_AGENT_BROWSER_DIR"
-migrate_dir_to_persistent /workspace/.bapx-state "$KORTIX_KORTIX_STATE_DIR"
-migrate_dir_to_persistent /workspace/.XDG "$KORTIX_XDG_DIR"
+migrate_dir_to_persistent /workspace/.browser-profile "$BAPX_BROWSER_PROFILE_DIR"
+migrate_dir_to_persistent /workspace/.agent-browser "$BAPX_AGENT_BROWSER_DIR"
+migrate_dir_to_persistent /workspace/.bapx-state "$BAPX_BAPX_STATE_DIR"
+migrate_dir_to_persistent /workspace/.XDG "$BAPX_XDG_DIR"
 
 # ── Migrate legacy symlinks to real dirs ────────────────────────────────────
 # Old images created /workspace/.opencode as a symlink to /workspace/.bapx/.opencode.
@@ -310,9 +310,9 @@ fi
 # starts bapx-master, so the master always sees a v2-capable schema even
 # if its own bundled code is stale. NOT NULL DEFAULT 2 means every insert
 # the master does — even one that doesn't list the column — gets v2.
-KORTIX_DB="/workspace/.bapx/bapx.db"
-if [ -f "$KORTIX_DB" ] && command -v python3 >/dev/null 2>&1; then
-  python3 - "$KORTIX_DB" <<'PYEOF' || echo "[startup] bapx.db migration skipped (best-effort)"
+BAPX_DB="/workspace/.bapx/bapx.db"
+if [ -f "$BAPX_DB" ] && command -v python3 >/dev/null 2>&1; then
+  python3 - "$BAPX_DB" <<'PYEOF' || echo "[startup] bapx.db migration skipped (best-effort)"
 import sqlite3, sys
 db = sqlite3.connect(sys.argv[1])
 def add(sql):

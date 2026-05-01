@@ -1,4 +1,4 @@
--- Initial migration for Kortix on Trailbase
+-- Initial migration for Bapx Media Hub on TrailBase
 
 -- Accounts
 CREATE TABLE accounts (

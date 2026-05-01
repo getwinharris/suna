@@ -3,7 +3,7 @@
  *
  * Format: `<base64url(json payload)>.<base64url(HMAC-SHA256)>`
  *
- * Bapx-master owns the same secret (the sandbox's KORTIX_TOKEN service key)
+ * Bapx-master owns the same secret (the sandbox's BAPX_TOKEN service key)
  * and verifies the signature locally — no callback to the Bapx API per
  * request. An `exp` field bounds staleness after ACL changes.
  *
@@ -13,10 +13,10 @@
 
 import { createHmac, timingSafeEqual } from 'crypto';
 
-export const KORTIX_USER_CONTEXT_HEADER = 'X-Bapx-User-Context';
+export const BAPX_USER_CONTEXT_HEADER = 'X-Bapx-User-Context';
 
 /** TTL for a signed context — short enough that revocations take effect quickly. */
-export const KORTIX_USER_CONTEXT_TTL_SECONDS = 60;
+export const BAPX_USER_CONTEXT_TTL_SECONDS = 60;
 
 export interface BapxUserContext {
   userId: string;
@@ -47,7 +47,7 @@ export function encodeBapxUserContext(
   secret: string,
 ): string {
   const iat = Math.floor(Date.now() / 1000);
-  const exp = iat + (ctx.ttlSeconds ?? KORTIX_USER_CONTEXT_TTL_SECONDS);
+  const exp = iat + (ctx.ttlSeconds ?? BAPX_USER_CONTEXT_TTL_SECONDS);
   const payload: BapxUserContext = {
     userId: ctx.userId,
     sandboxId: ctx.sandboxId,

@@ -15,7 +15,7 @@ import type { AppEnv } from '../../types';
 
 function getMasterUrlCandidates(): string[] {
   const candidates: string[] = [];
-  const explicit = process.env.KORTIX_MASTER_URL;
+  const explicit = process.env.BAPX_MASTER_URL;
   if (explicit?.trim()) candidates.push(explicit.trim());
   candidates.push('http://sandbox:8000');
   candidates.push(`http://localhost:${config.SANDBOX_PORT_BASE || 14000}`);

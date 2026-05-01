@@ -3,7 +3,7 @@ import { creditAccounts } from '@bapx/db';
 import { db } from '../../shared/db';
 
 /**
- * Read tier from the OLD public.credit_accounts (Suna billing schema).
+ * Read tier from the OLD public.credit_accounts (Bapx billing schema).
  * Used ONLY for claim-computer eligibility in cloud env.
  */
 export async function getPublicSchemaTier(accountId: string): Promise<string | null> {

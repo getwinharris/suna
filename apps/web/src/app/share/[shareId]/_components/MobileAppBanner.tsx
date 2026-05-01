@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Bapx Media HubLogo } from '@/components/sidebar/bapx-logo';
+import { BapxLogo } from '@/components/sidebar/bapx-logo';
 
 function isMobileDevice(): boolean {
   if (typeof window === 'undefined') return false;
@@ -82,7 +82,7 @@ export function MobileAppBanner({ shareId }: MobileAppBannerProps) {
         <div className="flex items-center gap-3">
           {/* App icon */}
           <div className="shrink-0 w-10 h-10 rounded-xl bg-foreground flex items-center justify-center">
-            <Bapx Media HubLogo size={20} className="invert dark:invert-0" />
+            <BapxLogo size={20} className="invert dark:invert-0" />
           </div>
 
           {/* Content */}

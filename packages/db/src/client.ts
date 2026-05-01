@@ -76,8 +76,8 @@ function createTrailbaseProxy(trail: Client): any {
                 processedData[key] = toTrailBlob(val);
               }
             }
-            const res = await trail.records.create(tableName, processedData);
-            results.push(fromTrailRecord(res));
+            const id = await trail.records(tableName).create(processedData);
+            results.push(fromTrailRecord({ ...processedData, id }));
           }
           return results;
         }
@@ -89,20 +89,20 @@ function createTrailbaseProxy(trail: Client): any {
           limit: (n: number) => wrapInProxy({
             execute: async () => {
               const tableName = table._?.name || table.name;
-              const res = await trail.records.list(tableName);
-              return res.map(fromTrailRecord);
+              const res = await trail.records(tableName).list();
+              return res.records.map(fromTrailRecord);
             }
           }),
           execute: async () => {
              const tableName = table._?.name || table.name;
-             const res = await trail.records.list(tableName);
-             return res.map(fromTrailRecord);
+             const res = await trail.records(tableName).list();
+             return res.records.map(fromTrailRecord);
           }
         }),
         execute: async () => {
            const tableName = table._?.name || table.name;
-           const res = await trail.records.list(tableName);
-           return res.map(fromTrailRecord);
+           const res = await trail.records(tableName).list();
+           return res.records.map(fromTrailRecord);
         }
       })
     }),
@@ -125,12 +125,12 @@ function createTrailbaseProxy(trail: Client): any {
     query: new Proxy({}, {
       get: (_, tableName) => ({
         findFirst: async (options: any) => {
-           const res = await trail.records.list(tableName as string);
-           return res[0] ? fromTrailRecord(res[0]) : null;
+           const res = await trail.records(tableName as string).list({ pagination: { limit: 1 } });
+           return res.records[0] ? fromTrailRecord(res.records[0]) : null;
         },
         findMany: async (options: any) => {
-           const res = await trail.records.list(tableName as string);
-           return res.map(fromTrailRecord);
+           const res = await trail.records(tableName as string).list();
+           return res.records.map(fromTrailRecord);
         }
       })
     })

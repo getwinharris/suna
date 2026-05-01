@@ -105,8 +105,8 @@ fi
 if [ "$SKIP_INSTALL" = "false" ]; then
   step "PHASE 3: Run get-bapx.sh installer"
 
-  export KORTIX_OWNER_EMAIL="$E2E_OWNER_EMAIL"
-  export KORTIX_OWNER_PASSWORD="$E2E_OWNER_PASSWORD"
+  export BAPX_OWNER_EMAIL="$E2E_OWNER_EMAIL"
+  export BAPX_OWNER_PASSWORD="$E2E_OWNER_PASSWORD"
 
   info "Running installer (local mode, Docker DB, skip integrations)..."
   # stdin: 1=local, 1=docker db, testpass123=confirm password, n=skip integrations

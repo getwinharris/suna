@@ -187,9 +187,9 @@ describe('/v1/setup', () => {
       expect(content).toContain('ANTHROPIC_API_KEY=sk-ant-test-setup-123');
     });
 
-    it('core/docker/.env has KORTIX_API_URL', async () => {
+    it('core/docker/.env has BAPX_API_URL', async () => {
       const content = readFileSync(resolve(TEST_DIR, 'core/docker/.env'), 'utf-8');
-      expect(content).toContain('KORTIX_API_URL=http://bapx-api:8008');
+      expect(content).toContain('BAPX_API_URL=http://bapx-api:8008');
     });
 
     it('rejects invalid body', async () => {

@@ -18,7 +18,7 @@ interface AgentContextType {
   loadAgents: () => Promise<void>;
   getDefaultAgent: () => Agent | null;
   getCurrentAgent: () => Agent | null;
-  isSunaAgent: () => boolean;
+  isBapxAgent: () => boolean;
   clearSelection: () => Promise<void>;
 }
 
@@ -172,7 +172,7 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
     return agents.find(agent => agent.agent_id === selectedAgentId) || null;
   }, [selectedAgentId, agents]);
 
-  const isSunaAgent = React.useCallback((): boolean => {
+  const isBapxAgent = React.useCallback((): boolean => {
     const currentAgent = getCurrentAgent();
     return currentAgent?.metadata?.is_bapX_default || false;
   }, [getCurrentAgent]);
@@ -204,7 +204,7 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
     loadAgents,
     getDefaultAgent,
     getCurrentAgent,
-    isSunaAgent,
+    isBapxAgent,
     clearSelection,
   }), [
     selectedAgentId,
@@ -218,7 +218,7 @@ export function AgentProvider({ children }: { children: React.ReactNode }) {
     loadAgents,
     getDefaultAgent,
     getCurrentAgent,
-    isSunaAgent,
+    isBapxAgent,
     clearSelection,
   ]);
 

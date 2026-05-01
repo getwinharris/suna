@@ -15,7 +15,7 @@ import type {
   ProvisioningStatus,
 } from './index';
 
-const KORTIX_MASTER_PORT = 8000;
+const BAPX_MASTER_PORT = 8000;
 const API_TIMEOUT_MS = 300_000;
 const PROVISION_TIMEOUT_MS = 600_000;
 const POLL_INTERVAL_MS = 3_000;
@@ -448,7 +448,7 @@ function shellEscape(value: string): string {
 }
 
 function resolveReachableBapxApiUrl(): string {
-  const directBase = config.KORTIX_URL.replace(/\/v1\/router\/?$/, '');
+  const directBase = config.BAPX_URL.replace(/\/v1\/router\/?$/, '');
 
   try {
     const parsed = new URL(directBase);
@@ -577,20 +577,20 @@ export class JustAVPSProvider implements SandboxProvider {
     const routerBase = `${sandboxApiBase}/v1/router`;
     const machineName = `bapx-sandbox-${opts.accountId.slice(0, 8)}-${Date.now().toString(36)}`;
 
-    const serviceKey = opts.envVars?.KORTIX_TOKEN || '';
+    const serviceKey = opts.envVars?.BAPX_TOKEN || '';
     // Inject the API's own version into the sandbox container so the sandbox
     // health endpoint reports the correct version. All components share one
     // version number (set by deploy-zero-downtime.sh from the Docker image tag).
     // This works even when SANDBOX_IMAGE defaults to :latest.
     const envVars: Record<string, string> = {
-      KORTIX_API_URL: sandboxApiBase,
+      BAPX_API_URL: sandboxApiBase,
       ENV_MODE: 'cloud',
       INTERNAL_SERVICE_KEY: serviceKey,
-      KORTIX_TOKEN: serviceKey,
-      KORTIX_YOLO_API_KEY: serviceKey,
-      KORTIX_YOLO_URL: config.KORTIX_YOLO_URL,
+      BAPX_TOKEN: serviceKey,
+      BAPX_YOLO_API_KEY: serviceKey,
+      BAPX_YOLO_URL: config.BAPX_YOLO_URL,
       SANDBOX_VERSION: SANDBOX_VERSION,
-      KORTIX_SANDBOX_VERSION: SANDBOX_VERSION,
+      BAPX_SANDBOX_VERSION: SANDBOX_VERSION,
       TUNNEL_API_URL: sandboxApiBase,
       TUNNEL_TOKEN: serviceKey,
       TAVILY_API_URL: `${routerBase}/tavily`,

@@ -34,7 +34,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         if (!trailbase?.auth) return;
         
-        const currentUser = await trailbase.auth.getUser();
+        const userResult = await trailbase.auth.getUser();
+        const currentUser = userResult?.data?.user || userResult;
 
         if (currentUser) {
           setUser(currentUser);

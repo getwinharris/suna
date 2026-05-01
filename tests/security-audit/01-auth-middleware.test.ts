@@ -91,9 +91,9 @@ describe('Security Audit: Auth Middleware', () => {
       expect(isBapxToken('cortix_abc123')).toBe(false);
     });
 
-    test('rejects token with KORTIX_ uppercase prefix', () => {
+    test('rejects token with BAPX_ uppercase prefix', () => {
       // The check is case-sensitive — uppercase must not match
-      expect(isBapxToken('KORTIX_abc123')).toBe(false);
+      expect(isBapxToken('BAPX_abc123')).toBe(false);
     });
 
     test('accepts valid bapx_ prefix', () => {

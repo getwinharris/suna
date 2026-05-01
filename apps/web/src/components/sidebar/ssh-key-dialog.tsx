@@ -121,7 +121,7 @@ function SecretCodeBlock({ text, label }: { text: string; label?: string }) {
 
   // Mask the private key: show first 6 chars after heredoc then bullets
   const masked = text.replace(
-    /(cat > [^\n]+<< 'KORTIX_KEY'\n)([^\n]{6})[^]*?(KORTIX_KEY)/,
+    /(cat > [^\n]+<< 'BAPX_KEY'\n)([^\n]{6})[^]*?(BAPX_KEY)/,
     '$1$2••••••••••••\n$3',
   );
   const finalMasked = masked.replace(

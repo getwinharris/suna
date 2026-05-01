@@ -80,8 +80,8 @@ cd /Users/markokraemer/Projects/heyagi/computer
 
 # Run installer with all inputs provided via stdin
 # 1 = local mode, 1 = Docker database, email, password, password, n = skip integrations
-export KORTIX_OWNER_EMAIL="$OWNER_EMAIL"
-export KORTIX_OWNER_PASSWORD="$OWNER_PASSWORD"
+export BAPX_OWNER_EMAIL="$OWNER_EMAIL"
+export BAPX_OWNER_PASSWORD="$OWNER_PASSWORD"
 
 printf "1\n1\nn\n" | bash scripts/get-bapx.sh --local 2>&1 | tee /tmp/bapx-install.log | while read line; do
     if [[ "$line" == *"Bapx is running"* ]]; then

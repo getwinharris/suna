@@ -23,7 +23,7 @@
 services:
   desktop:
     environment:
-      - KORTIX_DEV_MODE=1
+      - BAPX_DEV_MODE=1
     volumes:
       # Bind-mount local source over the prebaked /opt dirs
       # All packages now live inside core/bapx-master/

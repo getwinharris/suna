@@ -3,7 +3,7 @@
 import { lazy, Suspense, useMemo, type ComponentType } from 'react';
 import { BapxLoader } from '@/components/ui/bapx-loader';
 
-const DEPLOYMENTS_ENABLED = process.env.NEXT_PUBLIC_KORTIX_DEPLOYMENTS_ENABLED === 'true';
+const DEPLOYMENTS_ENABLED = process.env.NEXT_PUBLIC_BAPX_DEPLOYMENTS_ENABLED === 'true';
 
 // ---------------------------------------------------------------------------
 // Lazy-load every route-based page component so they can be pre-mounted in the

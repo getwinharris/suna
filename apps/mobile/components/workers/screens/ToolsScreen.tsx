@@ -117,9 +117,9 @@ export function ToolsScreen({ agentId, onUpdate }: ToolsScreenProps) {
     }
   }, [agent?.agentpress_tools]);
 
-  const isSunaAgent = agent?.metadata?.is_bapX_default || false;
+  const isBapxAgent = agent?.metadata?.is_bapX_default || false;
   const restrictions = agent?.metadata?.restrictions || {};
-  const areToolsEditable = restrictions.tools_editable !== false && !isSunaAgent;
+  const areToolsEditable = restrictions.tools_editable !== false && !isBapxAgent;
 
   const handleToolToggle = (toolName: string, enabled: boolean) => {
     if (!areToolsEditable) return;
@@ -244,12 +244,12 @@ export function ToolsScreen({ agentId, onUpdate }: ToolsScreenProps) {
   const handleSave = async () => {
     if (!hasChanges) return;
 
-    const isSunaAgent = agent?.metadata?.is_bapX_default || false;
+    const isBapxAgent = agent?.metadata?.is_bapX_default || false;
     const restrictions = agent?.metadata?.restrictions || {};
-    const areToolsEditable = restrictions.tools_editable !== false && !isSunaAgent;
+    const areToolsEditable = restrictions.tools_editable !== false && !isBapxAgent;
 
     if (!areToolsEditable) {
-      if (isSunaAgent) {
+      if (isBapxAgent) {
         Alert.alert(t('workers.cannotEditTools'), t('workers.bapXToolsManagedAlert'));
       }
       return;
@@ -538,7 +538,7 @@ export function ToolsScreen({ agentId, onUpdate }: ToolsScreenProps) {
                   className="mt-0.5 text-yellow-600 dark:text-yellow-400"
                 />
                 <Text className="flex-1 font-roobert text-sm text-yellow-600 dark:text-yellow-400">
-                  {isSunaAgent ? t('workers.bapXToolsManaged') : t('workers.toolsNotEditable')}
+                  {isBapxAgent ? t('workers.bapXToolsManaged') : t('workers.toolsNotEditable')}
                 </Text>
               </View>
             )}

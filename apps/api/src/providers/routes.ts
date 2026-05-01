@@ -43,7 +43,7 @@ function findRepoRoot(): string | null {
 
 function getMasterUrlCandidates(): string[] {
   const candidates: string[] = [];
-  const explicit = process.env.KORTIX_MASTER_URL;
+  const explicit = process.env.BAPX_MASTER_URL;
   if (explicit && explicit.trim()) candidates.push(explicit.trim());
   candidates.push('http://sandbox:8000');
   candidates.push(`http://localhost:${config.SANDBOX_PORT_BASE || 14000}`);
@@ -353,7 +353,7 @@ providersApp.put('/:id/connect', async (c) => {
     sandboxData.ENV_MODE = 'local';
     sandboxData.SANDBOX_ID = config.SANDBOX_CONTAINER_NAME;
     sandboxData.PROJECT_ID = 'local';
-    sandboxData.KORTIX_API_URL = 'http://bapx-api:8008';
+    sandboxData.BAPX_API_URL = 'http://bapx-api:8008';
     writeEnvFile(sandboxEnvPath, sandboxData);
   }
 

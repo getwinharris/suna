@@ -116,7 +116,7 @@ export async function provision(resource: PoolResource): Promise<void> {
     accountId: 'pool',
     userId: 'pool',
     name: `pool-${resource.serverType}-${resource.location}`,
-    envVars: { KORTIX_TOKEN: placeholderToken },
+    envVars: { BAPX_TOKEN: placeholderToken },
     serverType: resource.serverType,
     location: resource.location,
   });

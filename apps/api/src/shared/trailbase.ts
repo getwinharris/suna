@@ -18,6 +18,48 @@ export function getTrailbase(): Client {
   return client;
 }
 
+function decodeUserFromToken(token: string): { id: string; email?: string } | null {
+  try {
+    const payload = token.split('.')[1];
+    if (!payload) return null;
+
+    const padded = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const padding = (4 - (padded.length % 4)) % 4;
+    const decoded = JSON.parse(atob(padded + '='.repeat(padding)));
+    if (!decoded.sub) return null;
+
+    return {
+      id: decoded.sub,
+      email: decoded.email || decoded.user_metadata?.email || '',
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Validate a bearer token with TrailBase and return the token user.
+ */
+export async function getTrailbaseUser(token: string): Promise<{ id: string; email?: string } | null> {
+  if (!config.TRAILBASE_URL) return null;
+
+  const scopedClient = initClient(config.TRAILBASE_URL, {
+    tokens: {
+      auth_token: token,
+      refresh_token: null,
+      csrf_token: null,
+    },
+  });
+
+  const status = await scopedClient.fetch('/api/auth/v1/status', {
+    method: 'GET',
+    throwOnError: false,
+  });
+
+  if (!status.ok) return null;
+  return scopedClient.user() || decodeUserFromToken(token);
+}
+
 /**
  * Check if TrailBase is configured.
  */

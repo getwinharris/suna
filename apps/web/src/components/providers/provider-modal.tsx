@@ -529,12 +529,12 @@ export function GlobalProviderModal() {
     const connectedIds = new Set(providers.connected ?? []);
     // If bapx provider is connected, it serves all models — hide redundant
     // built-in providers so users see a clean Bapx-only model list.
-    const KORTIX_SUPERSEDED = ['anthropic', 'openai', 'google', 'xai', 'moonshotai', 'minimax', 'zhipuai'];
+    const BAPX_SUPERSEDED = ['anthropic', 'openai', 'google', 'xai', 'moonshotai', 'minimax', 'zhipuai'];
     const bapxConnected = connectedIds.has('bapx');
     const result: FlatModel[] = [];
     for (const provider of providers.all ?? []) {
       if (!connectedIds.has(provider.id)) continue;
-      if (bapxConnected && KORTIX_SUPERSEDED.includes(provider.id)) continue;
+      if (bapxConnected && BAPX_SUPERSEDED.includes(provider.id)) continue;
       for (const [modelID, model] of Object.entries(provider.models ?? {})) {
         const caps = (model as any).capabilities;
         const modalities = (model as any).modalities;

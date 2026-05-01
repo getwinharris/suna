@@ -54,4 +54,4 @@ FRONTEND_PID=$!
 
 echo "[start] Starting API..."
 cd "$ROOT_DIR"
-KORTIX_SKIP_ENSURE_SCHEMA=1 pnpm --filter bapx-api start
+BAPX_SKIP_ENSURE_SCHEMA=1 pnpm --filter bapx-api start

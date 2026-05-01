@@ -91,8 +91,8 @@ async function processRow(row: typeof sandboxes.$inferSelect) {
       body: JSON.stringify({
         command: [
           'set -e',
-          'TOKEN="$(docker exec justavps-workload sh -lc \"printenv KORTIX_TOKEN\" 2>/dev/null | tr -d \"\\r\" || true)"',
-          'if [ -z "$TOKEN" ]; then TOKEN="$(grep -E "^(KORTIX_TOKEN|INTERNAL_SERVICE_KEY)=" /etc/justavps/env 2>/dev/null | tail -1 | cut -d= -f2- | tr -d "\\r" || true)"; fi',
+          'TOKEN="$(docker exec justavps-workload sh -lc \"printenv BAPX_TOKEN\" 2>/dev/null | tr -d \"\\r\" || true)"',
+          'if [ -z "$TOKEN" ]; then TOKEN="$(grep -E "^(BAPX_TOKEN|INTERNAL_SERVICE_KEY)=" /etc/justavps/env 2>/dev/null | tail -1 | cut -d= -f2- | tr -d "\\r" || true)"; fi',
           'printf "%s" "$TOKEN"',
         ].join('\n'),
         timeout: 15,

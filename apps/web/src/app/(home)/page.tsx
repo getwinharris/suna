@@ -163,7 +163,7 @@ export default function Home() {
           </Reveal>
           */}
 
-        {/* ═══════════════ WHAT IS KORTIX ═══════════════ */}
+        {/* ═══════════════ WHAT IS BAPX ═══════════════ */}
         <section className="max-w-3xl mx-auto px-6 py-10 sm:py-14">
           <Reveal>
           <p className="text-2xl sm:text-3xl md:text-4xl font-medium text-foreground leading-snug tracking-tight">

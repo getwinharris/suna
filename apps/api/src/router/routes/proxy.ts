@@ -7,7 +7,7 @@ import {
 } from '../config/proxy-services';
 import { validateSecretKey } from '../../repositories/api-keys';
 import { isBapxToken } from '../../shared/crypto';
-import { config, KORTIX_MARKUP, PLATFORM_FEE_MARKUP } from '../../config';
+import { config, BAPX_MARKUP, PLATFORM_FEE_MARKUP } from '../../config';
 import { checkCredits, deductToolCredits, deductLLMCredits } from '../services/billing';
 import { getModel, type ModelConfig } from '../config/models';
 import { calculateCost, extractUsage } from '../services/llm';
@@ -35,7 +35,7 @@ for (const [prefix, serviceConfig] of Object.entries(services)) {
 // Three authentication/billing modes:
 //
 // 1. Bapx token (bapx_/bapx_sb_ in our DB) in Authorization header
-//    → Inject Bapx's API key, forward, bill at KORTIX_MARKUP (1.2×).
+//    → Inject Bapx's API key, forward, bill at BAPX_MARKUP (1.2×).
 //
 // 2. User's own API key in Authorization + Bapx token in X-Bapx-Token header
 //    → Passthrough (no key injection), bill at PLATFORM_FEE_MARKUP (0.1×).
@@ -140,7 +140,7 @@ async function handleBapxProxy(
     duplex: 'half',
   });
 
-  // LLM services: bill per-token at KORTIX_MARKUP (1.2×)
+  // LLM services: bill per-token at BAPX_MARKUP (1.2×)
   if (service.isLlm === true) {
     if (upstream.ok) {
       return billLlmBapxProxy(upstream, service, subPath, accountId, actor);
@@ -239,7 +239,7 @@ async function billLlmBapxProxy(
       completionTokens,
       cachedTokens,
       cacheWriteTokens,
-      KORTIX_MARKUP,
+      BAPX_MARKUP,
     );
 
     deductLLMCredits(
@@ -258,7 +258,7 @@ async function billLlmBapxProxy(
       })
       .catch((err) => console.error(`[PROXY] LLM bapx billing error: ${err}`));
 
-    console.log(`[PROXY] LLM bapx ${modelId}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${KORTIX_MARKUP}x)`);
+    console.log(`[PROXY] LLM bapx ${modelId}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${BAPX_MARKUP}x)`);
   } else {
     console.warn(`[PROXY] LLM bapx ${service.name}: no usage data in response — billing skipped`);
   }
@@ -270,7 +270,7 @@ async function billLlmBapxProxy(
 }
 
 /**
- * Extract usage from an SSE stream and bill at KORTIX_MARKUP.
+ * Extract usage from an SSE stream and bill at BAPX_MARKUP.
  * Handles both OpenAI-compatible and Anthropic-native SSE formats.
  * Runs in background (fire-and-forget).
  */
@@ -335,14 +335,14 @@ async function extractUsageFromBapxProxyStream(
         return;
       }
       const modelConfig = getModel(detectedModel);
-      const cost = calculateCost(modelConfig, anthropicInputTokens, anthropicOutputTokens, 0, 0, KORTIX_MARKUP);
+      const cost = calculateCost(modelConfig, anthropicInputTokens, anthropicOutputTokens, 0, 0, BAPX_MARKUP);
       const res = await deductLLMCredits(accountId, detectedModel, anthropicInputTokens, anthropicOutputTokens, cost);
       if (res.success && actor && cost > 0) {
         applyActorSpend(actor.sandboxId, actor.userId, dollarsToCents(cost)).catch(
           (err) => console.error('[PROXY] Actor spend attribution failed:', err),
         );
       }
-      console.log(`[PROXY] LLM bapx stream ${detectedModel}: ${anthropicInputTokens}/${anthropicOutputTokens} tokens, cost=$${cost.toFixed(6)} (${KORTIX_MARKUP}x)`);
+      console.log(`[PROXY] LLM bapx stream ${detectedModel}: ${anthropicInputTokens}/${anthropicOutputTokens} tokens, cost=$${cost.toFixed(6)} (${BAPX_MARKUP}x)`);
       return;
     }
 
@@ -354,14 +354,14 @@ async function extractUsageFromBapxProxyStream(
     const { promptTokens, completionTokens, cachedTokens, cacheWriteTokens } = lastUsage;
     if (promptTokens > 0 || completionTokens > 0) {
       const modelConfig = getModel(detectedModel);
-      const cost = calculateCost(modelConfig, promptTokens, completionTokens, cachedTokens, cacheWriteTokens, KORTIX_MARKUP);
+      const cost = calculateCost(modelConfig, promptTokens, completionTokens, cachedTokens, cacheWriteTokens, BAPX_MARKUP);
       const res = await deductLLMCredits(accountId, detectedModel, promptTokens, completionTokens, cost);
       if (res.success && actor && cost > 0) {
         applyActorSpend(actor.sandboxId, actor.userId, dollarsToCents(cost)).catch(
           (err) => console.error('[PROXY] Actor spend attribution failed:', err),
         );
       }
-      console.log(`[PROXY] LLM bapx stream ${detectedModel}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${KORTIX_MARKUP}x)`);
+      console.log(`[PROXY] LLM bapx stream ${detectedModel}: ${promptTokens}/${completionTokens} tokens, cost=$${cost.toFixed(6)} (${BAPX_MARKUP}x)`);
     } else {
       console.warn(`[PROXY] LLM bapx stream (${service.name}): zero tokens — billing skipped`);
     }

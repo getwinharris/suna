@@ -45,11 +45,11 @@ function shellQuote(value: string): string {
  * Returns [] when not running from a repo checkout (packaged install) so
  * production / self-hosted deployments are unaffected.
  *
- * Set `KORTIX_DEV_BIND_SOURCE=0` to force-disable even when running from a
+ * Set `BAPX_DEV_BIND_SOURCE=0` to force-disable even when running from a
  * checkout (e.g. when intentionally testing the baked image).
  */
 function findRepoRoot(): string | null {
-  if (process.env.KORTIX_DEV_BIND_SOURCE === '0') return null;
+  if (process.env.BAPX_DEV_BIND_SOURCE === '0') return null;
   // apps/api/src → repo root = ../../.. from this file's runtime location.
   // Walk up until we find a `core/bapx-master/opencode/opencode.jsonc`.
   let dir = resolve(__dirname);
@@ -126,7 +126,7 @@ const PORT_BINDINGS: Record<string, { HostPort: string; HostIp: string }[]> = Ob
  * - Shared Docker network (SANDBOX_NETWORK set):  http://bapx-api:{PORT}  (Docker DNS)
  * - Default bridge (sandbox on host ports):        http://host.docker.internal:{PORT}
  *
- * If KORTIX_URL is set to something other than localhost (e.g. a real domain),
+ * If BAPX_URL is set to something other than localhost (e.g. a real domain),
  * we use it as-is since the sandbox can reach it directly.
  */
 function getSandboxInternalApiUrl(): string {
@@ -134,7 +134,7 @@ function getSandboxInternalApiUrl(): string {
     return `http://bapx-api:${config.PORT}`;
   }
 
-  const externalUrl = config.KORTIX_URL?.replace(/\/v1\/router\/?$/, '');
+  const externalUrl = config.BAPX_URL?.replace(/\/v1\/router\/?$/, '');
   if (externalUrl) {
     try {
       const parsed = new URL(externalUrl);
@@ -338,7 +338,7 @@ export class LocalDockerProvider implements SandboxProvider {
     if (existing) {
       if (existing.status === 'running') {
         await this.syncCoreEnvVars();
-        const callerToken = this._lastCreateOpts?.envVars?.KORTIX_TOKEN;
+        const callerToken = this._lastCreateOpts?.envVars?.BAPX_TOKEN;
         if (callerToken) {
           await this.syncTokenToContainer(callerToken);
         }
@@ -611,7 +611,7 @@ export class LocalDockerProvider implements SandboxProvider {
    * take effect immediately — no service restart needed.
    * Only POSTs when values actually differ from what's currently set.
    *
-   * Auth aliases (KORTIX_TOKEN / INTERNAL_SERVICE_KEY / TUNNEL_TOKEN) are
+   * Auth aliases (BAPX_TOKEN / INTERNAL_SERVICE_KEY / TUNNEL_TOKEN) are
    * synced separately from the canonical sandbox service key in the DB.
    */
   async syncCoreEnvVars(): Promise<void> {
@@ -626,10 +626,10 @@ export class LocalDockerProvider implements SandboxProvider {
     const sandboxApiBase = getSandboxInternalApiUrl();
     const routerBase = `${sandboxApiBase}/v1/router`;
     const desired: Record<string, string> = {
-      KORTIX_API_URL: sandboxApiBase,
+      BAPX_API_URL: sandboxApiBase,
       TUNNEL_API_URL: sandboxApiBase,
       // Tool proxy URLs — route through bapx-api router so sandbox tools
-      // auth with KORTIX_TOKEN and the router injects real upstream API keys.
+      // auth with BAPX_TOKEN and the router injects real upstream API keys.
       TAVILY_API_URL: `${routerBase}/tavily`,
       REPLICATE_API_URL: `${routerBase}/replicate`,
       SERPER_API_URL: `${routerBase}/serper`,
@@ -739,7 +739,7 @@ export class LocalDockerProvider implements SandboxProvider {
   }
 
   /**
-   * Push a KORTIX_TOKEN into a running container so it matches the DB.
+   * Push a BAPX_TOKEN into a running container so it matches the DB.
    *
    * Called by ensure() when the caller (e.g. POST /init/local) registered a
    * new token in the DB but the container is already running with a stale one.
@@ -748,15 +748,15 @@ export class LocalDockerProvider implements SandboxProvider {
   private async syncTokenToContainer(token: string): Promise<void> {
     const containerEnv = await this.getContainerEnv();
     if (
-      containerEnv['KORTIX_TOKEN'] === token &&
+      containerEnv['BAPX_TOKEN'] === token &&
       containerEnv['INTERNAL_SERVICE_KEY'] === token &&
       containerEnv['TUNNEL_TOKEN'] === token
     ) return;
 
-    console.log('[LOCAL-DOCKER] Syncing DB-registered KORTIX_TOKEN into running container...');
+    console.log('[LOCAL-DOCKER] Syncing DB-registered BAPX_TOKEN into running container...');
     const authCandidates = getAuthCandidates(token);
     const authBundle = {
-      KORTIX_TOKEN: token,
+      BAPX_TOKEN: token,
       INTERNAL_SERVICE_KEY: token,
       TUNNEL_TOKEN: token,
     };
@@ -775,7 +775,7 @@ export class LocalDockerProvider implements SandboxProvider {
 
   private async getCanonicalServiceKey(): Promise<string> {
     const dbKey = await getSandboxServiceKeyByExternalId(CONTAINER_NAME);
-    return dbKey || this._lastCreateOpts?.envVars?.KORTIX_TOKEN || '';
+    return dbKey || this._lastCreateOpts?.envVars?.BAPX_TOKEN || '';
   }
 
   private _lastCreateOpts?: CreateSandboxOpts;
@@ -902,7 +902,7 @@ export class LocalDockerProvider implements SandboxProvider {
       await this.pullImage();
     }
 
-    let authToken = this._lastCreateOpts?.envVars?.KORTIX_TOKEN || '';
+    let authToken = this._lastCreateOpts?.envVars?.BAPX_TOKEN || '';
     if (!authToken) {
       authToken = generateSandboxKeyPair().secretKey;
     }
@@ -911,8 +911,8 @@ export class LocalDockerProvider implements SandboxProvider {
     const serviceKey = authToken;
 
     const MANAGED_VARS = new Set([
-      'KORTIX_TOKEN',
-      'KORTIX_API_URL',
+      'BAPX_TOKEN',
+      'BAPX_API_URL',
       'SANDBOX_ID',
       'INTERNAL_SERVICE_KEY',
       'PROJECT_ID',
@@ -942,7 +942,7 @@ export class LocalDockerProvider implements SandboxProvider {
       'OPENCODE_PERMISSION={"*":"allow"}',
       'DISPLAY=:1',
       'LSS_DIR=/persistent/lss',
-      'KORTIX_WORKSPACE=/workspace',
+      'BAPX_WORKSPACE=/workspace',
       'PYTHONUSERBASE=/workspace/.local',
       'PIP_USER=1',
       'NPM_CONFIG_PREFIX=/workspace/.npm-global',
@@ -950,8 +950,8 @@ export class LocalDockerProvider implements SandboxProvider {
       'SECRET_FILE_PATH=/persistent/secrets/.secrets.json',
       'SALT_FILE_PATH=/persistent/secrets/.salt',
       'ENCRYPTION_KEY_PATH=/persistent/secrets/.encryption-key',
-      `KORTIX_API_URL=${sandboxApiBase}`,
-      `KORTIX_TOKEN=${authToken}`,
+      `BAPX_API_URL=${sandboxApiBase}`,
+      `BAPX_TOKEN=${authToken}`,
       `INTERNAL_SERVICE_KEY=${serviceKey}`,
       `TUNNEL_API_URL=${sandboxApiBase}`,
       `TUNNEL_TOKEN=${authToken}`,
@@ -961,15 +961,15 @@ export class LocalDockerProvider implements SandboxProvider {
       `SANDBOX_VERSION=${SANDBOX_VERSION}`,
       'PROJECT_ID=local',
       // ── Tool proxy URLs — route through bapx-api router ─────────────
-      // Sandbox tools use KORTIX_TOKEN to auth; the router injects the real
+      // Sandbox tools use BAPX_TOKEN to auth; the router injects the real
       // upstream API key. Matches cloud provider env injection (justavps/daytona/pool).
       `TAVILY_API_URL=${routerBase}/tavily`,
       `REPLICATE_API_URL=${routerBase}/replicate`,
       `SERPER_API_URL=${routerBase}/serper`,
       `FIRECRAWL_API_URL=${routerBase}/firecrawl`,
-      ...(config.KORTIX_LOCAL_IMAGES ? ['KORTIX_LOCAL_SOURCE=1'] : []),
-      `ENV_MODE=${config.KORTIX_BILLING_INTERNAL_ENABLED ? 'cloud' : 'local'}`,
-      `CORS_ALLOWED_ORIGINS=${[config.FRONTEND_URL, config.KORTIX_URL].filter(Boolean).join(',')}`,
+      ...(config.BAPX_LOCAL_IMAGES ? ['BAPX_LOCAL_SOURCE=1'] : []),
+      `ENV_MODE=${config.BAPX_BILLING_INTERNAL_ENABLED ? 'cloud' : 'local'}`,
+      `CORS_ALLOWED_ORIGINS=${[config.FRONTEND_URL, config.BAPX_URL].filter(Boolean).join(',')}`,
       ...filteredSandboxEnv,
     ];
 

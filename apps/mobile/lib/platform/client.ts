@@ -16,7 +16,7 @@ import { log } from '@/lib/logger';
 export const SANDBOX_PORTS = {
   DESKTOP: '6080',
   DESKTOP_HTTPS: '6081',
-  KORTIX_MASTER: '8000',
+  BAPX_MASTER: '8000',
   BROWSER_STREAM: '9223',
   SSH: '22',
 } as const;
@@ -58,7 +58,7 @@ interface LocalBridgeSandboxResponse {
  * Pattern: {BACKEND_URL}/p/{externalId}/8000
  */
 export function getSandboxUrl(sandboxExternalId: string): string {
-  return `${API_URL}/p/${sandboxExternalId}/${SANDBOX_PORTS.KORTIX_MASTER}`;
+  return `${API_URL}/p/${sandboxExternalId}/${SANDBOX_PORTS.BAPX_MASTER}`;
 }
 
 /**

@@ -20,7 +20,7 @@ set -euo pipefail
 DOMAIN="${1:-}"
 ADMIN_USER="${2:-admin}"
 ADMIN_PASSWORD="${3:-}"
-INSTALL_DIR="${KORTIX_HOME:-$HOME/.bapx}"
+INSTALL_DIR="${BAPX_HOME:-$HOME/.bapx}"
 
 if [ -z "$DOMAIN" ]; then
   echo "Usage: $0 <domain-or-ip> [admin-user] [admin-password]"
@@ -197,15 +197,15 @@ if [ -f "$INSTALL_DIR/.env" ]; then
     fail ".env has secure permissions (got: ${ENV_PERMS})"
   fi
 
-  if grep -q 'KORTIX_TOKEN=' "$INSTALL_DIR/.env" 2>/dev/null; then
-    TOKEN_VAL=$(grep 'KORTIX_TOKEN=' "$INSTALL_DIR/.env" | cut -d= -f2)
+  if grep -q 'BAPX_TOKEN=' "$INSTALL_DIR/.env" 2>/dev/null; then
+    TOKEN_VAL=$(grep 'BAPX_TOKEN=' "$INSTALL_DIR/.env" | cut -d= -f2)
     if [ ${#TOKEN_VAL} -ge 32 ]; then
-      pass "KORTIX_TOKEN is set (${#TOKEN_VAL} chars)"
+      pass "BAPX_TOKEN is set (${#TOKEN_VAL} chars)"
     else
-      fail "KORTIX_TOKEN is too short (${#TOKEN_VAL} chars)"
+      fail "BAPX_TOKEN is too short (${#TOKEN_VAL} chars)"
     fi
   else
-    fail "KORTIX_TOKEN is set in .env"
+    fail "BAPX_TOKEN is set in .env"
   fi
 
   if grep -q 'INTERNAL_SERVICE_KEY=' "$INSTALL_DIR/.env" 2>/dev/null; then

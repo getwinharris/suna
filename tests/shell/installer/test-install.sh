@@ -68,7 +68,7 @@ else
   fail "supports local and VPS deploy modes"
 fi
 
-if grep -q -- '--local' "$SCRIPT" && grep -q 'KORTIX_LOCAL_IMAGES' "$SCRIPT"; then
+if grep -q -- '--local' "$SCRIPT" && grep -q 'BAPX_LOCAL_IMAGES' "$SCRIPT"; then
   pass "supports local installer image mode"
 else
   fail "supports local installer image mode"

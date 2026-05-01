@@ -73,7 +73,7 @@ for i in \$(seq 1 120); do
     if [ "\$ENV_MTIME" -gt "\$BOOT_TIME" ]; then
       break
     fi
-    if grep -Eq '^(INTERNAL_SERVICE_KEY|KORTIX_TOKEN|KORTIX_API_URL)=' "${ENV_FILE}" 2>/dev/null; then
+    if grep -Eq '^(INTERNAL_SERVICE_KEY|BAPX_TOKEN|BAPX_API_URL)=' "${ENV_FILE}" 2>/dev/null; then
       echo "[bapx] Reusing persisted env file ${ENV_FILE}"
       break
     fi
@@ -82,7 +82,7 @@ for i in \$(seq 1 120); do
 done
 [ -s "${ENV_FILE}" ] || touch "${ENV_FILE}"
 docker rm -f ${CONTAINER} 2>/dev/null || true
-exec docker run --rm --name ${CONTAINER} --env-file "${ENV_FILE}" -e KORTIX_ENABLE_INNER_DOCKER=0 \\
+exec docker run --rm --name ${CONTAINER} --env-file "${ENV_FILE}" -e BAPX_ENABLE_INNER_DOCKER=0 \\
   --privileged --cap-add SYS_ADMIN --security-opt seccomp=unconfined --shm-size 2g \\
   -v ${STARTUP_PATCH}:/ephemeral/startup.sh:ro -v ${VOLUME}:/workspace -v ${VOLUME}:/config ${PORT_ARGS} \\
   ${DOCKER_IMAGE}

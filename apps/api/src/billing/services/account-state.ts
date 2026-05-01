@@ -25,7 +25,7 @@ async function getYoloUsage(serviceKey: string | null): Promise<AccountStateResp
   if (config.ENV_MODE !== 'cloud') return null;
   if (!serviceKey) return null;
   try {
-    const res = await fetch(`${config.KORTIX_YOLO_URL}/me`, {
+    const res = await fetch(`${config.BAPX_YOLO_URL}/me`, {
       headers: { Authorization: `Bearer ${serviceKey}` },
       signal: AbortSignal.timeout(5000),
     });

@@ -189,27 +189,27 @@ async function attemptKeySync(baseUrl: string, canonicalServiceKey: string, auth
 
   // Compute the correct internal API URL for the sandbox (same logic as local-docker.ts)
   let internalApiUrl = `http://host.docker.internal:${config.PORT}`;
-  if (config.KORTIX_URL) {
+  if (config.BAPX_URL) {
     try {
-      const parsed = new URL(config.KORTIX_URL);
+      const parsed = new URL(config.BAPX_URL);
       if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') {
         parsed.hostname = 'host.docker.internal';
         internalApiUrl = parsed.toString().replace(/\/$/, '');
       } else {
-        internalApiUrl = config.KORTIX_URL.replace(/\/$/, '');
+        internalApiUrl = config.BAPX_URL.replace(/\/$/, '');
       }
     } catch {}
   }
 
   const keysToSync: Record<string, string> = {
-    KORTIX_TOKEN: canonicalServiceKey,
+    BAPX_TOKEN: canonicalServiceKey,
     INTERNAL_SERVICE_KEY: canonicalServiceKey,
     TUNNEL_TOKEN: canonicalServiceKey,
-    KORTIX_API_URL: internalApiUrl,
+    BAPX_API_URL: internalApiUrl,
     TUNNEL_API_URL: internalApiUrl,
     ...(config.ENV_MODE === 'cloud' ? {
-      KORTIX_YOLO_API_KEY: canonicalServiceKey,
-      KORTIX_YOLO_URL: config.KORTIX_YOLO_URL,
+      BAPX_YOLO_API_KEY: canonicalServiceKey,
+      BAPX_YOLO_URL: config.BAPX_YOLO_URL,
     } : {}),
   };
 
@@ -280,8 +280,8 @@ async function attemptKeySyncFallback(keys: Record<string, string>): Promise<boo
       env.DOCKER_HOST = `unix://${config.DOCKER_HOST}`;
     }
 
-    const token = keys.KORTIX_TOKEN || keys.INTERNAL_SERVICE_KEY || '';
-    const apiUrl = keys.KORTIX_API_URL || keys.TUNNEL_API_URL || '';
+    const token = keys.BAPX_TOKEN || keys.INTERNAL_SERVICE_KEY || '';
+    const apiUrl = keys.BAPX_API_URL || keys.TUNNEL_API_URL || '';
     execSync(
       `docker exec ${shellQuote(config.SANDBOX_CONTAINER_NAME)} bash -c ${shellQuote(buildCanonicalSandboxAuthCommand(token, apiUrl))}`,
       { timeout: 15_000, stdio: 'pipe', env },

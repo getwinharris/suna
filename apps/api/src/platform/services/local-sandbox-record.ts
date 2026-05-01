@@ -25,7 +25,7 @@ function getHealthUrl(): string {
 }
 
 function getBaseUrl(): string {
-  const routerBase = (config.KORTIX_URL || `http://localhost:${config.PORT || 8008}/v1/router`).replace(/\/router$/, '');
+  const routerBase = (config.BAPX_URL || `http://localhost:${config.PORT || 8008}/v1/router`).replace(/\/router$/, '');
   return `${routerBase}/p/${config.SANDBOX_CONTAINER_NAME}/8000`;
 }
 

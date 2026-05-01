@@ -46,7 +46,7 @@ if (LOG_TOKEN) {
 
 const BASE_CONTEXT = {
   service: 'bapx-api',
-  env: process.env.INTERNAL_KORTIX_ENV || 'dev',
+  env: process.env.INTERNAL_BAPX_ENV || 'dev',
   version: process.env.SANDBOX_VERSION || 'dev',
 };
 

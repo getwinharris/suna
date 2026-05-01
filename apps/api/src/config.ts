@@ -144,10 +144,10 @@ const envSchema = z.object({
   // ── Sandbox Platform ──────────────────────────────────────────────────────
   // BAPX_URL is auto-derived from PORT if not explicitly set (see validateEnv).
   BAPX_URL:                  optStr,
-  KORTIX_YOLO_URL:             optUrl('https://api-yolo.bapx.in/v1'),
+  BAPX_YOLO_URL:             optUrl('https://api-yolo.bapx.in/v1'),
   ALLOWED_SANDBOX_PROVIDERS:   optStrDefault('local_docker'),
   SANDBOX_IMAGE:               optStr,  // overridden below if empty
-  KORTIX_LOCAL_IMAGES:         optBoolFalse,
+  BAPX_LOCAL_IMAGES:         optBoolFalse,
   DOCKER_HOST:                 optStr,
   SANDBOX_NETWORK:             optStr,
   SANDBOX_PORT_BASE:           optInt(14000),
@@ -203,9 +203,9 @@ const envSchema = z.object({
 
   // ── Stray env vars used directly in other files (centralized here) ───────
   CORS_ALLOWED_ORIGINS:        optStr,
-  KORTIX_MASTER_URL:           optStr,
+  BAPX_MASTER_URL:           optStr,
   OPENCODE_URL:                optStr,
-  KORTIX_DATA_DIR:             optStr,
+  BAPX_DATA_DIR:             optStr,
 });
 
 // ─── Validation + Conditional Checks ────────────────────────────────────────
@@ -441,10 +441,10 @@ export const config = {
 
   // ─── Sandbox Provisioning (Platform) ──────────────────────────────────────
   BAPX_URL: env.BAPX_URL,
-  KORTIX_YOLO_URL: env.KORTIX_YOLO_URL,
+  BAPX_YOLO_URL: env.BAPX_YOLO_URL,
   ALLOWED_SANDBOX_PROVIDERS: allowedProviders,
   SANDBOX_IMAGE: env.SANDBOX_IMAGE || 'bapx/computer:latest',
-  KORTIX_LOCAL_IMAGES: env.KORTIX_LOCAL_IMAGES,
+  BAPX_LOCAL_IMAGES: env.BAPX_LOCAL_IMAGES,
   DOCKER_HOST: env.DOCKER_HOST,
   SANDBOX_NETWORK: env.SANDBOX_NETWORK,
   SANDBOX_PORT_BASE: env.SANDBOX_PORT_BASE,
@@ -458,7 +458,7 @@ export const config = {
    * includes `Authorization: Bearer <INTERNAL_SERVICE_KEY>`. The sandbox's
    * bapx-master middleware validates it.
    *
-   * Counterpart: KORTIX_TOKEN goes the other direction (sandbox -> bapx-api).
+   * Counterpart: BAPX_TOKEN goes the other direction (sandbox -> bapx-api).
    *
    * Auto-generated at startup if not provided -- always present.
    * Persisted to .env so the same key survives process restarts.
@@ -535,9 +535,9 @@ export const config = {
 
   // ─── Stray env vars (centralized from other files) ────────────────────────
   CORS_ALLOWED_ORIGINS: env.CORS_ALLOWED_ORIGINS,
-  KORTIX_MASTER_URL: env.KORTIX_MASTER_URL,
+  BAPX_MASTER_URL: env.BAPX_MASTER_URL,
   OPENCODE_URL: env.OPENCODE_URL,
-  KORTIX_DATA_DIR: env.KORTIX_DATA_DIR,
+  BAPX_DATA_DIR: env.BAPX_DATA_DIR,
 
   // ─── Helper Methods ────────────────────────────────────────────────────────
 
@@ -582,7 +582,7 @@ export const config = {
 //   * User's own keys (passthrough):     0.1x provider cost (10% platform fee)
 
 /** Markup when Bapx provides the API key. */
-export const KORTIX_MARKUP = 1.2;
+export const BAPX_MARKUP = 1.2;
 
 /** Platform fee when user provides their own API key. */
 export const PLATFORM_FEE_MARKUP = 0.1;

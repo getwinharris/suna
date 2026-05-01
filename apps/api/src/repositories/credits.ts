@@ -67,7 +67,7 @@ export async function checkCredits(
   minimumRequired: number = 0.01
 ): Promise<CreditCheckResult> {
   // Billing disabled: no credit gating
-  if (!config.KORTIX_BILLING_INTERNAL_ENABLED) {
+  if (!config.BAPX_BILLING_INTERNAL_ENABLED) {
     return { hasCredits: true, balance: 0, message: 'OK' };
   }
 
@@ -107,7 +107,7 @@ export async function deductCredits(
   description: string,
 ): Promise<CreditDeductResult> {
   // Billing disabled: no deduction
-  if (!config.KORTIX_BILLING_INTERNAL_ENABLED) {
+  if (!config.BAPX_BILLING_INTERNAL_ENABLED) {
     return { success: true, amountDeducted: 0, newBalance: 0 };
   }
 

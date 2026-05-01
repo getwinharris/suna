@@ -158,10 +158,10 @@ mock.module('../config', () => ({
   config: {
     STRIPE_WEBHOOK_SECRET: 'whsec_test',
     ENV_MODE: 'cloud',
-    INTERNAL_KORTIX_ENV: 'staging',
+    INTERNAL_BAPX_ENV: 'staging',
     DATABASE_URL: '',
     FRONTEND_URL: 'http://localhost:3000',
-    KORTIX_BILLING_INTERNAL_ENABLED: true,
+    BAPX_BILLING_INTERNAL_ENABLED: true,
     ALLOWED_SANDBOX_PROVIDERS: ['local_docker'],
     isLocal: () => false,
     isCloud: () => true,

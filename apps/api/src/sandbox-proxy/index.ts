@@ -12,7 +12,7 @@ import { isProxyTokenStale, refreshSandboxProxyToken } from '../platform/provide
 import { resolvePreviewUserContext } from '../shared/preview-ownership';
 import {
   encodeBapxUserContext,
-  KORTIX_USER_CONTEXT_HEADER,
+  BAPX_USER_CONTEXT_HEADER,
 } from '../shared/bapx-user-context';
 
 async function buildSignedUserContextHeader(
@@ -37,7 +37,7 @@ async function buildSignedUserContextHeader(
   console.log(
     `[PREVIEW] signing X-Bapx-User-Context user=${userId} sandbox=${sandboxId} role=${payload.sandboxRole} tokenPrefix=${signed.slice(0, 16)}`,
   );
-  return { [KORTIX_USER_CONTEXT_HEADER]: signed };
+  return { [BAPX_USER_CONTEXT_HEADER]: signed };
 }
 
 const sandboxProxyApp = new Hono();

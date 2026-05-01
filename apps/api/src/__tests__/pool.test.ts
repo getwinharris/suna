@@ -117,7 +117,7 @@ describe('pool/env-injector', () => {
       expect(opts.headers['X-Proxy-Token']).toBe('proxy_tok');
 
       const body = JSON.parse(opts.body);
-      expect(body.keys.KORTIX_TOKEN).toBe('sk_test_key');
+      expect(body.keys.BAPX_TOKEN).toBe('sk_test_key');
       expect(body.keys.INTERNAL_SERVICE_KEY).toBe('sk_test_key');
     } finally {
       globalThis.fetch = originalFetch;

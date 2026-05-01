@@ -24,7 +24,7 @@ import { Daytona } from '@daytonaio/sdk';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
-const OLD_SUNA_SNAPSHOT = 'bapx/bapX:0.1.3.30';
+const OLD_BAPX_SNAPSHOT = 'bapx/bapX:0.1.3.30';
 
 const DUMMY_FILES = [
   { path: '/workspace/uploads/report.pdf', content: 'fake-pdf-content-here' },
@@ -150,7 +150,7 @@ async function main() {
 
   const sandbox = await daytona.create(
     {
-      snapshot: OLD_SUNA_SNAPSHOT,
+      snapshot: OLD_BAPX_SNAPSHOT,
       envVars: {},
       autoStopInterval: 30,
       autoArchiveInterval: 60,
@@ -207,7 +207,7 @@ async function main() {
   Sandbox ID:    ${sandboxId}
   Resource ID:   ${resourceId}
   Account ID:    ${accountId}
-  Snapshot:      ${OLD_SUNA_SNAPSHOT}
+  Snapshot:      ${OLD_BAPX_SNAPSHOT}
   Files:         ${DUMMY_FILES.length} dummy files in /workspace/uploads/
 
   Next steps:

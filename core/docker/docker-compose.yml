@@ -59,14 +59,14 @@ services:
       - OPENCODE_CONFIG_DIR=/ephemeral/bapx-master/opencode
       - OPENCODE_PERMISSION={"*":"allow"}
       - DISPLAY=:1
-      - KORTIX_PERSISTENT_ROOT=/persistent
+      - BAPX_PERSISTENT_ROOT=/persistent
       - OPENCODE_STORAGE_BASE=/persistent/opencode
       - OPENCODE_SHADOW_STORAGE_BASE=/persistent/opencode-shadow
-      - KORTIX_OPENCODE_ARCHIVE_DIR=/persistent/opencode-archive
-      - KORTIX_OPENCODE_CACHE_DIR=/persistent/opencode-cache
+      - BAPX_OPENCODE_ARCHIVE_DIR=/persistent/opencode-archive
+      - BAPX_OPENCODE_CACHE_DIR=/persistent/opencode-cache
       - AUTH_JSON_PATH=/persistent/opencode/auth.json
       - LSS_DIR=/persistent/lss
-      - KORTIX_WORKSPACE=/workspace
+      - BAPX_WORKSPACE=/workspace
       # ── Persistent package paths (all under /workspace/) ──────────────
       - PYTHONUSERBASE=/workspace/.local
       - PIP_USER=1
@@ -76,15 +76,15 @@ services:
       - SALT_FILE_PATH=/persistent/secrets/.salt
       - ENCRYPTION_KEY_PATH=/persistent/secrets/.encryption-key
       # ── Sandbox identity (injected by bapx-api or set manually) ─────
-      - KORTIX_API_URL=${KORTIX_API_URL:-http://host.docker.internal:8008}
-      - KORTIX_TOKEN=${KORTIX_TOKEN:-}
+      - BAPX_API_URL=${BAPX_API_URL:-http://host.docker.internal:8008}
+      - BAPX_TOKEN=${BAPX_TOKEN:-}
       - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-}
-      - TUNNEL_API_URL=${KORTIX_API_URL:-http://host.docker.internal:8008}
-      - TUNNEL_TOKEN=${KORTIX_TOKEN:-}
+      - TUNNEL_API_URL=${BAPX_API_URL:-http://host.docker.internal:8008}
+      - TUNNEL_TOKEN=${BAPX_TOKEN:-}
       - SANDBOX_ID=${SANDBOX_ID:-local}
       - PROJECT_ID=${PROJECT_ID:-local}
       - ENV_MODE=${ENV_MODE:-local}
-      - KORTIX_LOCAL_SOURCE=${KORTIX_LOCAL_SOURCE:-1}
+      - BAPX_LOCAL_SOURCE=${BAPX_LOCAL_SOURCE:-1}
     env_file:
       - .env
     volumes:

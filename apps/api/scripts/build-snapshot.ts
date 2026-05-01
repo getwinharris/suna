@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Build a JustAVPS snapshot for Suna sandboxes.
+ * Build a JustAVPS snapshot for Bapx sandboxes.
  *
  * Self-contained — only needs JUSTAVPS_API_URL and JUSTAVPS_API_KEY.
  * Works both locally (reads .env) and in CI (env vars set by GitHub secrets).
