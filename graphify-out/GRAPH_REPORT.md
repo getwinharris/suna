@@ -275,10 +275,10 @@
   core/bapx-master/opencode/tools/scrape_webpage.ts → apps/mobile/components/chat/tool-views/sheets-tool/SheetsToolView.tsx
 - `ttcCompress()` --calls--> `fetch()`  [INFERRED]
   core/bapx-master/opencode/plugin/bapx-system/lib/session.ts → apps/api/src/index.ts
-- `sendTelegramText()` --calls--> `fetch()`  [INFERRED]
-  core/bapx-master/src/routes/channel-webhooks.ts → apps/api/src/index.ts
-- `sendSlackText()` --calls--> `fetch()`  [INFERRED]
-  core/bapx-master/src/routes/channel-webhooks.ts → apps/api/src/index.ts
+- `fetch()` --calls--> `sendTelegramText()`  [INFERRED]
+  apps/api/src/index.ts → core/bapx-master/src/routes/channel-webhooks.ts
+- `fetch()` --calls--> `sendSlackText()`  [INFERRED]
+  apps/api/src/index.ts → core/bapx-master/src/routes/channel-webhooks.ts
 
 ## Communities
 
