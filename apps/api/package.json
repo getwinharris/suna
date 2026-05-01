@@ -22,7 +22,6 @@
     "@bapx/shared": "workspace:*",
     "@logtail/node": "^0.5.8",
     "@sentry/bun": "^10.47.0",
-    "@trailbase/trailbase-js": "^2.95.3",
     "trailbase": "^0.12.1",
     "agent-tunnel": "workspace:@bapx/agent-tunnel@*",
     "ai": "^6.0.77",

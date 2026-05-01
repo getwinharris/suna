@@ -1,8 +1,8 @@
 import { getRequestConfig } from 'next-intl/server';
 import { cookies, headers } from 'next/headers';
-import { createServerClient } from '@trailbase/ssr';
+import { createServerClient } from '@/lib/trailbase/server-compat';
 import { locales, defaultLocale, type Locale } from './config';
-import { BAPX_TRAILBASE_AUTH_COOKIE } from '@/lib/trailbase/constants';
+import { BAPX_TRAILBASE_AUTH_COOKIE } from '@/lib/trailbase/client';
 import { getServerPublicEnv } from '@/lib/public-env-server';
 
 export default getRequestConfig(async ({ requestLocale }) => {
@@ -28,7 +28,6 @@ export default getRequestConfig(async ({ requestLocale }) => {
     const runtimeEnv = getServerPublicEnv();
     const trailbase = createServerClient(
       process.env.TRAILBASE_SERVER_URL || process.env.TRAILBASE_URL || runtimeEnv.TRAILBASE_URL,
-      process.env.TRAILBASE_ANON_KEY || runtimeEnv.TRAILBASE_ANON_KEY,
       {
         cookieOptions: {
           name: BAPX_TRAILBASE_AUTH_COOKIE,

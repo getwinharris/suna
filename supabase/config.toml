@@ -1,68 +1,102 @@
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  Supabase Local Development Configuration                                  ║
+# ║  Supabase → TrailBase Migration Configuration                              ║
 # ║                                                                             ║
-# ║  Used by `supabase start` to spin up the local Supabase stack.             ║
-# ║  pg_cron and pg_net are built into Supabase's local postgres image —       ║
-# ║  no custom compilation needed (replaces services/postgres/Dockerfile).     ║
+# ║  This project has migrated from Supabase to TrailBase.                      ║
+# ║  This file is retained for reference; active services now use TrailBase.    ║
+# ║                                                                             ║
+# ║  TrailBase replaces:                                                        ║
+# ║    - PostgreSQL → SQLite (built-in)                                         ║
+# ║    - GoTrue Auth → Built-in auth                                            ║
+# ║    - PostgREST → Built-in REST API                                          ║
+# ║    - Realtime → Built-in subscriptions                                      ║
+# ║    - Storage → Built-in file management                                     ║
+# ║    - Studio/admin → Built-in admin UI at /_/admin/                          ║
 # ║                                                                             ║
 # ║  Usage:                                                                     ║
-# ║    supabase start          (first time — pulls images, ~2 min)             ║
-# ║    supabase status         (show URLs, keys, ports)                        ║
-# ║    supabase db reset       (re-run migrations from scratch)                ║
-# ║    supabase stop           (stop all containers)                           ║
+# ║    ./bin/trail-bin run         (start server)                              ║
+# ║    http://localhost:4000       (server URL)                                ║
+# ║    http://localhost:4000/_/admin/  (admin UI)                             ║
+# ║    http://localhost:4000/_/auth/login (auth UI)                           ║
+# ║                                                                             ║
+# ║  Key files:                                                                 ║
+# ║    traildepot/config.textproto     (TrailBase config)                      ║
+# ║    traildepot/data/main.db         (SQLite database)                       ║
+# ║    traildepot/migrations/main/     (SQL migrations)                        ║
+# ║    traildepot/secrets/keys/        (Ed25519 JWT keys)                      ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 project_id = "bapx-local"
 
-# ─── API (PostgREST) ─────────────────────────────────────────────────────────
+# ─── Legacy Supabase (DISABLED — replaced by TrailBase) ──────────────────────
+# These services are disabled because TrailBase provides equivalent
+# functionality natively. Keep configurations for reference.
+
 [api]
-enabled = true
-port = 54321
+enabled = false
 schemas = ["public", "bapx"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
-# ─── Database ─────────────────────────────────────────────────────────────────
 [db]
-port = 54322
+enabled = false
 major_version = 17
 
 [db.pooler]
 enabled = false
 
-# ─── Auth (GoTrue) ────────────────────────────────────────────────────────────
 [auth]
-enabled = true
+enabled = false
 site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://127.0.0.1:3000", "http://localhost:3000"]
-enable_signup = true
 
 [auth.email]
 enable_signup = true
 enable_confirmations = false
 
-# ─── Realtime ─────────────────────────────────────────────────────────────────
 [realtime]
 enabled = false
 
-# ─── Storage ──────────────────────────────────────────────────────────────────
 [storage]
 enabled = false
 
-# ─── Edge Functions ───────────────────────────────────────────────────────────
 [edge_runtime]
 enabled = false
 
-# ─── Studio (Dashboard UI) ───────────────────────────────────────────────────
 [studio]
-enabled = true
-port = 54323
+enabled = false
 
-# ─── Inbucket (Email testing) ────────────────────────────────────────────────
 [inbucket]
-enabled = true
-port = 54324
+enabled = false
 
-# ─── Analytics ────────────────────────────────────────────────────────────────
 [analytics]
 enabled = false
+
+# ─── TrailBase Service Mapping ────────────────────────────────────────────────
+# TrailBase serves all backend functionality on port 4000.
+#
+# Port   Service              Supabase Equivalent
+# ─────  ───────────────────  ───────────────────────────────
+# 4000   TrailBase server     (replaces postgres:54322, gotrue:54321,
+#                              postgrest, realtime, storage, studio:54323)
+# 3000   Next.js frontend     (unchanged)
+# 8008   Bapx API (Hono)      (custom API layer)
+#
+# TrailBase JWT signing uses Ed25519 keys at:
+#   traildepot/secrets/keys/private_key.pem
+#   traildepot/secrets/keys/public_key.pem
+#
+# Database location:
+#   traildepot/data/main.db
+#
+# Auth tables:
+#   _user       (user accounts, password hashes, verification status)
+#   _session    (refresh token sessions)
+#
+# Application tables (STRICT SQLite):
+#   accounts, account_members, platform_user_roles
+#   sandboxes, sandbox_members, sandbox_invites, sandbox_integrations
+#   api_keys, integrations, deployments
+#   billing_customers, credit_accounts, credit_ledger, credit_purchases, credit_usage
+#   platform_settings, access_allowlist, access_requests, account_deletion_requests
+#   oauth_clients, oauth_access_tokens, oauth_authorization_codes, oauth_refresh_tokens
+#   pool_resources, pool_sandboxes, server_entries
+#   tunnel_connections, tunnel_permissions, tunnel_permission_requests, tunnel_audit_logs

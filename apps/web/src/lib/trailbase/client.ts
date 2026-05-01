@@ -108,7 +108,7 @@ export function createClient(initialToken?: string | null): TrailbaseCompatClien
 
             await rawClient.refreshAuthToken().catch(() => undefined)
             const user = getCurrentUser()
-            return user ? { ...user, data: { user }, error: null } : { data: { user: null }, error: null }
+            return user ? { ...user, data: { user }, error: null } : null
           },
           getSession: async () => {
             await rawClient.refreshAuthToken().catch(() => undefined)

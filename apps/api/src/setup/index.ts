@@ -273,27 +273,17 @@ const SYSTEM_KEYS = ['ONBOARDING_COMPLETE'];
  */
 setupApp.get('/install-status', async (c) => {
   try {
-    console.log('[setup] install-status: checking database...');
-    if (!hasDatabase) {
-      console.warn('[setup] install-status: DATABASE_URL not configured — returning 503');
-      return c.json({ installed: null, error: 'Database not configured' }, 503);
-    }
-
-    // Query auth.users directly via the existing postgres connection.
-    // This is reliable regardless of Trailbase version / service role key format.
-    console.log('[setup] install-status: executing query...');
-    const result = await db.execute(
-      sql`SELECT EXISTS(SELECT 1 FROM auth.users LIMIT 1) AS has_users`
-    );
-    console.log('[setup] install-status: query finished, result type:', typeof result);
-    const queryResult = result as { rows?: Array<{ has_users?: boolean | 't' | 'f' }> } | Array<{ has_users?: boolean | 't' | 'f' }>;
-    const row = Array.isArray(queryResult) ? queryResult[0] : queryResult.rows?.[0];
-    const hasUsers = row?.has_users === true || row?.has_users === 't';
-
-    return c.json({ installed: hasUsers });
+    console.log('[setup] install-status: checking...');
+    const { Database } = await import('bun:sqlite');
+    const trailbaseDbPath = resolve(findRepoRoot() || process.cwd(), 'traildepot/data/main.db');
+    const sdb = new Database(trailbaseDbPath, { readonly: true });
+    const row = sdb.query('SELECT COUNT(*) as count FROM accounts').get() as { count: number } | undefined;
+    sdb.close();
+    const installed = (row?.count || 0) > 0;
+    return c.json({ installed });
   } catch (err) {
     console.error('[setup] install-status error:', err);
-    return c.json({ installed: null, error: 'Internal error' }, 503);
+    return c.json({ installed: false, error: 'Internal error' }, 503);
   }
 });
 
@@ -363,26 +353,49 @@ setupApp.get('/local-sandbox/warm/status', async (c) => {
 async function registerTrailbaseUser(email: string, password: string) {
   const baseUrl = config.TRAILBASE_URL?.replace(/\/+$/, '') || 'http://localhost:4000';
   
-  const res = await fetch(`${baseUrl}/api/auth/v1/register`, {
+  // Step 1: Register via Trailbase API
+  const regRes = await fetch(`${baseUrl}/api/auth/v1/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password, password_repeat: password }),
   });
   
-  if (!res.ok && res.status !== 303) {
-    const err = await res.text();
+  if (!regRes.ok && regRes.status !== 303) {
+    const err = await regRes.text();
     throw new Error(err || 'Failed to register user');
   }
 
-  // After registration, login via SDK to get the user object
-  const trail = getTrailbase();
-  await trail.login(email, password);
-  const user = trail.user();
-  if (!user) throw new Error('Failed to get user after registration');
-  return user;
+  // Step 2: Set verified=1 via Trailbase's built-in SQLite (bootstrap only)
+  const { Database } = await import('bun:sqlite');
+  const trailbaseDbPath = resolve(findRepoRoot() || process.cwd(), 'traildepot/data/main.db');
+  const sdb = new Database(trailbaseDbPath);
+  sdb.run('UPDATE _user SET verified = 1 WHERE email = ?', [email]);
+  sdb.close();
+
+  // Step 3: Login via Trailbase API to get auth token
+  const loginRes = await fetch(`${baseUrl}/api/auth/v1/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  
+  if (!loginRes.ok) {
+    throw new Error('Failed to login after registration');
+  }
+  
+  const loginData = await loginRes.json() as { auth_token?: string; refresh_token?: string };
+  
+  return { 
+    id: '',  // Will be extracted from token on the frontend
+    email, 
+    accessToken: loginData.auth_token || '',
+    refreshToken: loginData.refresh_token || ''
+  };
 }
 
 setupApp.post('/bootstrap-owner', async (c) => {
+  const baseUrl = config.TRAILBASE_URL?.replace(/\/+$/, '') || 'http://localhost:4000';
+
   if (!hasDatabase) {
     return c.json({ success: false, error: 'Database not configured' }, 503);
   }
@@ -400,56 +413,79 @@ setupApp.post('/bootstrap-owner', async (c) => {
       return c.json({ success: false, error: 'Password must be at least 6 characters' }, 400);
     }
 
-    const trail = getTrailbase();
-    
-    // Check if any users exist in platform_user_roles (which indicates installation)
-    const existingAdmins = await db.select().from(accounts).limit(1);
-    
-    if (existingAdmins.length > 0) {
-       // Check if this specific user exists in Trailbase
-       try {
-         await trail.login(email, password);
-         const user = trail.user();
-         if (user) {
-           return c.json({ success: true, created: false, message: 'Owner already exists', credentials_reset: true });
-         }
-       } catch {
-         return c.json({ success: false, error: 'Owner account already exists with different credentials' }, 409);
-       }
-    }
-
-    const user = await registerTrailbaseUser(email, password);
-    const userId = user.id;
-
-    if (userId) {
-      try {
-        const accountId = userId; // In Trailbase, userId is often used as accountId for personal
-        
-        // Create account record
-        await db.insert(accounts).values({
-          accountId,
-          name: email.split('@')[0],
-          personalAccount: true,
-          setupWizardStep: 2,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-
-        // Assign super_admin role
-        const { platformUserRoles } = await import('@bapx/db');
-        await db.insert(platformUserRoles).values({
-          accountId,
-          role: 'super_admin',
-        });
-
-        await setSandboxEnv({ ONBOARDING_COMPLETE: 'false', ONBOARDING_SESSION_ID: '', ONBOARDING_COMMAND_FIRED: 'false' }).catch(() => {});
-      } catch (err) {
-        console.error('[setup] bootstrap-owner DB error:', err);
-        // continue, maybe record already exists
+    // Check if any accounts exist via Trailbase install-status
+    const statusRes = await fetch(`${baseUrl}/api/records/v1/accounts?limit=1`);
+    if (statusRes.ok) {
+      const data = await statusRes.json() as { total_count?: number };
+      if (data.total_count && data.total_count > 0) {
+        return c.json({ success: false, error: 'Owner account already exists' }, 409);
       }
     }
 
-    return c.json({ success: true, created: true, email, accessToken: trail.tokens()?.auth_token });
+    // Register user, verify, and get auth token
+    const result = await registerTrailbaseUser(email, password);
+    const accessToken = result.accessToken;
+
+    if (!accessToken) {
+      return c.json({ success: false, error: 'Failed to authenticate after registration' }, 500);
+    }
+
+    // Create account record via Trailbase Record API
+    const headersAuth = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` };
+    
+    // Generate a UUID v4 for the account
+    function uuidV4() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+    }
+    const accountId = uuidV4();
+    const now = new Date().toISOString();
+    
+    const accountPayload = { 
+      account_id: accountId,
+      name: email.split('@')[0], 
+      personal_account: 1, 
+      setup_wizard_step: 2,
+      created_at: now,
+      updated_at: now
+    };
+    
+    const accountRes = await fetch(`${baseUrl}/api/records/v1/accounts`, {
+      method: 'POST',
+      headers: headersAuth,
+      body: JSON.stringify(accountPayload),
+    });
+    
+    if (!accountRes.ok) {
+      const errText = await accountRes.text();
+      console.error('[setup] Failed to create account record:', errText);
+    }
+
+    // Assign super_admin role via Trailbase Record API
+    const rolePayload = { 
+      account_id: accountId,
+      role: 'super_admin',
+      created_at: now,
+      updated_at: now
+    };
+    
+    const roleRes = await fetch(`${baseUrl}/api/records/v1/platform_user_roles`, {
+      method: 'POST',
+      headers: headersAuth,
+      body: JSON.stringify(rolePayload),
+    });
+    
+    if (!roleRes.ok) {
+      const errText = await roleRes.text();
+      console.error('[setup] Failed to create platform_user_roles record:', errText);
+    }
+
+    // Fire-and-forget sandbox env setup
+    setSandboxEnv({ ONBOARDING_COMPLETE: 'false', ONBOARDING_SESSION_ID: '', ONBOARDING_COMMAND_FIRED: 'false' }).catch(() => {});
+
+    return c.json({ success: true, created: true, email, accessToken });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error('[setup] bootstrap-owner error:', err);
