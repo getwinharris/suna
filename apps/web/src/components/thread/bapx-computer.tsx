@@ -1,2 +1,2 @@
-export { KortixComputer as BapxComputer, type ToolCallInput } from './bapx-media-hub/KortixComputer';
-export { KortixComputerHeader as BapxComputerHeader } from './bapx-media-hub/KortixComputerHeader';
+export { BapxComputer, type ToolCallInput } from './bapx-media-hub/KortixComputer';
+export { BapxComputerHeader } from './bapx-media-hub/KortixComputerHeader';

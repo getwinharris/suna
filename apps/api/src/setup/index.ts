@@ -360,14 +360,13 @@ setupApp.get('/local-sandbox/warm/status', async (c) => {
   return c.json(await getLocalSandboxWarmStatus());
 });
 
-import { getTrailbase } from '../shared/trailbase';
-
 async function registerTrailbaseUser(email: string, password: string) {
-  const trail = getTrailbase();
-  const res = await trail.fetch('/api/auth/v1/register', {
+  const baseUrl = config.TRAILBASE_URL?.replace(/\/+$/, '') || 'http://localhost:4000';
+  
+  const res = await fetch(`${baseUrl}/api/auth/v1/register`, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password, password_repeat: password }),
-    throwOnError: false,
   });
   
   if (!res.ok && res.status !== 303) {
@@ -375,7 +374,8 @@ async function registerTrailbaseUser(email: string, password: string) {
     throw new Error(err || 'Failed to register user');
   }
 
-  // After registration, login to get the ID
+  // After registration, login via SDK to get the user object
+  const trail = getTrailbase();
   await trail.login(email, password);
   const user = trail.user();
   if (!user) throw new Error('Failed to get user after registration');
