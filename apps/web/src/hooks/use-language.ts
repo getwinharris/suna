@@ -5,8 +5,6 @@ import { useCallback, useState, useEffect } from 'react';
 import { detectBestLocale } from '@/lib/utils/geo-detection';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/lib/trailbase/client';
-import type { User } from '@supabase/supabase-js';
-
 /**
  * Gets the stored locale with priority:
  * 1. User profile preference (from user_metadata) - ALWAYS highest priority
@@ -15,7 +13,7 @@ import type { User } from '@supabase/supabase-js';
  * 4. Geo-detection (timezone/browser) - default when nothing is explicitly set
  * 5. Default locale
  */
-function getStoredLocale(user: User | null): Locale {
+function getStoredLocale(user: any | null): Locale {
   if (typeof window === 'undefined') return defaultLocale;
 
   // Priority 1: Check user profile preference (if authenticated)
@@ -96,16 +94,16 @@ export function useLanguage() {
     // Use user from AuthProvider to avoid unnecessary getUser call
     if (user) {
       try {
-        const supabase = createClient();
-        const { error: updateError } = await supabase.auth.updateUser({
+        const trailbase = createClient();
+        const { error: updateError } = await trailbase.auth.updateUser({
           data: { locale: newLocale }
         });
         
         if (updateError) {
-          console.warn('Failed to save locale to user profile:', updateError);
+          console.error('[useLanguage] Error updating user locale:', updateError);
         }
-      } catch (error) {
-        console.warn('Error saving locale to user profile:', error);
+      } catch (err) {
+        console.error('[useLanguage] Error updating user locale:', err);
       }
     }
     

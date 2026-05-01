@@ -18,7 +18,7 @@ export interface RequestContext {
   method: string;
   /** Request path */
   path: string;
-  /** Supabase user ID (set after auth middleware) */
+  /** Trailbase user ID (set after auth middleware) */
   userId?: string;
   /** Bapx account ID (set after auth middleware) */
   accountId?: string;

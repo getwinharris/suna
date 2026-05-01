@@ -191,7 +191,7 @@ export async function proxyToDaytona(
         headers.set('X-Daytona-Preview-Token', previewToken);
       }
       // Authenticate to the sandbox using the stored service key (= BAPX_TOKEN).
-      // This replaces the user's Supabase JWT with the sandbox's INTERNAL_SERVICE_KEY.
+      // This replaces the user's Trailbase JWT with the sandbox's INTERNAL_SERVICE_KEY.
       if (serviceKey) {
         headers.set('Authorization', `Bearer ${serviceKey}`);
       }

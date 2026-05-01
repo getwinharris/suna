@@ -806,6 +806,15 @@ function LoginContent() {
                       </div>
                     </form>
 
+                    <div className="mt-6 flex flex-col items-center gap-2">
+                      <Link
+                        href={`/auth/password${returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ''}`}
+                        className="text-[11px] text-foreground/30 hover:text-foreground/50 transition-colors"
+                      >
+                        Sign in with password instead
+                      </Link>
+                    </div>
+
                     {/* Referral link */}
                     {!referralCodeParam && (
                       <div className="flex justify-center mt-4">
@@ -854,7 +863,7 @@ function SelfHostedLoginContent() {
   // sandbox creation, and /instances/[id] handles setup (provider, keys).
   useEffect(() => {
     if (isLoading || !user) return;
-    if (installed === false) return; // installer flow handles its own redirect
+    if (installed !== true) return; // Only redirect if we ARE installed
     router.replace(returnUrl);
   }, [isLoading, user, installed, returnUrl, router]);
 

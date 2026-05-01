@@ -1,5 +1,3 @@
-import type { User } from '@supabase/supabase-js';
-
 /**
  * Derive a stable @handle for the current real human from their auth profile.
  *
@@ -8,7 +6,7 @@ import type { User } from '@supabase/supabase-js';
  * refers to the human by handle. Future multi-user support will replace this
  * with a per-user table — the handle remains the display key.
  */
-export function getUserHandle(user: User | null | undefined): string {
+export function getUserHandle(user: any | null | undefined): string {
   if (!user) return 'me';
   const raw =
     (user.user_metadata?.username as string | undefined) ||

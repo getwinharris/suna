@@ -115,29 +115,46 @@ export async function installOwner(prevState: any, formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
-  const trailbase = await createClient();
-  const normalizedEmail = email.trim().toLowerCase();
+  if (!email || !password) {
+    return { success: false, message: 'Email and password are required' };
+  }
+
+  const backendUrl = process.env.BACKEND_URL || 'http://localhost:8008/v1';
 
   try {
-    // For self-hosted, we treat the first signup as the owner installation
-    await trailbase.auth.signUp(normalizedEmail, password);
-    const token = requireTrailbaseToken(trailbase.auth.getToken());
-    
-    const cookieStore = await cookies();
-    cookieStore.set(BAPX_TRAILBASE_AUTH_COOKIE, token, {
-      path: '/',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+    // Call the backend bootstrap endpoint which handles both Trailbase registration 
+    // and setting up the initial account/role records in the database.
+    const response = await fetch(`${backendUrl}/setup/bootstrap-owner`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
     });
 
-    return { 
-      success: true, 
-      accessToken: token,
-      message: 'Owner account created successfully' 
-    };
+    const result = await response.json();
+
+    if (result.success && result.accessToken) {
+      const cookieStore = await cookies();
+      cookieStore.set(BAPX_TRAILBASE_AUTH_COOKIE, result.accessToken, {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
+
+      return { 
+        success: true, 
+        accessToken: result.accessToken,
+        message: result.message || 'Owner account created successfully' 
+      };
+    } else {
+      return { 
+        success: false, 
+        message: result.error || result.message || 'Installation failed' 
+      };
+    }
   } catch (err: any) {
-    return { message: err.message || 'Installation failed' };
+    console.error('[installOwner] Error:', err);
+    return { success: false, message: err.message || 'Installation failed' };
   }
 }
 

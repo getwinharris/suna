@@ -270,7 +270,7 @@ export default function NotificationManagementPage() {
                         onChange={(e) => setSubscriberId(e.target.value)}
                       />
                       <p className="text-xs text-muted-foreground">
-                        The Supabase user ID of the recipient
+                        The Trailbase user ID of the recipient
                       </p>
                     </div>
                   )}

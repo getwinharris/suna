@@ -69,8 +69,8 @@ export default function ActivateTrialPage() {
   };
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    const trailbase = createClient();
+    await trailbase.auth.signOut();
     clearUserLocalStorage();
     router.push('/auth');
   };

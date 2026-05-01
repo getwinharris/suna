@@ -51,7 +51,7 @@ sandboxProxyApp.route('/auth', getAuthToken);
 sandboxProxyApp.route('/share', shareApp);
 
 // ── Path-based proxy ────────────────────────────────────────────────────────
-// Auth middleware for both modes (Supabase JWT, bapx_ tokens, cookies).
+// Auth middleware for both modes (Trailbase JWT, bapx_ tokens, cookies).
 sandboxProxyApp.use('/:sandboxId/:port/*', combinedAuth);
 sandboxProxyApp.use('/:sandboxId/:port', combinedAuth);
 

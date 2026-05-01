@@ -1,5 +1,5 @@
 import type { Database } from '@bapx/db';
-import { getSupabase } from '../../shared/supabase';
+import { getTrailbase } from '../../shared/trailbase';
 import { invalidatePreviewCacheForUser } from '../../shared/preview-ownership';
 
 import {
@@ -94,12 +94,12 @@ export async function listMembers(
 
   if (userIds.size === 0) return [];
 
-  const supabase = getSupabase();
+  const trailbase = getTrailbase();
   const emails = new Map<string, string | null>();
   await Promise.all(
     Array.from(userIds).map(async (uid) => {
       try {
-        const { data } = await supabase.auth.admin.getUserById(uid);
+        const { data } = await trailbase.auth.admin.getUserById(uid);
         emails.set(uid, data?.user?.email ?? null);
       } catch {
         emails.set(uid, null);

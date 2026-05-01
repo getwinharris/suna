@@ -1166,7 +1166,7 @@ export function createCloudSandboxRouter(
       }
 
       // Lazy-migrate: create bapx.credit_accounts row with full credits.
-      // Supabase RPCs can't access bapx schema, so set everything via drizzle directly.
+      // Trailbase RPCs can't access bapx schema, so set everything via drizzle directly.
       try {
         const { MACHINE_CREDIT_BONUS } = await import('../../billing/services/tiers');
         const { grantMachineBonusOnce, getLegacyClaimMachineBonusKey } = await import('../../billing/services/machine-bonus');

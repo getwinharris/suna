@@ -1,5 +1,5 @@
 import { getEnv } from '@/lib/env-config';
-import { getSupabaseAccessTokenWithRetry } from '@/lib/auth-token';
+import { getTrailbaseAccessTokenWithRetry } from '@/lib/auth-token';
 import { handleApiError, handleNetworkError, ErrorContext, ApiError } from './error-handler';
 import { parseBillingError, RequestTooLargeError } from './api/errors';
 
@@ -40,7 +40,7 @@ async function makeRequest<T = any>(
       }
     }, timeout);
 
-    const token = await getSupabaseAccessTokenWithRetry();
+    const token = await getTrailbaseAccessTokenWithRetry();
 
     // Don't set Content-Type for FormData - browser will set it automatically with boundary
     const isFormData = fetchOptions.body instanceof FormData;
@@ -56,7 +56,7 @@ async function makeRequest<T = any>(
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     } else {
-      // No session yet — Supabase hasn't hydrated from cookies.
+      // No session yet — Trailbase hasn't hydrated from cookies.
       // Return a silent failure instead of sending a naked request that will 401.
       // Callers gated by `enabled: !!user` should prevent this path, but this
       // is a safety net for any calls that slip through.
@@ -71,7 +71,7 @@ async function makeRequest<T = any>(
     }
 
     // Note: X-Refresh-Token was removed to reduce header size and prevent HTTP 431 errors.
-    // The backend handles token refresh via Supabase directly.
+    // The backend handles token refresh via Trailbase directly.
 
     const response = await fetch(url, {
       ...fetchOptions,
@@ -212,7 +212,7 @@ async function makeRequest<T = any>(
   }
 }
 
-export const supabaseClient = {
+export const trailbaseClient = {
   async execute<T = any>(
     queryFn: () => Promise<{ data: T | null; error: any }>,
     errorContext?: ErrorContext

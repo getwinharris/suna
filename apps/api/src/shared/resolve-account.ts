@@ -13,10 +13,12 @@ async function syncLegacySubscription(accountId: string): Promise<void> {
 
 async function getUserEmail(userId: string): Promise<string | null> {
   try {
-    const { getSupabase } = await import('./supabase');
-    const { data, error } = await getSupabase().auth.admin.getUserById(userId);
-    if (error) return null;
-    return data?.user?.email?.trim().toLowerCase() ?? null;
+    const { getTrailbase } = await import('./trailbase');
+    const trail = getTrailbase();
+    
+    // Trailbase users can be fetched by ID via records API or auth status
+    const user = await trail.records('users').get(userId);
+    return user?.email?.trim().toLowerCase() ?? null;
   } catch {
     return null;
   }

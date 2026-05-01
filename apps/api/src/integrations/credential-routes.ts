@@ -18,7 +18,7 @@ export function createCredentialRoutes(): Hono<AppEnv> {
 
   /**
    * PUT /credentials — save Pipedream creds for the authenticated account.
-   * Works from frontend (supabase JWT → userId) or sandbox (apiKey → accountId).
+   * Works from frontend (trailbase JWT → userId) or sandbox (apiKey → accountId).
    */
   app.put('/credentials', async (c) => {
     const accountId = await resolveAccount(c);
@@ -86,7 +86,7 @@ export function createCredentialRoutes(): Hono<AppEnv> {
 }
 
 /**
- * Resolve accountId from either supabase auth (userId) or api key auth (accountId).
+ * Resolve accountId from either trailbase auth (userId) or api key auth (accountId).
  */
 async function resolveAccount(c: any): Promise<string> {
   // apiKeyAuth sets accountId directly

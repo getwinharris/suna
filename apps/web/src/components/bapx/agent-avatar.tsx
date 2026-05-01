@@ -8,7 +8,7 @@
  * circles with the icon on a saturation/lightness-fixed HSL background —
  * keeping visual consistency even when the hue is random.
  *
- * Users render with their Supabase avatar_url when available, otherwise
+ * Users render with their Trailbase avatar_url when available, otherwise
  * a handle-derived colored circle with initials — same shape + size so
  * mixed assignee rows stay aligned.
  */

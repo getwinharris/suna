@@ -845,8 +845,8 @@ export function CommandPalette() {
 
   const handleLogout = useCallback(async () => {
     close();
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    const trailbase = createClient();
+    await trailbase.auth.signOut();
     clearUserLocalStorage();
     router.push('/auth');
   }, [close, router]);

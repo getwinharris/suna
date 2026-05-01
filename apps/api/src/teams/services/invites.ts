@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 import type { Database } from '@bapx/db';
-import { getSupabase } from '../../shared/supabase';
+import { getTrailbase } from '../../shared/trailbase';
 import { invalidatePreviewCacheForUser } from '../../shared/preview-ownership';
 
 import {
@@ -45,7 +45,7 @@ async function findAuthUserIdByEmail(db: Database, email: string): Promise<strin
 
 async function lookupAuthEmail(userId: string): Promise<string | null> {
   try {
-    const { data, error } = await getSupabase().auth.admin.getUserById(userId);
+    const { data, error } = await getTrailbase().auth.admin.getUserById(userId);
     if (error) return null;
     return data?.user?.email?.trim().toLowerCase() ?? null;
   } catch {

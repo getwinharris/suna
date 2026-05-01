@@ -29,7 +29,7 @@ export interface MarkdownFieldProps {
   agents: ProjectAgent[];
   userHandle: string;
 
-  /** Optional if the caller knows the user's Supabase avatar (passed to the overlay's mention dropdown). */
+  /** Optional if the caller knows the user's Trailbase avatar (passed to the overlay's mention dropdown). */
   userAvatarUrl?: string | null;
   placeholder?: string;
   /** Disable editing entirely (read-only) — defaults to false. */

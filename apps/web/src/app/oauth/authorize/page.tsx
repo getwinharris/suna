@@ -53,8 +53,8 @@ function OAuthConsent() {
     setError(null);
 
     try {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      const trailbase = createClient();
+      const { data: { session } } = await trailbase.auth.getSession();
       if (!session?.access_token) {
         setError('Session expired. Please sign in again.');
         setSubmitting(false);

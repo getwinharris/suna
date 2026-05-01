@@ -266,8 +266,8 @@ export const handleGoogleSlidesUpload = async (sandboxUrl: string, presentationP
   }
   
   try {
-    const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const trailbase = createClient();
+    const { data: { session } } = await trailbase.auth.getSession();
     
     // Use proper backend API client with authentication and extended timeout for PPTX generation
     const response = await backendApi.post('/presentation-tools/convert-and-upload-to-slides', {

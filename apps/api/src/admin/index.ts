@@ -4,7 +4,7 @@
  * Serves an embedded HTML admin UI at /v1/admin and exposes JSON API endpoints
  * for managing platform-level .env credentials and listing all sandbox instances.
  *
- * Auth: Supabase JWT (same as other authenticated routes).
+ * Auth: Trailbase JWT (same as other authenticated routes).
  *
  * Routes:
  *   GET  /v1/admin                → Admin panel HTML (single-page app)
@@ -42,7 +42,7 @@ import { execSync } from 'child_process';
 export const adminApp = new Hono<AppEnv>();
 
 // ─── Auth ───────────────────────────────────────────────────────────────────
-// All admin routes require a valid Supabase JWT AND admin/super_admin role.
+// All admin routes require a valid Trailbase JWT AND admin/super_admin role.
 adminApp.use('/*', trailbaseAuth, requireAdmin);
 
 // ─── Secret redaction ───────────────────────────────────────────────────────
@@ -278,11 +278,11 @@ function getAdminKeySchema(): Record<string, KeyGroup> {
     },
     core: {
       title: 'Core Infrastructure',
-      description: 'Database, Supabase, and API security keys.',
+      description: 'Database, Trailbase, and API security keys.',
       keys: [
         { key: 'DATABASE_URL', label: 'Database URL', secret: true },
-        { key: 'SUPABASE_URL', label: 'Supabase URL' },
-        { key: 'SUPABASE_SERVICE_ROLE_KEY', label: 'Supabase Service Role Key', secret: true },
+        { key: 'TRAILBASE_URL', label: 'Trailbase URL' },
+        { key: 'TRAILBASE_SERVICE_ROLE_KEY', label: 'Trailbase Service Role Key', secret: true },
         { key: 'API_KEY_SECRET', label: 'API Key Hashing Secret', secret: true },
       ],
     },
@@ -1379,7 +1379,7 @@ adminApp.get('/api/status', async (c) => {
     daytonaEnabled: config.isDaytonaEnabled(),
     localDockerEnabled: config.isLocalDockerEnabled(),
     databaseConfigured: !!config.DATABASE_URL,
-    supabaseConfigured: !!config.SUPABASE_URL,
+    trailbaseConfigured: !!config.TRAILBASE_URL,
     stripeConfigured: !!config.STRIPE_SECRET_KEY,
   });
 });
@@ -1871,7 +1871,7 @@ function getAdminHTML(): string {
   <div id="auth-overlay" class="auth-overlay" style="display: none;">
     <div class="auth-box">
       <h2>Bapx Admin</h2>
-      <p>Enter your Supabase JWT or sign in to access the admin panel.</p>
+      <p>Enter your Trailbase JWT or sign in to access the admin panel.</p>
       <input type="password" id="auth-token" placeholder="Bearer token" />
       <div id="auth-error" class="auth-error" style="display: none;"></div>
       <button class="btn btn-primary" style="width: 100%;" onclick="authenticate()">Sign In</button>
@@ -2267,7 +2267,7 @@ function getAdminHTML(): string {
           ['Daytona', data.daytonaEnabled ? 'Enabled' : 'Disabled'],
           ['Local Docker', data.localDockerEnabled ? 'Enabled' : 'Disabled'],
           ['Database', data.databaseConfigured ? 'Configured' : 'Not Set'],
-          ['Supabase', data.supabaseConfigured ? 'Configured' : 'Not Set'],
+          ['Trailbase', data.trailbaseConfigured ? 'Configured' : 'Not Set'],
           ['Stripe', data.stripeConfigured ? 'Configured' : 'Not Set'],
         ];
 

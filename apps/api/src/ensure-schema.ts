@@ -6,8 +6,8 @@
  *   2. `drizzle-kit push` (tables, indexes, enums — Drizzle-native)
  *   3. Run post-push migrations (table grants, atomic credit functions)
  *
- * SQL migrations live in supabase/migrations/ as individual files.
- * Each file contains a single statement so both `supabase db reset`
+ * SQL migrations live in trailbase/migrations/ as individual files.
+ * Each file contains a single statement so both `trailbase db reset`
  * and this runner can execute them without prepared-statement issues.
  *
  * In production (INTERNAL_BAPX_ENV=prod), schema is managed by external
@@ -36,7 +36,7 @@ export async function ensureSchema(): Promise<void> {
     return;
   }
 
-  const migrationsDir = join(import.meta.dir, '../../../supabase/migrations');
+  const migrationsDir = join(import.meta.dir, '../../../trailbase/migrations');
 
   // Step 1: Run bootstrap migration (schemas, extensions, grants)
   console.log('[schema] Running bootstrap migration...');
@@ -100,7 +100,7 @@ export async function ensureSchema(): Promise<void> {
 
 /**
  * Execute a raw SQL file against the database.
- * Uses postgres.js for direct connection (not Supabase client).
+ * Uses postgres.js for direct connection (not Trailbase client).
  */
 async function runSqlFile(filePath: string): Promise<void> {
   const fileName = filePath.split('/').pop();

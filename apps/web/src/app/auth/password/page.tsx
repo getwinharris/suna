@@ -196,6 +196,14 @@ function PasswordAuthContent() {
                 <input type="hidden" name="origin" value={typeof window !== 'undefined' ? window.location.origin : ''} />
 
                 <div className="space-y-4 pt-4">
+                  <div className="flex justify-end">
+                    <Link
+                      href="/auth/reset-password"
+                      className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
                   <SubmitButton
                     formAction={handleAuth}
                     className="w-full h-12 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-md"

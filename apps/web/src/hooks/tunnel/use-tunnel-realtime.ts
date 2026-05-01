@@ -19,8 +19,8 @@ export function useTunnelRealtimeSync() {
     let cancelled = false;
 
     async function connect() {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      const trailbase = createClient();
+      const { data: { session } } = await trailbase.auth.getSession();
       if (!session?.access_token || cancelled) return;
 
       if (sseStreamRef.current) {

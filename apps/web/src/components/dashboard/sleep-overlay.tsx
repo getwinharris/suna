@@ -83,8 +83,8 @@ function SleepClock({ phase }: { phase: 'in' | 'visible' | 'out' }) {
 function useSleepUser() {
   const [user, setUser] = useState<{ name: string; avatar: string } | null>(null);
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
+    const trailbase = createClient();
+    trailbase.auth.getUser().then(({ data }) => {
       if (data.user) {
         setUser({
           name: data.user.user_metadata?.name || data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || 'User',

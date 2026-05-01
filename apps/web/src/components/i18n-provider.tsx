@@ -5,8 +5,6 @@ import { ReactNode, useEffect, useState, useCallback, useRef, useMemo } from 're
 import { locales, defaultLocale, type Locale } from '@/i18n/config';
 import { detectBestLocale } from '@/lib/utils/geo-detection';
 import { useAuth } from '@/components/AuthProvider';
-import type { User } from '@supabase/supabase-js';
-
 // Preload default translations synchronously for immediate render
 // This prevents the loading spinner from blocking FCP
 import defaultTranslations from '../../translations/en.json';
@@ -33,7 +31,7 @@ async function getTranslations(locale: Locale) {
  * 4. Geo-detection (timezone/browser) - default when nothing is set
  * 5. Default locale
  */
-function getStoredLocale(user: User | null): Locale {
+function getStoredLocale(user: any | null): Locale {
   if (typeof window === 'undefined') return defaultLocale;
   
   // Priority 1: Check user profile preference (if authenticated)

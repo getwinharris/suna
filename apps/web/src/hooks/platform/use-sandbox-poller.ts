@@ -13,7 +13,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { getSupabaseAccessToken } from '@/lib/auth-token';
+import { getTrailbaseAccessToken } from '@/lib/auth-token';
 import { backendApi } from '@/lib/api-client';
 import { getEnv } from '@/lib/env-config';
 import type { ProvisioningStageInfo } from '@/lib/provisioning-stages';
@@ -303,7 +303,7 @@ export function useSandboxPoller(opts: UseSandboxPollerOpts = {}) {
 
     // Try SSE first
     try {
-      const token = await getSupabaseAccessToken();
+      const token = await getTrailbaseAccessToken();
       if (!token) throw new Error('No auth token');
 
       const baseUrl = getPlatformUrl();

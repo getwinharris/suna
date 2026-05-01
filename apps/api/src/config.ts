@@ -70,10 +70,7 @@ const envSchema = z.object({
     { message: 'TRAILBASE_URL must be a valid HTTP(S) URL' },
   ).optional().default('http://localhost:4000'),
   TRAILBASE_API_KEY: optStr,
-
-  // ── Supabase (LEGACY) ──────────────────────────────────────────────────
-  SUPABASE_URL: optUrl('http://127.0.0.1:64321'),
-  SUPABASE_SERVICE_ROLE_KEY: optStr,
+  TRAILBASE_SERVICE_ROLE_KEY: optStr,
 
   // ── API Key Hashing (REQUIRED) ───────────────────────────────────────────
   API_KEY_SECRET: z.string().min(1, 'API_KEY_SECRET is required — API key hashing will fail'),
@@ -374,9 +371,9 @@ export const config = {
   TRAILBASE_URL: env.TRAILBASE_URL,
   TRAILBASE_API_KEY: env.TRAILBASE_API_KEY,
 
-  // ─── Supabase ──────────────────────────────────────────────────────────────
-  SUPABASE_URL: env.SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE_KEY: env.SUPABASE_SERVICE_ROLE_KEY,
+  // ─── Trailbase ──────────────────────────────────────────────────────────────
+  TRAILBASE_URL: env.TRAILBASE_URL,
+  TRAILBASE_SERVICE_ROLE_KEY: env.TRAILBASE_SERVICE_ROLE_KEY,
 
   // ─── API Key Hashing ──────────────────────────────────────────────────────
   API_KEY_SECRET: env.API_KEY_SECRET,

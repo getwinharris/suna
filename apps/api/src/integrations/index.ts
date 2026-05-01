@@ -5,7 +5,7 @@ import { createCredentialRoutes } from './credential-routes';
 
 const integrationsApp = new Hono();
 
-// Credential management — works from both frontend (supabase) and sandbox (api key)
+// Credential management — works from both frontend (trailbase) and sandbox (api key)
 integrationsApp.use('/credentials', combinedAuth);
 
 integrationsApp.use('/apps', trailbaseAuth);

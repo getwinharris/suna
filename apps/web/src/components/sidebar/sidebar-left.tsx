@@ -1262,8 +1262,8 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.auth.getUser();
+      const trailbase = createClient();
+      const { data } = await trailbase.auth.getUser();
       if (data.user) {
         setUser({
           name: data.user.user_metadata?.name || data.user.email?.split('@')[0] || 'User',

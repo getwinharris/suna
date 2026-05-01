@@ -1,4 +1,4 @@
-import { supabaseMFAService } from '@/lib/supabase/mfa';
+import { trailbaseMFAService } from '@/lib/trailbase/mfa';
 
 
 
@@ -81,55 +81,55 @@ export const phoneVerificationService = {
    * Enroll phone number for SMS-based 2FA
    */
   async enrollPhoneNumber(data: PhoneVerificationEnroll): Promise<EnrollFactorResponse> {
-    return await supabaseMFAService.enrollPhoneNumber(data);
+    return await trailbaseMFAService.enrollPhoneNumber(data);
   },
 
   /**
    * Create a challenge for an enrolled phone factor (sends SMS)
    */
   async createChallenge(data: PhoneVerificationChallenge): Promise<ChallengeResponse> {
-    return await supabaseMFAService.createChallenge(data);
+    return await trailbaseMFAService.createChallenge(data);
   },
 
   /**
    * Verify SMS code for phone verification
    */
   async verifyChallenge(data: PhoneVerificationVerify): Promise<PhoneVerificationResponse> {
-    return await supabaseMFAService.verifyChallenge(data);
+    return await trailbaseMFAService.verifyChallenge(data);
   },
 
   /**
    * Create challenge and verify in one step
    */
   async challengeAndVerify(data: PhoneVerificationChallengeAndVerify): Promise<PhoneVerificationResponse> {
-    return await supabaseMFAService.challengeAndVerify(data);
+    return await trailbaseMFAService.challengeAndVerify(data);
   },
 
   /**
    * Resend SMS code (create new challenge for existing factor)
    */
   async resendSMS(factorId: string): Promise<ChallengeResponse> {
-    return await supabaseMFAService.resendSMS(factorId);
+    return await trailbaseMFAService.resendSMS(factorId);
   },
 
   /**
    * List all enrolled MFA factors
    */
   async listFactors(): Promise<ListFactorsResponse> {
-    return await supabaseMFAService.listFactors();
+    return await trailbaseMFAService.listFactors();
   },
 
   /**
    * Remove phone verification from account
    */
   async unenrollFactor(factorId: string): Promise<PhoneVerificationResponse> {
-    return await supabaseMFAService.unenrollFactor(factorId);
+    return await trailbaseMFAService.unenrollFactor(factorId);
   },
 
   /**
    * Get Authenticator Assurance Level
    */
   async getAAL(): Promise<AALResponse> {
-    return await supabaseMFAService.getAAL();
+    return await trailbaseMFAService.getAAL();
   }
 };

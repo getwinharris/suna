@@ -135,7 +135,7 @@ export function useInstallStatus() {
           fetch(`${backendUrl}/setup/sandbox-providers`).catch(() => null),
         ]);
 
-        if (statusRes.status === 503) {
+        if (statusRes.status === 503 || !statusRes.ok) {
           if (retries < MAX_RETRIES) {
             retries++;
             setTimeout(fetchStatus, 1500 * retries);
@@ -146,29 +146,7 @@ export function useInstallStatus() {
           return;
         }
 
-        if (!statusRes.ok) {
-          if (retries < MAX_RETRIES) {
-            retries++;
-            setTimeout(fetchStatus, 1500 * retries);
-            return;
-          }
-          setInstalled(true);
-          setLoading(false);
-          return;
-        }
-
-        const statusData = await statusRes.json();
-
-        if (statusData.installed === null || statusData.installed === undefined) {
-          if (retries < MAX_RETRIES) {
-            retries++;
-            setTimeout(fetchStatus, 1500 * retries);
-            return;
-          }
-          setInstalled(true);
-          setLoading(false);
-          return;
-        }
+        const statusData = await statusRes.json().catch(() => ({ installed: true }));
 
         const providerData = providerRes?.ok
           ? await providerRes.json().catch(() => null)

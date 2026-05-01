@@ -144,8 +144,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Handle Supabase verification redirects at root level
-  // Supabase sometimes redirects to root (/) instead of /auth/callback
+  // Handle Trailbase verification redirects at root level
+  // Trailbase sometimes redirects to root (/) instead of /auth/callback
   // Detect authentication parameters and redirect to proper callback handler
   if (pathname === '/' || pathname === '') {
     const searchParams = request.nextUrl.searchParams;
@@ -154,7 +154,7 @@ export async function middleware(request: NextRequest) {
     const type = searchParams.get('type');
     const error = searchParams.get('error');
     
-    // If we have Supabase auth parameters, redirect to /auth/callback
+    // If we have Trailbase auth parameters, redirect to /auth/callback
     // Note: Mobile apps use direct deep links and bypass this route
     if (code || token || type || error) {
       const callbackUrl = new URL('/auth/callback', request.url);
@@ -164,7 +164,7 @@ export async function middleware(request: NextRequest) {
         callbackUrl.searchParams.set(key, value);
       });
       
-      console.log('🔄 Redirecting Supabase verification from root to /auth/callback');
+      console.log('🔄 Redirecting Trailbase verification from root to /auth/callback');
       return NextResponse.redirect(callbackUrl);
     }
   }
@@ -286,11 +286,14 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Allow all public routes — but return supabaseResponse (not NextResponse.next())
+  // Allow all public routes — but return trailbaseResponse (not NextResponse.next())
   // so that any cookie updates from getUser() token refresh are preserved.
-  // Returning a fresh NextResponse.next() would discard refreshed auth cookies,
-  // causing the session to break on the next navigation.
   if (PUBLIC_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+    return trailbaseResponse;
+  }
+
+  // Skip auth check for auth routes to avoid redirect loops
+  if (isAuthRoute) {
     return trailbaseResponse;
   }
 

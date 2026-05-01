@@ -36,7 +36,7 @@ export function buildPreviewAuthEndpoint(previewUrl: string, serverUrl?: string)
  * iframe with a null or unauthenticated URL.
  *
  * Flow:
- *   1. Fetch Supabase JWT via `getAuthToken()`.
+ *   1. Fetch Trailbase JWT via `getAuthToken()`.
  *   2. Call `POST /v1/p/auth` with `Authorization: Bearer <jwt>` — the backend
  *      validates the token and sets a `__preview_session` HttpOnly cookie.
  *   3. Return the bare preview URL (no `?token=` appended). The cookie handles

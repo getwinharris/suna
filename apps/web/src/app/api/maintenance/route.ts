@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/trailbase/server';
 import {
   getMaintenanceConfig,
   setMaintenanceConfig,
@@ -36,12 +36,12 @@ export async function GET() {
 const VALID_LEVELS: MaintenanceLevel[] = ['none', 'info', 'warning', 'critical', 'blocking'];
 
 export async function PUT(request: NextRequest) {
-  // Authenticate: require a valid Supabase session
-  const supabase = await createClient();
+  // Authenticate: require a valid Trailbase session
+  const trailbase = await createClient();
   const {
     data: { user },
     error: authError,
-  } = await supabase.auth.getUser();
+  } = await trailbase.auth.getUser();
 
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -101,9 +101,9 @@ export async function PUT(request: NextRequest) {
 async function checkAdminRole(request: NextRequest): Promise<boolean> {
   try {
     // Forward the authorization header from the original request if present,
-    // otherwise extract the Supabase access token from the cookie.
-    const supabase = await createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    // otherwise extract the Trailbase access token from the cookie.
+    const trailbase = await createClient();
+    const { data: { session } } = await trailbase.auth.getSession();
 
     if (!session?.access_token) return false;
 

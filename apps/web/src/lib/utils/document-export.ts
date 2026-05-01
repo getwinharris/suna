@@ -428,8 +428,8 @@ export async function exportDocument({ content, fileName, format }: DocumentExpo
           }
 
           // Get authentication token
-          const supabase = createClient();
-          const { data: { session } } = await supabase.auth.getSession();
+          const trailbase = createClient();
+          const { data: { session } } = await trailbase.auth.getSession();
 
           if (!session?.access_token) {
             throw new Error('Authentication required');
@@ -484,8 +484,8 @@ export async function exportDocument({ content, fileName, format }: DocumentExpo
           }
 
           // Get authentication token
-          const supabase = createClient();
-          const { data: { session } } = await supabase.auth.getSession();
+          const trailbase = createClient();
+          const { data: { session } } = await trailbase.auth.getSession();
 
           if (!session?.access_token) {
             throw new Error('Authentication required');

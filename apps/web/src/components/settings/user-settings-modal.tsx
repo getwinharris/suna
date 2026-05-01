@@ -391,7 +391,7 @@ function GeneralTab({ onClose }: { onClose: () => void }) {
     const [deleteConfirmText, setDeleteConfirmText] = useState('');
     const [deletionType, setDeletionType] = useState<'grace-period' | 'immediate'>('grace-period');
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const supabase = createClient();
+    const trailbase = createClient();
     const queryClient = useQueryClient();
 
     const { data: deletionStatus, isLoading: isCheckingStatus } = useAccountDeletionStatus();
@@ -403,7 +403,7 @@ function GeneralTab({ onClose }: { onClose: () => void }) {
     useEffect(() => {
         const fetchUserData = async () => {
             setIsLoading(true);
-            const { data } = await supabase.auth.getUser();
+            const { data } = await trailbase.auth.getUser();
             if (data.user) {
                 setUserName(data.user.user_metadata?.name || data.user.email?.split('@')[0] || '');
                 setUserEmail(data.user.email || '');
@@ -452,8 +452,8 @@ function GeneralTab({ onClose }: { onClose: () => void }) {
             const fileExt = avatarFile.name.split('.').pop();
             const fileName = `${userId}-${Date.now()}.${fileExt}`;
 
-            // Upload to Supabase Storage
-            const { error: uploadError } = await supabase.storage
+            // Upload to Trailbase Storage
+            const { error: uploadError } = await trailbase.storage
                 .from('avatars')
                 .upload(fileName, avatarFile, {
                     cacheControl: '3600',
@@ -466,7 +466,7 @@ function GeneralTab({ onClose }: { onClose: () => void }) {
             }
 
             // Get public URL
-            const { data: { publicUrl } } = supabase.storage
+            const { data: { publicUrl } } = trailbase.storage
                 .from('avatars')
                 .getPublicUrl(fileName);
 
@@ -483,7 +483,7 @@ function GeneralTab({ onClose }: { onClose: () => void }) {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            const { data: userData } = await supabase.auth.getUser();
+            const { data: userData } = await trailbase.auth.getUser();
             const userId = userData.user?.id;
             
             if (!userId) throw new Error('User not found');
@@ -497,7 +497,7 @@ function GeneralTab({ onClose }: { onClose: () => void }) {
                 }
             }
 
-            const { data, error } = await supabase.auth.updateUser({
+            const { data, error } = await trailbase.auth.updateUser({
                 data: { 
                     name: userName,
                     avatar_url: newAvatarUrl,

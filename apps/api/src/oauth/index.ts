@@ -452,9 +452,9 @@ oauthApp.get('/userinfo', oauthTokenAuth, async (c) => {
   const userId = c.get('oauthUserId') as string;
   const accountId = c.get('oauthAccountId') as string;
 
-  const { getSupabase } = await import('../shared/supabase');
-  const supabase = getSupabase();
-  const { data: { user } } = await supabase.auth.admin.getUserById(userId);
+  const { getTrailbase } = await import('../shared/trailbase');
+  const trailbase = getTrailbase();
+  const { data: { user } } = await trailbase.auth.admin.getUserById(userId);
 
   return c.json({
     user_id: userId,

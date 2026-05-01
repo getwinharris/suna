@@ -1002,7 +1002,7 @@ export const SandboxDesktop = memo(function SandboxDesktop({
         <div className="absolute inset-0">
           <div className="absolute inset-0 dark:block hidden">
             <Image 
-              src="https://heprlhlltebrxydgtsjs.supabase.co/storage/v1/object/public/image-uploads/backgrounds/computer-bg-dark.jpg"
+              src="https://heprlhlltebrxydgtsjs.trailbase.co/storage/v1/object/public/image-uploads/backgrounds/computer-bg-dark.jpg"
               alt="Desktop wallpaper"
               fill
               className="object-cover"
@@ -1011,7 +1011,7 @@ export const SandboxDesktop = memo(function SandboxDesktop({
           </div>
           <div className="absolute inset-0 dark:hidden">
             <Image 
-              src="https://heprlhlltebrxydgtsjs.supabase.co/storage/v1/object/public/image-uploads/backgrounds/computer-bg-light.jpg"
+              src="https://heprlhlltebrxydgtsjs.trailbase.co/storage/v1/object/public/image-uploads/backgrounds/computer-bg-light.jpg"
               alt="Desktop wallpaper"
               fill
               className="object-cover"

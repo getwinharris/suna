@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { supabase } from '@/api/supabase';
+import { trailbase } from '@/api/trailbase';
 import * as WebBrowser from 'expo-web-browser';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as Linking from 'expo-linking';
@@ -24,7 +24,6 @@ import type {
   PasswordResetRequest,
   AuthError,
 } from '@/lib/utils/auth-types';
-import type { Session, User, AuthChangeEvent } from '@supabase/supabase-js';
 import { log, setLoggerUserId } from '@/lib/logger';
 
 // Complete any pending auth sessions (required for web)
@@ -72,7 +71,7 @@ async function createSessionFromUrl(url: string) {
   }
   
   log.log('✅ Tokens extracted, setting session...');
-  const { data, error } = await supabase.auth.setSession({
+  const { data, error } = await trailbase.auth.setSession({
     access_token,
     refresh_token,
   });
@@ -106,7 +105,7 @@ export function useAuth() {
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(async ({ data: { session } }: { data: { session: Session | null } }) => {
+    trailbase.auth.getSession().then(async ({ data: { session } }: { data: { session: Session | null } }) => {
       if (!mounted) return;
 
       // Update logger with user ID
@@ -144,7 +143,7 @@ export function useAuth() {
 
   // Handle auth state changes and canTrack changes
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = trailbase.auth.onAuthStateChange(
       async (_event: AuthChangeEvent, session: Session | null) => {
         // Update logger with user ID
         setLoggerUserId(session?.user?.id || null);
@@ -210,7 +209,7 @@ export function useAuth() {
       setError(null);
       setAuthState((prev) => ({ ...prev, isLoading: true }));
 
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await trailbase.auth.signInWithPassword({
         email,
         password,
       });
@@ -246,7 +245,7 @@ export function useAuth() {
         setError(null);
         setAuthState((prev) => ({ ...prev, isLoading: true }));
 
-        const { data, error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await trailbase.auth.signUp({
           email,
           password,
           options: {
@@ -318,7 +317,7 @@ export function useAuth() {
           log.log('✅ Apple credential received:', credential.user);
 
           // Sign in to Supabase with Apple ID token
-          const { data, error: appleError } = await supabase.auth.signInWithIdToken({
+          const { data, error: appleError } = await trailbase.auth.signInWithIdToken({
             provider: 'apple',
             token: credential.identityToken!,
           });
@@ -365,7 +364,7 @@ export function useAuth() {
       log.log('📊 Redirect URL:', redirectTo, 'Platform:', Platform.OS);
 
       // Get OAuth URL from Supabase
-      const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
+      const { data, error: oauthError } = await trailbase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo,
@@ -440,7 +439,7 @@ export function useAuth() {
                 await new Promise(r => setTimeout(r, 1500));
                 
                 // Check if session was set by deep link handler in _layout.tsx
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await trailbase.auth.getSession();
                 
                 if (session) {
                   hasResolved = true;
@@ -459,7 +458,7 @@ export function useAuth() {
                   // User might have returned without completing auth
                   // Wait a bit more in case deep link is still processing
                   await new Promise(r => setTimeout(r, 1000));
-                  const { data: { session: retrySession } } = await supabase.auth.getSession();
+                  const { data: { session: retrySession } } = await trailbase.auth.getSession();
                   
                   if (retrySession) {
                     hasResolved = true;
@@ -527,7 +526,7 @@ export function useAuth() {
             if (accessToken && refreshToken) {
               // Set the session with the tokens
               const { data: sessionData, error: sessionError } = 
-                await supabase.auth.setSession({
+                await trailbase.auth.setSession({
                   access_token: accessToken,
                   refresh_token: refreshToken,
                 });
@@ -560,7 +559,7 @@ export function useAuth() {
             log.log('✅ OAuth code received, exchanging for session');
             
             const { data: sessionData, error: sessionError } = 
-              await supabase.auth.exchangeCodeForSession(code);
+              await trailbase.auth.exchangeCodeForSession(code);
 
             if (sessionError) {
               log.error('❌ Session exchange error:', sessionError.message);
@@ -641,7 +640,7 @@ export function useAuth() {
 
       log.log('📱 Magic link redirect URL:', emailRedirectTo);
 
-      const { error: magicLinkError, data } = await supabase.auth.signInWithOtp({
+      const { error: magicLinkError, data } = await trailbase.auth.signInWithOtp({
         email: email.trim().toLowerCase(),
         options: {
           emailRedirectTo,
@@ -689,7 +688,7 @@ export function useAuth() {
       log.log('🎯 Password reset request:', email);
       setError(null);
 
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error: resetError } = await trailbase.auth.resetPasswordForEmail(email, {
         redirectTo: 'bapx://auth/reset-password',
       });
 
@@ -715,7 +714,7 @@ export function useAuth() {
       log.log('🎯 Password update attempt');
       setError(null);
 
-      const { error: updateError } = await supabase.auth.updateUser({
+      const { error: updateError } = await trailbase.auth.updateUser({
         password: newPassword,
       });
 
@@ -765,15 +764,15 @@ export function useAuth() {
     const clearSupabaseStorage = async () => {
       try {
         const allKeys = await AsyncStorage.getAllKeys();
-        const supabaseKeys = allKeys.filter((key: string) => 
-          key.includes('supabase') || 
+        const trailbaseKeys = allKeys.filter((key: string) => 
+          key.includes('trailbase') || 
           key.includes('sb-') || 
           key.includes('-auth-token')
         );
         
-        if (supabaseKeys.length > 0) {
-          log.log(`🗑️  Removing ${supabaseKeys.length} Supabase keys from storage`);
-          await AsyncStorage.multiRemove(supabaseKeys);
+        if (trailbaseKeys.length > 0) {
+          log.log(`🗑️  Removing ${trailbaseKeys.length} Supabase keys from storage`);
+          await AsyncStorage.multiRemove(trailbaseKeys);
         }
       } catch (error) {
         log.warn('⚠️  Failed to clear Supabase storage:', error);
@@ -827,12 +826,12 @@ export function useAuth() {
         }
       }
 
-      const { error: globalError } = await supabase.auth.signOut({ scope: 'global' });
+      const { error: globalError } = await trailbase.auth.signOut({ scope: 'global' });
 
       if (globalError) {
         log.warn('⚠️  Global sign out failed:', globalError.message);
         
-        const { error: localError } = await supabase.auth.signOut({ scope: 'local' });
+        const { error: localError } = await trailbase.auth.signOut({ scope: 'local' });
         
         if (localError) {
           log.warn('⚠️  Local sign out also failed:', localError.message);

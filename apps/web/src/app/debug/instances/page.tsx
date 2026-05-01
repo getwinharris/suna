@@ -12,7 +12,6 @@
  */
 
 import { useState } from 'react';
-import type { User } from '@supabase/supabase-js';
 import { AlertCircle, Archive, HardDrive, Loader2, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -38,7 +37,7 @@ const MOCK_USER = {
   aud: 'authenticated',
   created_at: new Date().toISOString(),
   email: 'debug@bapx.dev',
-} as unknown as User;
+};
 
 function mockSandbox(overrides: Partial<SandboxInfo>): SandboxInfo {
   return {

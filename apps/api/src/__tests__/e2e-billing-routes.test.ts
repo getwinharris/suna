@@ -133,9 +133,9 @@ mock.module('../billing/services/account-deletion', () => ({
   },
 }));
 
-// Supabase + Stripe mocks (prevent imports from failing)
-mock.module('../shared/supabase', () => ({
-  getSupabase: () => ({
+// Trailbase + Stripe mocks (prevent imports from failing)
+mock.module('../shared/trailbase', () => ({
+  getTrailbase: () => ({
     rpc: () => Promise.resolve({ data: null, error: null }),
     auth: { getUser: async () => ({ data: { user: null }, error: 'mocked' }) },
   }),

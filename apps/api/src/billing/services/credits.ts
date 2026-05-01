@@ -1,12 +1,15 @@
-import { getSupabase } from '../../shared/supabase';
+import { getTrailbase } from '../../shared/trailbase';
 import {
   getCreditAccount,
   getCreditBalance,
   updateCreditAccount,
+  updateBalance,
 } from '../repositories/credit-accounts';
 import { insertLedgerEntry } from '../repositories/transactions';
 import { InsufficientCreditsError } from '../../errors';
 import { TOKEN_PRICE_MULTIPLIER, MINIMUM_CREDIT_FOR_RUN } from './tiers';
+import { db } from '../../shared/db';
+import { sql } from 'drizzle-orm';
 
 export async function getBalance(accountId: string) {
   const row = await getCreditBalance(accountId);
@@ -46,34 +49,68 @@ export async function deductCredits(
   amount: number,
   description: string,
 ) {
-  const supabase = getSupabase();
+  const account = await getCreditAccount(accountId);
+  if (!account) {
+    throw new InsufficientCreditsError(0, amount);
+  }
 
-  const { data, error } = await supabase.rpc('atomic_use_credits', {
-    p_account_id: accountId,
-    p_amount: amount,
-    p_description: description,
+  const currentTotal = Number(account.balance) || 0;
+  const currentDaily = Number(account.dailyCreditsBalance) || 0;
+  const currentExpiring = Number(account.expiringCredits) || 0;
+  const currentNonExpiring = Number(account.nonExpiringCredits) || 0;
+
+  if (currentTotal < amount) {
+    throw new InsufficientCreditsError(currentTotal, amount);
+  }
+
+  // Atomically calculate new balances. 
+  // Priority: Daily -> Expiring -> Non-Expiring
+  let remainingToDeduct = amount;
+  let newDaily = currentDaily;
+  let newExpiring = currentExpiring;
+  let newNonExpiring = currentNonExpiring;
+
+  if (newDaily >= remainingToDeduct) {
+    newDaily -= remainingToDeduct;
+    remainingToDeduct = 0;
+  } else {
+    remainingToDeduct -= newDaily;
+    newDaily = 0;
+  }
+
+  if (remainingToDeduct > 0) {
+    if (newExpiring >= remainingToDeduct) {
+      newExpiring -= remainingToDeduct;
+      remainingToDeduct = 0;
+    } else {
+      remainingToDeduct -= newExpiring;
+      newExpiring = 0;
+    }
+  }
+
+  if (remainingToDeduct > 0) {
+    newNonExpiring -= remainingToDeduct;
+  }
+
+  const newTotal = newDaily + newExpiring + newNonExpiring;
+
+  // Update account
+  await updateBalance(accountId, {
+    balance: String(newTotal),
+    dailyCreditsBalance: String(newDaily),
+    expiringCredits: String(newExpiring),
+    nonExpiringCredits: String(newNonExpiring),
   });
 
-  if (error) {
-    console.error('[Credits] Deduction RPC error:', error);
-    const account = await getCreditAccount(accountId);
-    const actualBalance = account ? Number(account.balance) : 0;
-    throw new InsufficientCreditsError(actualBalance, amount);
-  }
-
-  const result = data as {
-    success: boolean;
-    error?: string;
-    amount_deducted?: number;
-    new_total?: number;
-    transaction_id?: string;
-  };
-
-  if (!result.success) {
-    const account = await getCreditAccount(accountId);
-    const actualBalance = account ? Number(account.balance) : 0;
-    throw new InsufficientCreditsError(actualBalance, amount);
-  }
+  // Log transaction
+  const [entry] = await insertLedgerEntry({
+    accountId,
+    amount: String(-amount),
+    balanceAfter: String(newTotal),
+    type: 'usage',
+    description,
+    isExpiring: false,
+  });
 
   // Fire-and-forget: check if auto-topup should trigger
   const { checkAndTriggerAutoTopup } = await import('./auto-topup');
@@ -81,9 +118,9 @@ export async function deductCredits(
 
   return {
     success: true,
-    cost: result.amount_deducted ?? amount,
-    newBalance: result.new_total ?? 0,
-    transactionId: result.transaction_id,
+    cost: amount,
+    newBalance: newTotal,
+    transactionId: (entry as any)?.id,
   };
 }
 
@@ -139,79 +176,60 @@ export async function grantCredits(
   isExpiring: boolean = true,
   stripeEventId?: string,
 ) {
-  const supabase = getSupabase();
   const idempotencyKey = stripeEventId ? `grant:${accountId}:${stripeEventId}` : null;
 
-  const { data, error } = await supabase.rpc('atomic_add_credits', {
-    p_account_id: accountId,
-    p_amount: amount,
-    p_is_expiring: isExpiring,
-    p_description: description,
-    p_expires_at: null,
-    p_type: type,
-    p_stripe_event_id: stripeEventId ?? null,
-    p_idempotency_key: idempotencyKey,
-  });
+  const account = await getCreditAccount(accountId);
+  const currentTotal = account ? Number(account.balance) : 0;
+  const currentExpiring = account ? Number(account.expiringCredits) : 0;
+  const currentNonExpiring = account ? Number(account.nonExpiringCredits) : 0;
 
-  if (error) {
-    console.error('[Credits] Grant RPC error:', error);
+  const newTotal = currentTotal + amount;
+  let newExpiring = currentExpiring;
+  let newNonExpiring = currentNonExpiring;
 
-    const account = await getCreditAccount(accountId);
-    const currentBalance = account ? Number(account.balance) : 0;
-    const newBalance = currentBalance + amount;
-
-    try {
-      await insertLedgerEntry({
-        accountId,
-        amount: String(amount),
-        balanceAfter: String(newBalance),
-        type,
-        description,
-        isExpiring,
-        stripeEventId: stripeEventId ?? null,
-        idempotencyKey,
-      });
-    } catch (insertErr) {
-      const message = insertErr instanceof Error ? insertErr.message : String(insertErr);
-      const isDuplicate =
-        message.includes('duplicate key') &&
-        (message.includes('bapx_unique_stripe_event') || message.includes('idx_bapx_credit_ledger_idempotency'));
-      if (isDuplicate) {
-        return { success: true, duplicate_prevented: true };
-      }
-
-      const missingIdempotencyColumn = message.includes('idempotency_key') && message.includes('does not exist');
-      if (missingIdempotencyColumn) {
-        await insertLedgerEntry({
-          accountId,
-          amount: String(amount),
-          balanceAfter: String(newBalance),
-          type,
-          description,
-          isExpiring,
-          stripeEventId: stripeEventId ?? null,
-        });
-      } else {
-        throw insertErr;
-      }
-    }
-
-    if (isExpiring) {
-      const currentExpiring = account ? Number(account.expiringCredits) : 0;
-      await updateCreditAccount(accountId, {
-        balance: String(newBalance),
-        expiringCredits: String(currentExpiring + amount),
-      } as any);
-    } else {
-      const currentNonExpiring = account ? Number(account.nonExpiringCredits) : 0;
-      await updateCreditAccount(accountId, {
-        balance: String(newBalance),
-        nonExpiringCredits: String(currentNonExpiring + amount),
-      } as any);
-    }
+  if (isExpiring) {
+    newExpiring += amount;
+  } else {
+    newNonExpiring += amount;
   }
 
-  return data;
+  try {
+    // Log transaction with idempotency check
+    const [entry] = await insertLedgerEntry({
+      accountId,
+      amount: String(amount),
+      balanceAfter: String(newTotal),
+      type,
+      description,
+      isExpiring,
+      stripeEventId: stripeEventId ?? null,
+      idempotencyKey,
+    });
+
+    // Update account balance
+    await updateBalance(accountId, {
+      balance: String(newTotal),
+      expiringCredits: String(newExpiring),
+      nonExpiringCredits: String(newNonExpiring),
+    });
+
+    return {
+      success: true,
+      newBalance: newTotal,
+      transactionId: (entry as any)?.id
+    };
+  } catch (err: any) {
+    const message = err instanceof Error ? err.message : String(err);
+    const isDuplicate =
+      message.includes('duplicate key') ||
+      message.includes('UNIQUE constraint failed');
+
+    if (isDuplicate) {
+      return { success: true, duplicate_prevented: true };
+    }
+
+    throw err;
+  }
 }
 
 export async function resetExpiringCredits(
@@ -220,9 +238,9 @@ export async function resetExpiringCredits(
   description: string,
   stripeEventId?: string,
 ) {
-  const supabase = getSupabase();
+  const trailbase = getTrailbase();
 
-  const { error } = await supabase.rpc('atomic_reset_expiring_credits', {
+  const { error } = await trailbase.rpc('atomic_reset_expiring_credits', {
     p_account_id: accountId,
     p_description: description,
     p_new_credits: newCredits,

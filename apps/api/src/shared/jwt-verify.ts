@@ -1,14 +1,14 @@
 /**
  * Local JWT verification using Web Crypto API (no network roundtrip).
  *
- * Supabase JWTs are signed with ES256 (ECDSA P-256). We fetch the JWKS once
+ * Trailbase JWTs are signed with ES256 (ECDSA P-256). We fetch the JWKS once
  * at startup and verify tokens locally — no call to /auth/v1/user per request.
  *
- * Why: supabase.auth.getUser() makes a live HTTP call every time. On local dev
+ * Why: trailbase.auth.getUser() makes a live HTTP call every time. On local dev
  * any transient blip to 127.0.0.1:54321 → intermittent 401 on valid tokens.
  * Local verification is also ~10x faster.
  *
- * Fallback: if JWKS fetch fails (Supabase not up yet) or key is unknown, we
+ * Fallback: if JWKS fetch fails (Trailbase not up yet) or key is unknown, we
  * fall back to the network call so nothing breaks during cold starts.
  */
 

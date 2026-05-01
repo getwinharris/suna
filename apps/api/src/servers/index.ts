@@ -3,7 +3,7 @@
  *
  * Scoped per-account: each user only sees/modifies their own entries.
  * In local mode (single user), accountId is a static UUID.
- * In cloud mode, accountId is resolved from the Supabase JWT.
+ * In cloud mode, accountId is resolved from the Trailbase JWT.
  *
  * Stores URL, label, provider, sandboxId, mappedPorts — everything EXCEPT
  * auth tokens (those stay in the browser's localStorage for security).
@@ -23,7 +23,7 @@ import { resolveAccountId } from '../shared/resolve-account';
 export const serversApp = new Hono<AppEnv>();
 
 // ─── Auth middleware ────────────────────────────────────────────────────────
-// In cloud mode: require Supabase JWT. In local mode: inject static userId.
+// In cloud mode: require Trailbase JWT. In local mode: inject static userId.
 
 serversApp.use('/*', trailbaseAuth);
 

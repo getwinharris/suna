@@ -1,23 +1,23 @@
 /**
  * Shared auth token helpers.
  *
- * Provides Supabase JWT authentication for all requests.
+ * Provides Trailbase JWT authentication for all requests.
  *
- * `getAuthToken()` is the unified getter: returns the Supabase JWT.
+ * `getAuthToken()` is the unified getter: returns the Trailbase JWT.
  * Use it anywhere you need to authenticate against the sandbox proxy.
  *
- * `getSupabaseAccessToken()` is kept for callers that specifically need the
- * Supabase JWT (e.g. platform API calls that go through Supabase auth).
+ * `getTrailbaseAccessToken()` is kept for callers that specifically need the
+ * Trailbase JWT (e.g. platform API calls that go through Trailbase auth).
  *
  * **Deduplication**: Multiple callers (SSE, health check, session fetch, etc.)
- * all call getSupabaseAccessToken() on page load simultaneously. Without
+ * all call getTrailbaseAccessToken() on page load simultaneously. Without
  * deduplication, each triggers its own getSession() → refreshSession() chain,
- * causing 5+ parallel Supabase auth roundtrips that take seconds. The inflight
+ * causing 5+ parallel Trailbase auth roundtrips that take seconds. The inflight
  * promise ensures only ONE auth call runs at a time; all others piggyback.
  *
  * **Caching**: The resolved token is cached for TOKEN_CACHE_TTL (30s). Within
  * that window, subsequent calls return instantly. After TTL, the next call
- * refreshes from Supabase.
+ * refreshes from Trailbase.
  */
 
 import { createClient } from "@/lib/trailbase/client";
@@ -46,14 +46,14 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Get the current Supabase access token with caching + deduplication.
+ * Get the current Trailbase access token with caching + deduplication.
  *
  * Fast path: returns cached token if within TTL.
  * Slow path: deduplicates concurrent calls into a single auth roundtrip.
  */
-export async function getSupabaseAccessToken(): Promise<string | null> {
+export async function getTrailbaseAccessToken(): Promise<string | null> {
 	// Installer/bootstrap flow: server actions may set auth cookies without a
-	// client-side Supabase session yet. Use an injected token until the client
+	// client-side Trailbase session yet. Use an injected token until the client
 	// session hydrates.
 	if (bootstrapToken) {
 		return bootstrapToken;
@@ -81,7 +81,7 @@ export async function getSupabaseAccessToken(): Promise<string | null> {
 /**
  * Retry token acquisition for initial auth hydration / stale cache recovery.
  */
-export async function getSupabaseAccessTokenWithRetry(options?: {
+export async function getTrailbaseAccessTokenWithRetry(options?: {
 	attempts?: number;
 	baseDelayMs?: number;
 	invalidateBetweenAttempts?: boolean;
@@ -92,13 +92,13 @@ export async function getSupabaseAccessTokenWithRetry(options?: {
 		invalidateBetweenAttempts = true,
 	} = options ?? {};
 
-	let token = await getSupabaseAccessToken();
+	let token = await getTrailbaseAccessToken();
 	for (let attempt = 0; !token && attempt < attempts; attempt++) {
 		await sleep(baseDelayMs * 2 ** attempt);
 		if (invalidateBetweenAttempts) {
 			invalidateTokenCache();
 		}
-		token = await getSupabaseAccessToken();
+		token = await getTrailbaseAccessToken();
 	}
 
 	return token;
@@ -106,7 +106,7 @@ export async function getSupabaseAccessTokenWithRetry(options?: {
 
 /**
  * Invalidate the cached token (e.g. after a 401 response).
- * The next getSupabaseAccessToken() call will fetch fresh.
+ * The next getTrailbaseAccessToken() call will fetch fresh.
  */
 export function invalidateTokenCache(): void {
 	setCachedAuthToken(null);
@@ -122,7 +122,7 @@ export function setCachedAuthToken(token: string | null): void {
 
 /**
  * Seed auth for setup/install flows that receive a JWT from server actions
- * before the browser Supabase client has established local session state.
+ * before the browser Trailbase client has established local session state.
  */
 export function setBootstrapAuthToken(token: string | null): void {
 	bootstrapToken = token;
@@ -131,26 +131,26 @@ export function setBootstrapAuthToken(token: string | null): void {
 	}
 }
 
-/** Internal: actually fetch the token from Supabase with retries. */
+/** Internal: actually fetch the token from Trailbase with retries. */
 async function fetchToken(): Promise<string | null> {
-	const supabase = createClient();
+	const trailbase = createClient();
 
 	for (let attempt = 0; attempt <= TOKEN_MAX_RETRIES; attempt++) {
 		try {
 			const {
 				data: { session },
-			} = await supabase.auth.getSession();
+			} = await trailbase.auth.getSession();
 			if (session?.access_token) return session.access_token;
 
 			// Session is null — token may have expired. Try an explicit refresh.
 			if (attempt === 0) {
 				const {
 					data: { session: refreshed },
-				} = await supabase.auth.refreshSession();
+				} = await trailbase.auth.refreshSession();
 				if (refreshed?.access_token) return refreshed.access_token;
 			}
 		} catch {
-			// Network error or Supabase internal failure — retry after delay
+			// Network error or Trailbase internal failure — retry after delay
 		}
 
 		// Don't delay after the last attempt
@@ -167,11 +167,11 @@ async function fetchToken(): Promise<string | null> {
 /**
  * Unified auth token getter.
  *
- * Returns the Supabase JWT. All requests go through bapx-api which
- * authenticates via Supabase JWT — no additional sandbox lock/key needed.
+ * Returns the Trailbase JWT. All requests go through bapx-api which
+ * authenticates via Trailbase JWT — no additional sandbox lock/key needed.
  */
 export async function getAuthToken(): Promise<string | null> {
-  return getSupabaseAccessToken();
+  return getTrailbaseAccessToken();
 }
 
 export async function getAuthTokenWithRetry(options?: {
@@ -179,7 +179,7 @@ export async function getAuthTokenWithRetry(options?: {
 	baseDelayMs?: number;
 	invalidateBetweenAttempts?: boolean;
 }): Promise<string | null> {
-	return getSupabaseAccessTokenWithRetry(options);
+	return getTrailbaseAccessTokenWithRetry(options);
 }
 
 // ── Shared auth-injecting fetch ──
@@ -238,7 +238,7 @@ function buildAuthHeaders(
  * and server-selector. All three auth injection points now go through this.
  *
  * Behavior:
- *   1. Gets the current auth token (Supabase JWT)
+ *   1. Gets the current auth token (Trailbase JWT)
  *   2. Injects it as Bearer token on the request
  *   3. On 401: invalidates the token cache, gets fresh, retries once
  *

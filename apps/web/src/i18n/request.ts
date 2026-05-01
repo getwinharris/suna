@@ -1,8 +1,8 @@
 import { getRequestConfig } from 'next-intl/server';
 import { cookies, headers } from 'next/headers';
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient } from '@trailbase/ssr';
 import { locales, defaultLocale, type Locale } from './config';
-import { BAPX_SUPABASE_AUTH_COOKIE } from '@/lib/supabase/constants';
+import { BAPX_TRAILBASE_AUTH_COOKIE } from '@/lib/trailbase/constants';
 import { getServerPublicEnv } from '@/lib/public-env-server';
 
 export default getRequestConfig(async ({ requestLocale }) => {
@@ -26,12 +26,12 @@ export default getRequestConfig(async ({ requestLocale }) => {
   // This ALWAYS takes precedence over geo-detection - user explicitly set it in settings
   try {
     const runtimeEnv = getServerPublicEnv();
-    const supabase = createServerClient(
-      process.env.SUPABASE_SERVER_URL || process.env.SUPABASE_URL || runtimeEnv.SUPABASE_URL,
-      process.env.SUPABASE_ANON_KEY || runtimeEnv.SUPABASE_ANON_KEY,
+    const trailbase = createServerClient(
+      process.env.TRAILBASE_SERVER_URL || process.env.TRAILBASE_URL || runtimeEnv.TRAILBASE_URL,
+      process.env.TRAILBASE_ANON_KEY || runtimeEnv.TRAILBASE_ANON_KEY,
       {
         cookieOptions: {
-          name: BAPX_SUPABASE_AUTH_COOKIE,
+          name: BAPX_TRAILBASE_AUTH_COOKIE,
           path: '/',
           sameSite: 'lax',
         },
@@ -46,7 +46,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       }
     );
     
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await trailbase.auth.getUser();
     if (user?.user_metadata?.locale && locales.includes(user.user_metadata.locale as Locale)) {
       locale = user.user_metadata.locale as Locale;
       return {

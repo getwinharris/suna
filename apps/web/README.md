@@ -16,8 +16,8 @@ This will configure all necessary environment variables automatically.
 The setup wizard automatically creates a `.env.local` file with the following configuration:
 
 ```sh
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_TRAILBASE_URL=https://your-project.trailbase.co
+NEXT_PUBLIC_TRAILBASE_ANON_KEY=your-anon-key
 NEXT_PUBLIC_BACKEND_URL=http://localhost:8000/v1
 NEXT_PUBLIC_URL=http://localhost:3000
 NEXT_PUBLIC_ENV_MODE=LOCAL
@@ -52,6 +52,6 @@ npm run start
 ## Development Notes
 
 - The frontend connects to the backend API at `http://localhost:8000/v1`
-- Supabase is used for authentication and database operations
+- Trailbase is used for authentication and database operations
 - The app runs on `http://localhost:3000` by default
 - Environment variables are automatically configured by the setup wizard

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/trailbase/server'
 import { getServerPublicEnv } from '@/lib/public-env-server'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
@@ -18,7 +18,7 @@ import { sanitizeAuthReturnUrl } from '@/lib/auth/return-url'
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
-  const token = searchParams.get('token') // Supabase verification token
+  const token = searchParams.get('token') // Trailbase verification token
   const type = searchParams.get('type') // signup, recovery, etc.
   const next = sanitizeAuthReturnUrl(searchParams.get('returnUrl') || searchParams.get('redirect'))
   const termsAccepted = searchParams.get('terms_accepted') === 'true'
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
   const errorDescription = searchParams.get('error_description')
 
 
-  // Handle errors FIRST - before any Supabase operations that might affect session
+  // Handle errors FIRST - before any Trailbase operations that might affect session
   if (error) {
     console.error('❌ Auth callback error:', error, errorCode, errorDescription)
 
@@ -63,10 +63,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${baseUrl}/auth?error=${encodeURIComponent(error)}`)
   }
 
-  const supabase = await createClient()
+  const trailbase = await createClient()
 
   // Handle token-based verification (email confirmation, etc.)
-  // Supabase sends these to the redirect URL for processing
+  // Trailbase sends these to the redirect URL for processing
   if (token && type) {
     // For token-based flows, redirect to auth page that can handle the verification client-side
     const verifyUrl = new URL(`${baseUrl}/auth`)
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
   // Handle code exchange (OAuth, magic link)
   if (code) {
     try {
-      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+      const { data, error } = await trailbase.auth.exchangeCodeForSession(code)
       
       if (error) {
         console.error('❌ Error exchanging code for session:', error)
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
         const pendingReferralCode = request.cookies.get('pending-referral-code')?.value
         if (pendingReferralCode) {
           try {
-            await supabase.auth.updateUser({
+            await trailbase.auth.updateUser({
               data: {
                 referral_code: pendingReferralCode
               }
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
           const currentMetadata = data.user.user_metadata || {};
           if (!currentMetadata.terms_accepted_at) {
             try {
-              await supabase.auth.updateUser({
+              await trailbase.auth.updateUser({
                 data: {
                   ...currentMetadata,
                   terms_accepted_at: new Date().toISOString(),
@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
 
         // Check subscription status via backend API (has direct DB access)
         const backendUrl = process.env.BACKEND_URL || runtimeEnv.BACKEND_URL || '';
-        const { data: sessionData } = await supabase.auth.getSession();
+        const { data: sessionData } = await trailbase.auth.getSession();
         const accessToken = sessionData?.session?.access_token;
 
         const billingEnabled = runtimeEnv.ENV_MODE === 'cloud';

@@ -4,7 +4,7 @@ import { HTTPException } from 'hono/http-exception';
 
 let mockSandboxAccountId: string | null = 'acct-owner';
 let mockResolvedAccountId = 'acct-owner';
-let mockSupabaseUser: { id: string; email?: string } | null = null;
+let mockTrailbaseUser: { id: string; email?: string } | null = null;
 let mockAdminAccounts = new Set<string>();
 
 mock.module('../shared/preview-ownership', () => ({
@@ -44,7 +44,7 @@ mock.module('../shared/crypto', () => ({
 }));
 
 mock.module('../shared/jwt-verify', () => ({
-  verifySupabaseJwt: async (token: string) => {
+  verifyTrailbaseJwt: async (token: string) => {
     if (token === 'jwt-owner') {
       return { ok: true, userId: 'user-owner', email: 'owner@bapx.dev' };
     }
@@ -58,10 +58,10 @@ mock.module('../shared/jwt-verify', () => ({
   },
 }));
 
-mock.module('../shared/supabase', () => ({
-  getSupabase: () => ({
+mock.module('../shared/trailbase', () => ({
+  getTrailbase: () => ({
     auth: {
-      getUser: async () => ({ data: { user: mockSupabaseUser }, error: mockSupabaseUser ? null : { message: 'invalid' } }),
+      getUser: async () => ({ data: { user: mockTrailbaseUser }, error: mockTrailbaseUser ? null : { message: 'invalid' } }),
     },
   }),
 }));
@@ -93,7 +93,7 @@ function createApp() {
 beforeEach(() => {
   mockSandboxAccountId = 'acct-owner';
   mockResolvedAccountId = 'acct-owner';
-  mockSupabaseUser = null;
+  mockTrailbaseUser = null;
   mockAdminAccounts = new Set();
 });
 
@@ -190,20 +190,20 @@ describe('preview auth ownership', () => {
     expect(res.status).toBe(200);
   });
 
-  test('allows jwt owner via Supabase fallback path', async () => {
+  test('allows jwt owner via Trailbase fallback path', async () => {
     const app = createApp();
     mockResolvedAccountId = 'acct-owner';
-    mockSupabaseUser = { id: 'user-fallback-owner', email: 'fallback@bapx.dev' };
+    mockTrailbaseUser = { id: 'user-fallback-owner', email: 'fallback@bapx.dev' };
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
       headers: { Authorization: 'Bearer jwt-fallback-owner' },
     });
     expect(res.status).toBe(200);
   });
 
-  test('rejects jwt via Supabase fallback without ownership', async () => {
+  test('rejects jwt via Trailbase fallback without ownership', async () => {
     const app = createApp();
     mockResolvedAccountId = 'acct-other';
-    mockSupabaseUser = { id: 'user-fallback-other', email: 'other@bapx.dev' };
+    mockTrailbaseUser = { id: 'user-fallback-other', email: 'other@bapx.dev' };
     const res = await app.request('/v1/p/8c70e5be-2f95-45ae-bd8d-5d07b65c631b/8000/session/status', {
       headers: { Authorization: 'Bearer jwt-fallback-other' },
     });

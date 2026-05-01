@@ -19,8 +19,8 @@ export function SharePageWrapper({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const supabase = createClient();
-        const { data: { session } } = await supabase.auth.getSession();
+        const trailbase = createClient();
+        const { data: { session } } = await trailbase.auth.getSession();
         setIsLoggedIn(!!session);
       } catch {
         setIsLoggedIn(false);

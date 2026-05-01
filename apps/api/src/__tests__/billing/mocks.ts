@@ -9,7 +9,7 @@ import { mock } from 'bun:test';
 // ─── Global Mock Registry ─────────────────────────────────────────────────────
 
 export const mockRegistry = {
-  supabaseRpc: null as ReturnType<typeof createMockSupabaseRpc> | null,
+  trailbaseRpc: null as ReturnType<typeof createMockTrailbaseRpc> | null,
   stripeClient: null as any,
 
   getCreditAccount: null as ((id: string) => Promise<any>) | null,
@@ -52,10 +52,10 @@ export function registerGlobalMocks() {
   if (_registered) return;
   _registered = true;
 
-  mock.module('../../shared/supabase', () => ({
-    getSupabase: () => ({
+  mock.module('../../shared/trailbase', () => ({
+    getTrailbase: () => ({
       rpc: (name: string, params?: any) => {
-        if (mockRegistry.supabaseRpc) return mockRegistry.supabaseRpc.rpc(name, params);
+        if (mockRegistry.trailbaseRpc) return mockRegistry.trailbaseRpc.rpc(name, params);
         return Promise.resolve({ data: null, error: null });
       },
     }),
@@ -289,7 +289,7 @@ export function createMockStripeEvent(type: string, object: any, overrides: Reco
   };
 }
 
-export function createMockSupabaseRpc(results: Record<string, { data?: any; error?: any }> = {}) {
+export function createMockTrailbaseRpc(results: Record<string, { data?: any; error?: any }> = {}) {
   return {
     rpc: (name: string, params?: any) => {
       const result = results[name];

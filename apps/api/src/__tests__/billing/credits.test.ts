@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import {
   createMockCreditAccount,
-  createMockSupabaseRpc,
+  createMockTrailbaseRpc,
   mockRegistry,
   registerGlobalMocks,
   resetMockRegistry,
@@ -26,8 +26,8 @@ beforeEach(() => {
 
   const defaultAccount = createMockCreditAccount();
 
-  // Configure supabase RPC tracking
-  mockRegistry.supabaseRpc = {
+  // Configure trailbase RPC tracking
+  mockRegistry.trailbaseRpc = {
     rpc: (name: string, params?: any) => {
       rpcCalls.push({ name, params });
       return Promise.resolve({ data: null, error: null });
@@ -121,7 +121,7 @@ describe('getCreditSummary', () => {
 
 describe('deductCredits', () => {
   test('calls atomic_use_credits RPC with correct params', async () => {
-    mockRegistry.supabaseRpc = createMockSupabaseRpc({
+    mockRegistry.trailbaseRpc = createMockTrailbaseRpc({
       atomic_use_credits: {
         data: { success: true, amount_deducted: 5, new_total: 95, transaction_id: 'tx_123' },
       },
@@ -129,11 +129,11 @@ describe('deductCredits', () => {
 
     await deductCredits('acc_test_123', 5, 'Test deduction');
 
-    expect(rpcCalls.length).toBe(0); // createMockSupabaseRpc doesn't push to rpcCalls
+    expect(rpcCalls.length).toBe(0); // createMockTrailbaseRpc doesn't push to rpcCalls
   });
 
   test('returns { success, cost, newBalance, transactionId }', async () => {
-    mockRegistry.supabaseRpc = createMockSupabaseRpc({
+    mockRegistry.trailbaseRpc = createMockTrailbaseRpc({
       atomic_use_credits: {
         data: { success: true, amount_deducted: 5, new_total: 95, transaction_id: 'tx_123' },
       },
@@ -147,7 +147,7 @@ describe('deductCredits', () => {
   });
 
   test('throws InsufficientCreditsError on RPC error with actual balance', async () => {
-    mockRegistry.supabaseRpc = createMockSupabaseRpc({
+    mockRegistry.trailbaseRpc = createMockTrailbaseRpc({
       atomic_use_credits: { error: { message: 'Insufficient credits' } },
     });
 
@@ -162,7 +162,7 @@ describe('deductCredits', () => {
   });
 
   test('throws InsufficientCreditsError when success=false', async () => {
-    mockRegistry.supabaseRpc = createMockSupabaseRpc({
+    mockRegistry.trailbaseRpc = createMockTrailbaseRpc({
       atomic_use_credits: {
         data: { success: false, error: 'Not enough credits' },
       },
@@ -179,7 +179,7 @@ describe('deductCredits', () => {
   test('passes only accountId, amount, description to RPC', async () => {
     // Use the rpcCalls-tracking mock from beforeEach
     // Override with a mock that ALSO tracks and returns success
-    mockRegistry.supabaseRpc = {
+    mockRegistry.trailbaseRpc = {
       rpc: (name: string, params?: any) => {
         rpcCalls.push({ name, params });
         if (name === 'atomic_use_credits') {
@@ -204,7 +204,7 @@ describe('deductCredits', () => {
 describe('grantCredits', () => {
   test('calls atomic_add_credits with correct params', async () => {
     // Use rpcCalls-tracking mock that also returns success
-    mockRegistry.supabaseRpc = {
+    mockRegistry.trailbaseRpc = {
       rpc: (name: string, params?: any) => {
         rpcCalls.push({ name, params });
         if (name === 'atomic_add_credits') {
@@ -229,7 +229,7 @@ describe('grantCredits', () => {
   });
 
   test('expiring=true grants expiring credits', async () => {
-    mockRegistry.supabaseRpc = {
+    mockRegistry.trailbaseRpc = {
       rpc: (name: string, params?: any) => {
         rpcCalls.push({ name, params });
         return Promise.resolve({ data: { success: true }, error: null });
@@ -241,7 +241,7 @@ describe('grantCredits', () => {
   });
 
   test('expiring=false grants non-expiring credits', async () => {
-    mockRegistry.supabaseRpc = {
+    mockRegistry.trailbaseRpc = {
       rpc: (name: string, params?: any) => {
         rpcCalls.push({ name, params });
         return Promise.resolve({ data: { success: true }, error: null });
@@ -253,7 +253,7 @@ describe('grantCredits', () => {
   });
 
   test('includes stripeEventId for idempotency', async () => {
-    mockRegistry.supabaseRpc = {
+    mockRegistry.trailbaseRpc = {
       rpc: (name: string, params?: any) => {
         rpcCalls.push({ name, params });
         return Promise.resolve({ data: { success: true }, error: null });
@@ -266,7 +266,7 @@ describe('grantCredits', () => {
 
   test('fallback on RPC error: inserts ledger + updates balance additively (not overwrite)', async () => {
     // Mock RPC to return error so fallback path is taken
-    mockRegistry.supabaseRpc = {
+    mockRegistry.trailbaseRpc = {
       rpc: (name: string, params?: any) => {
         rpcCalls.push({ name, params });
         return Promise.resolve({ data: null, error: { message: 'RPC failed' } });
@@ -288,7 +288,7 @@ describe('grantCredits', () => {
   });
 
   test('fallback on RPC error for non-expiring: updates nonExpiringCredits additively', async () => {
-    mockRegistry.supabaseRpc = {
+    mockRegistry.trailbaseRpc = {
       rpc: (name: string, params?: any) => {
         rpcCalls.push({ name, params });
         return Promise.resolve({ data: null, error: { message: 'RPC failed' } });
@@ -311,7 +311,7 @@ describe('grantCredits', () => {
 
 describe('resetExpiringCredits', () => {
   test('calls atomic_reset_expiring_credits RPC', async () => {
-    mockRegistry.supabaseRpc = {
+    mockRegistry.trailbaseRpc = {
       rpc: (name: string, params?: any) => {
         rpcCalls.push({ name, params });
         return Promise.resolve({ data: null, error: null });
@@ -331,7 +331,7 @@ describe('resetExpiringCredits', () => {
   });
 
   test('logs error but does not throw on failure', async () => {
-    mockRegistry.supabaseRpc = {
+    mockRegistry.trailbaseRpc = {
       rpc: (name: string, params?: any) => {
         rpcCalls.push({ name, params });
         return Promise.resolve({ data: null, error: { message: 'RPC failed' } });

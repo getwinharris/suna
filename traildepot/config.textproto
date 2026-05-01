@@ -21,6 +21,11 @@ record_apis: [
     acl_authenticated: [READ, CREATE, UPDATE, DELETE]
   },
   {
+    name: "platform_user_roles"
+    table_name: "platform_user_roles"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
     name: "sandboxes"
     table_name: "sandboxes"
     acl_authenticated: [READ, CREATE, UPDATE, DELETE]
@@ -43,6 +48,41 @@ record_apis: [
   {
     name: "deployments"
     table_name: "deployments"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "billing_customers"
+    table_name: "billing_customers"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "credit_accounts"
+    table_name: "credit_accounts"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "credit_ledger"
+    table_name: "credit_ledger"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "credit_usage"
+    table_name: "credit_usage"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "platform_settings"
+    table_name: "platform_settings"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "access_allowlist"
+    table_name: "access_allowlist"
+    acl_authenticated: [READ, CREATE, UPDATE, DELETE]
+  },
+  {
+    name: "access_requests"
+    table_name: "access_requests"
     acl_authenticated: [READ, CREATE, UPDATE, DELETE]
   }
 ]

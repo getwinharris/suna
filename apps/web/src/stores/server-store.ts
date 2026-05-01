@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { authenticatedFetch, getSupabaseAccessToken } from '@/lib/auth-token';
+import { authenticatedFetch, getTrailbaseAccessToken } from '@/lib/auth-token';
 import { isBillingEnabled } from '@/lib/config';
 import { getEnv } from '@/lib/env-config';
 import {
@@ -613,7 +613,7 @@ export const useServerStore = create<ServerStore>()(
         // Only sync with API if user is authenticated — otherwise these
         // fire-and-forget requests produce 401 console errors on the homepage.
         const localServers = [...state.servers];
-        getSupabaseAccessToken().then((token) => {
+        getTrailbaseAccessToken().then((token) => {
           if (!token) return; // Not authenticated, skip API sync
           loadFromApi(localServers).then((apiEntries) => {
             if (apiEntries && apiEntries.length > 0) {

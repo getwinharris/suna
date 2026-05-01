@@ -6,7 +6,7 @@
  */
 
 import { config } from '../../config';
-import { getSupabase } from '../../shared/supabase';
+import { getTrailbase } from '../../shared/trailbase';
 
 const MAILTRAP_SEND_URL = 'https://send.api.mailtrap.io/api/send';
 
@@ -26,9 +26,9 @@ export async function sendWorkspaceReadyEmail(opts: {
   const { accountId, sandboxName, sandboxId } = opts;
 
   try {
-    // Look up user email from Supabase auth
-    const supabase = getSupabase();
-    const { data, error } = await supabase.auth.admin.getUserById(accountId);
+    // Look up user email from Trailbase auth
+    const trailbase = getTrailbase();
+    const { data, error } = await trailbase.auth.admin.getUserById(accountId);
     if (error || !data?.user?.email) {
       console.warn(`[email-notification] Could not resolve email for account ${accountId}:`, error?.message ?? 'no email');
       return;

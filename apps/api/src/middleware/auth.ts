@@ -28,8 +28,8 @@ function isLocalPreviewBypassRequest(c: Context, previewSandboxId: string | null
 // Auth Middleware (3 middlewares — one per auth strategy)
 //
 //   1. apiKeyAuth      — Bapx API keys only (header)
-//   2. trailbaseAuth    — Supabase JWT only (header)
-//   3. combinedAuth    — Bapx OR Supabase (header + cookie fallback)
+//   2. trailbaseAuth    — Trailbase JWT only (header)
+//   3. combinedAuth    — Bapx OR Trailbase (header + cookie fallback)
 //
 // Token is read from query parameters ONLY as a last resort for preview proxy
 // routes (/v1/p/*) — browser WebSocket API can't set custom headers, so PTY

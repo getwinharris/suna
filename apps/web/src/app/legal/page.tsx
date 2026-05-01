@@ -246,7 +246,7 @@ function LegalContent() {
                           "Third-Party Services" refers to external services integrated
                           with the Service, including but not limited to Composio,
                           Apify, MCP servers, LLM providers (Anthropic, OpenAI, etc.),
-                          Supabase, and other third-party APIs and services.
+                          Trailbase, and other third-party APIs and services.
                         </li>
                         <li>
                           "Self-Hosting" refers to deployment of the Service on
@@ -1115,7 +1115,7 @@ function LegalContent() {
                         with numerous third-party services, including but not limited to:
                         Composio (for 2700+ app integrations), Apify (for web scraping),
                         MCP servers (for external tool integrations), LLM providers
-                        (Anthropic, OpenAI, and others via LiteLLM), Supabase (for
+                        (Anthropic, OpenAI, and others via LiteLLM), Trailbase (for
                         database and authentication), and various other APIs and services.
                       </p>
                       <p className="text-muted-foreground text-balance mb-4">

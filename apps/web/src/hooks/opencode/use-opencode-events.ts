@@ -10,7 +10,7 @@ import { fileContentKeys } from "@/features/files/hooks/use-file-content";
 import { fileListKeys } from "@/features/files/hooks/use-file-list";
 import { gitStatusKeys } from "@/features/files/hooks/use-git-status";
 import { clearConfigOverrides } from "@/hooks/opencode/use-opencode-config";
-import { getSupabaseAccessToken, invalidateTokenCache } from "@/lib/auth-token";
+import { getTrailbaseAccessToken, invalidateTokenCache } from "@/lib/auth-token";
 import { logger } from "@/lib/logger";
 import { getClient, resetClient } from "@/lib/opencode-sdk";
 import { authenticatedFetch } from "@/lib/auth-token";
@@ -448,7 +448,7 @@ export function useOpenCodeEventStream() {
 					if (isAuthError) {
 						try {
 							invalidateTokenCache();
-							await getSupabaseAccessToken();
+							await getTrailbaseAccessToken();
 							logger.info("SSE: refreshed auth token after auth error");
 						} catch (refreshErr) {
 							logger.error("SSE: failed to refresh auth token", {

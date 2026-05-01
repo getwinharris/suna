@@ -221,7 +221,7 @@ if (config.INTERNAL_BAPX_ENV === 'dev') {
 // Falls back to 'dev' for local development.
 const API_VERSION = process.env.SANDBOX_VERSION || 'dev';
 
-app.get('/health', (c) => {
+const healthHandler = (c: any) => {
   return c.json({
     status: 'ok',
     service: 'bapx-api',
@@ -230,19 +230,11 @@ app.get('/health', (c) => {
     env: config.ENV_MODE,
     tunnel: getTunnelServiceStatus(),
   });
-});
+};
 
-// Health check under /v1 prefix (frontend uses NEXT_PUBLIC_BACKEND_URL which includes /v1)
-app.get('/v1/health', (c) => {
-  return c.json({
-    status: 'ok',
-    service: 'bapx-api',
-    version: API_VERSION,
-    timestamp: new Date().toISOString(),
-    env: config.ENV_MODE,
-    tunnel: getTunnelServiceStatus(),
-  });
-});
+app.get('/', healthHandler);
+app.get('/health', healthHandler);
+app.get('/v1/health', healthHandler);
 
 // Also expose system status at root for backward compat with frontend
 app.get('/v1/system/status', (c) => {
@@ -420,7 +412,7 @@ app.route('/v1/tunnel', tunnelApp);
 
 // ── Bapx API — proxies /v1/bapx/* to the sandbox's /bapx/* ─────────────
 // Direct server-to-server proxy. Avoids double-CORS from the /v1/p/ path.
-// Auth: Supabase JWT (global middleware). Sandbox auth: INTERNAL_SERVICE_KEY.
+// Auth: Trailbase JWT (global middleware). Sandbox auth: INTERNAL_SERVICE_KEY.
 import { bapxProxyHandler } from './routes/bapx-projects';
 app.use('/v1/bapx/*', combinedAuth);
 app.use('/v1/bapx', combinedAuth);
@@ -432,7 +424,7 @@ app.all('/v1/bapx', bapxProxyHandler);
 // Cloud:  sandboxId = Daytona external ID → proxied via Daytona SDK
 // Local:  sandboxId = container name (e.g. 'bapx-sandbox') → Docker DNS resolution
 // JustAVPS: sandboxId → CF Worker proxy at {port}--{slug}.bapx.cloud
-// Auth: unified previewProxyAuth (accepts Supabase JWT and bapx_ tokens).
+// Auth: unified previewProxyAuth (accepts Trailbase JWT and bapx_ tokens).
 // MUST be after all explicit routes (wildcard catch-all).
 app.route('/v1/p', sandboxProxyApp);
 
@@ -839,7 +831,7 @@ async function ensureLocalSandboxRegistered() {
   const { execSync } = await import('child_process');
 
   // Use a well-known account ID for the self-hosted single-owner case.
-  // When Supabase auth is active, the real user ID will be used via POST /init.
+  // When Trailbase auth is active, the real user ID will be used via POST /init.
   // This bootstrap is for the case where we need a sandbox before any user logs in.
   const CONTAINER_NAME = config.SANDBOX_CONTAINER_NAME;
   const portBase = config.SANDBOX_PORT_BASE;
@@ -990,7 +982,7 @@ ${config.BAPX_DEPLOYMENTS_ENABLED ? '║    /v1/deployments (deploy lifecycle)  
 ║    /v1/p         (sandbox proxy — local + cloud)            ║
 ╠═══════════════════════════════════════════════════════════╣
 ║  Database:   ${config.DATABASE_URL ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
-║  Supabase:   ${config.SUPABASE_URL ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
+║  Trailbase:   ${config.TRAILBASE_URL ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
 ║  Stripe:     ${config.STRIPE_SECRET_KEY ? '✓ Configured'.padEnd(42) : '✗ NOT SET'.padEnd(42)}║
 ║  Billing:    ${(config.BAPX_BILLING_INTERNAL_ENABLED ? 'ENABLED' : 'DISABLED').padEnd(42)}║
 ║  Tunnel:     ${(config.TUNNEL_ENABLED ? 'ENABLED' : 'DISABLED').padEnd(42)}║
@@ -1151,7 +1143,7 @@ async function validatePreviewToken(token: string, sandboxId: string): Promise<b
     });
   }
   // Fast path: local JWT verification (no network roundtrip)
-  const local = await verifySupabaseJwt(token);
+  const local = await verifyTrailbaseJwt(token);
   if (local.ok) {
     return canAccessPreviewSandbox({
       previewSandboxId: sandboxId,
@@ -1162,8 +1154,8 @@ async function validatePreviewToken(token: string, sandboxId: string): Promise<b
   if (local.reason !== 'no-keys' && local.reason !== 'no-key-for-kid') return false;
   // JWKS not yet available — fall back to network call
   try {
-    const supabase = getSupabase();
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    const trailbase = getTrailbase();
+    const { data: { user }, error } = await trailbase.auth.getUser(token);
     if (error || !user) return false;
     return canAccessPreviewSandbox({
       previewSandboxId: sandboxId,

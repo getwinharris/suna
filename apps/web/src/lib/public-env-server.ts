@@ -11,8 +11,8 @@ function read(name: string): string | undefined {
 export function getServerPublicEnv(): PublicRuntimeEnv {
   return parseRuntimeEnv({
     TRAILBASE_URL: read('TRAILBASE_URL') || process.env.TRAILBASE_URL,
-    SUPABASE_URL: read('SUPABASE_URL') || process.env.SUPABASE_PUBLIC_URL || process.env.SUPABASE_URL,
-    SUPABASE_ANON_KEY: read('SUPABASE_ANON_KEY') || process.env.SUPABASE_ANON_KEY,
+    TRAILBASE_URL: read('TRAILBASE_URL') || process.env.TRAILBASE_PUBLIC_URL || process.env.TRAILBASE_URL,
+    TRAILBASE_ANON_KEY: read('TRAILBASE_ANON_KEY') || process.env.TRAILBASE_ANON_KEY,
     BACKEND_URL: read('BACKEND_URL') || process.env.BACKEND_URL,
     ENV_MODE: (read('ENV_MODE') || 'local') as 'local' | 'cloud',
     APP_URL: read('APP_URL') || process.env.PUBLIC_URL,

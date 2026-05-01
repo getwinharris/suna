@@ -4,7 +4,7 @@
  * Provides API endpoints for managing .env configuration and
  * system status after the initial wizard setup. Mounted at /v1/setup/*.
  *
- * Auth: All routes require Supabase JWT except /install-status (public).
+ * Auth: All routes require Trailbase JWT except /install-status (public).
  */
 
 import { Hono } from 'hono';
@@ -19,13 +19,13 @@ import { eq, sql } from 'drizzle-orm';
 import { accounts } from '@bapx/db';
 import { db, hasDatabase } from '../shared/db';
 import { resolveAccountId } from '../shared/resolve-account';
-import { getSupabase } from '../shared/supabase';
+import { getTrailbase } from '../shared/trailbase';
 import { checkLocalSandboxHealth, type LocalSandboxHealthCheck } from '../platform/services/local-sandbox-health';
 
 export const setupApp = new Hono<AppEnv>();
 
 // ─── Auth ───────────────────────────────────────────────────────────────────
-// All setup routes require Supabase JWT auth EXCEPT /install-status which must
+// All setup routes require Trailbase JWT auth EXCEPT /install-status which must
 // remain public (the installer/login page calls it before any user exists).
 setupApp.use('/*', async (c, next) => {
   // Allow public routes without auth
@@ -38,7 +38,7 @@ setupApp.use('/*', async (c, next) => {
   ) {
     return next();
   }
-  // Everything else requires a valid Supabase JWT
+  // Everything else requires a valid Trailbase JWT
   return trailbaseAuth(c, next);
 });
 
@@ -273,16 +273,19 @@ const SYSTEM_KEYS = ['ONBOARDING_COMPLETE'];
  */
 setupApp.get('/install-status', async (c) => {
   try {
+    console.log('[setup] install-status: checking database...');
     if (!hasDatabase) {
       console.warn('[setup] install-status: DATABASE_URL not configured — returning 503');
       return c.json({ installed: null, error: 'Database not configured' }, 503);
     }
 
     // Query auth.users directly via the existing postgres connection.
-    // This is reliable regardless of Supabase version / service role key format.
+    // This is reliable regardless of Trailbase version / service role key format.
+    console.log('[setup] install-status: executing query...');
     const result = await db.execute(
       sql`SELECT EXISTS(SELECT 1 FROM auth.users LIMIT 1) AS has_users`
     );
+    console.log('[setup] install-status: query finished, result type:', typeof result);
     const queryResult = result as { rows?: Array<{ has_users?: boolean | 't' | 'f' }> } | Array<{ has_users?: boolean | 't' | 'f' }>;
     const row = Array.isArray(queryResult) ? queryResult[0] : queryResult.rows?.[0];
     const hasUsers = row?.has_users === true || row?.has_users === 't';
@@ -357,6 +360,28 @@ setupApp.get('/local-sandbox/warm/status', async (c) => {
   return c.json(await getLocalSandboxWarmStatus());
 });
 
+import { getTrailbase } from '../shared/trailbase';
+
+async function registerTrailbaseUser(email: string, password: string) {
+  const trail = getTrailbase();
+  const res = await trail.fetch('/api/auth/v1/register', {
+    method: 'POST',
+    body: JSON.stringify({ email, password, password_repeat: password }),
+    throwOnError: false,
+  });
+  
+  if (!res.ok && res.status !== 303) {
+    const err = await res.text();
+    throw new Error(err || 'Failed to register user');
+  }
+
+  // After registration, login to get the ID
+  await trail.login(email, password);
+  const user = trail.user();
+  if (!user) throw new Error('Failed to get user after registration');
+  return user;
+}
+
 setupApp.post('/bootstrap-owner', async (c) => {
   if (!hasDatabase) {
     return c.json({ success: false, error: 'Database not configured' }, 503);
@@ -375,64 +400,59 @@ setupApp.post('/bootstrap-owner', async (c) => {
       return c.json({ success: false, error: 'Password must be at least 6 characters' }, 400);
     }
 
-    const supabase = getSupabase();
-    const listed = await supabase.auth.admin.listUsers({ page: 1, perPage: 1 });
-    if (listed.error) {
-      return c.json({ success: false, error: listed.error.message || 'Could not inspect existing users' }, 500);
-    }
-    const firstUser = listed.data?.users?.[0];
-    if (firstUser) {
-      if ((firstUser.email || '').toLowerCase() === email) {
-        const updateExisting = await supabase.auth.admin.updateUserById(firstUser.id, {
-          password,
-          email_confirm: true,
-        });
-        if (updateExisting.error) {
-          return c.json({ success: false, error: updateExisting.error.message || 'Could not refresh owner credentials' }, 500);
-        }
-        try {
-          const accountId = await resolveAccountId(firstUser.id);
-          await db
-            .update(accounts)
-            .set({ setupCompleteAt: null, setupWizardStep: 2, updatedAt: new Date() })
-            .where(eq(accounts.accountId, accountId));
-          await setSandboxEnv({ ONBOARDING_COMPLETE: 'false', ONBOARDING_SESSION_ID: '', ONBOARDING_COMMAND_FIRED: 'false' }).catch(() => {});
-        } catch {
-          // best effort reset
-        }
-        return c.json({ success: true, created: false, message: 'Owner already exists for this email', credentials_reset: true });
-      }
-      return c.json({ success: false, error: `Owner already exists (${firstUser.email})` }, 409);
+    const trail = getTrailbase();
+    
+    // Check if any users exist in platform_user_roles (which indicates installation)
+    const existingAdmins = await db.select().from(accounts).limit(1);
+    
+    if (existingAdmins.length > 0) {
+       // Check if this specific user exists in Trailbase
+       try {
+         await trail.login(email, password);
+         const user = trail.user();
+         if (user) {
+           return c.json({ success: true, created: false, message: 'Owner already exists', credentials_reset: true });
+         }
+       } catch {
+         return c.json({ success: false, error: 'Owner account already exists with different credentials' }, 409);
+       }
     }
 
-    const { data, error } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { is_owner: true },
-    });
+    const user = await registerTrailbaseUser(email, password);
+    const userId = user.id;
 
-    if (error) {
-      return c.json({ success: false, error: error.message || 'Could not create owner' }, 500);
-    }
-
-    const userId = data.user?.id;
     if (userId) {
       try {
-        const accountId = await resolveAccountId(userId);
-        await db
-          .update(accounts)
-          .set({ setupCompleteAt: null, setupWizardStep: 2, updatedAt: new Date() })
-          .where(eq(accounts.accountId, accountId));
+        const accountId = userId; // In Trailbase, userId is often used as accountId for personal
+        
+        // Create account record
+        await db.insert(accounts).values({
+          accountId,
+          name: email.split('@')[0],
+          personalAccount: true,
+          setupWizardStep: 2,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        // Assign super_admin role
+        const { platformUserRoles } = await import('@bapx/db');
+        await db.insert(platformUserRoles).values({
+          accountId,
+          role: 'super_admin',
+        });
+
         await setSandboxEnv({ ONBOARDING_COMPLETE: 'false', ONBOARDING_SESSION_ID: '', ONBOARDING_COMMAND_FIRED: 'false' }).catch(() => {});
-      } catch {
-        // best effort
+      } catch (err) {
+        console.error('[setup] bootstrap-owner DB error:', err);
+        // continue, maybe record already exists
       }
     }
 
-    return c.json({ success: true, created: true, email });
+    return c.json({ success: true, created: true, email, accessToken: trail.tokens()?.auth_token });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+    console.error('[setup] bootstrap-owner error:', err);
     return c.json({ success: false, error: message }, 500);
   }
 });

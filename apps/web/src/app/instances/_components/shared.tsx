@@ -11,7 +11,6 @@
 
 import { Fragment, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import type { User } from '@supabase/supabase-js';
 import { ChevronDown, Loader2, LogOut, Settings } from 'lucide-react';
 
 import { BapxLogo } from '@/components/sidebar/bapx-logo';
@@ -36,7 +35,7 @@ export function UserMenu({
   onOpenSettings,
   onLogout,
 }: {
-  user: User;
+  user: any;
   onOpenSettings: () => void;
   onLogout: () => void;
 }) {
@@ -96,7 +95,7 @@ export function InstancesTopBar({
   user,
   leading,
 }: {
-  user: User;
+  user: any;
   /** Optional slot rendered to the left, next to the Bapx Media Hub logo (e.g. a back button). */
   leading?: React.ReactNode;
 }) {
@@ -115,8 +114,8 @@ export function InstancesTopBar({
   }, [searchParams]);
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    const trailbase = createClient();
+    await trailbase.auth.signOut();
     clearUserLocalStorage();
     router.push('/auth');
   };
