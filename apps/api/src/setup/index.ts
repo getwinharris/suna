@@ -364,15 +364,7 @@ async function registerTrailbaseUser(email: string, password: string) {
     const err = await regRes.text();
     throw new Error(err || 'Failed to register user');
   }
-
-  // Step 2: Set verified=1 via Trailbase's built-in SQLite (bootstrap only)
-  const { Database } = await import('bun:sqlite');
-  const trailbaseDbPath = resolve(findRepoRoot() || process.cwd(), 'traildepot/data/main.db');
-  const sdb = new Database(trailbaseDbPath);
-  sdb.run('UPDATE _user SET verified = 1 WHERE email = ?', [email]);
-  sdb.close();
-
-  // Step 3: Login via Trailbase API to get auth token
+4
   const loginRes = await fetch(`${baseUrl}/api/auth/v1/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
