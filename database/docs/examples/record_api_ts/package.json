@@ -1,0 +1,22 @@
+{
+  "name": "record_api_ts",
+  "version": "1.0.0",
+  "description": "Example uses of record APIs for documentation purposes.",
+  "scripts": {
+    "check": "tsc --noEmit --skipLibCheck && eslint",
+    "manual-test": "vitest run # Not hermetic, don't run @CI",
+    "test:manual": "vitest run"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.5.2",
+    "eslint": "^10.2.0",
+    "prettier": "^3.8.1",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.58.1",
+    "vitest": "^4.1.3"
+  },
+  "dependencies": {
+    "trailbase": "workspace:*"
+  }
+}
