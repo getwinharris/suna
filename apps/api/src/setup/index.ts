@@ -273,13 +273,13 @@ const SYSTEM_KEYS = ['ONBOARDING_COMPLETE'];
  */
 setupApp.get('/install-status', async (c) => {
   try {
-    console.log('[setup] install-status: checking...');
-    const { Database } = await import('bun:sqlite');
-    const trailbaseDbPath = resolve(findRepoRoot() || process.cwd(), 'traildepot/data/main.db');
-    const sdb = new Database(trailbaseDbPath, { readonly: true });
-    const row = sdb.query('SELECT COUNT(*) as count FROM accounts').get() as { count: number } | undefined;
-    sdb.close();
-    const installed = (row?.count || 0) > 0;
+    const baseUrl = config.TRAILBASE_URL?.replace(/\/+$/, '') || 'http://localhost:4000';
+    const res = await fetch(`${baseUrl}/api/records/v1/accounts?limit=1`);
+    let installed = false;
+    if (res.ok) {
+      const body = await res.json() as { records?: any[] };
+      installed = (body.records?.length || 0) > 0;
+    }
     return c.json({ installed });
   } catch (err) {
     console.error('[setup] install-status error:', err);

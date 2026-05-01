@@ -1,5 +1,3 @@
-import { initClient } from 'trailbase';
-
 interface ServerClientOptions {
   cookieOptions?: {
     name: string;
@@ -12,33 +10,43 @@ interface ServerClientOptions {
   };
 }
 
-export function createServerClient(url: string, anonKey: string | undefined, options: ServerClientOptions) {
+export function createServerClient(url: string, options: ServerClientOptions) {
   const cookies = options.cookies.getAll();
   const authCookie = cookies.find(c => c.name === (options.cookieOptions?.name || 'bapx-trailbase-auth'));
   const initialToken = authCookie?.value || null;
 
-  const client = initClient(url, initialToken ? { tokens: { auth_token: initialToken, refresh_token: null, csrf_token: null } } : undefined);
+  const trailFetch = (path: string, opts?: RequestInit) =>
+    fetch(`${url}${path}`, {
+      ...opts,
+      headers: { 'Content-Type': 'application/json', ...opts?.headers },
+    });
 
-  const getToken = () => client.tokens()?.auth_token || initialToken;
+  const getToken = () => initialToken;
 
   return {
     auth: {
       getUser: async () => {
-        try {
-          await client.refreshAuthToken().catch(() => undefined);
-        } catch {}
-        const user = client.user();
-        return { data: { user: user || null }, error: null };
+        let user = null;
+        if (initialToken) {
+          try {
+            const payload = initialToken.split('.')[1];
+            if (payload) {
+              const padded = payload.replace(/-/g, '+').replace(/_/g, '/');
+              const padding = (4 - (padded.length % 4)) % 4;
+              const decoded = JSON.parse(atob(padded + '='.repeat(padding)));
+              if (decoded.sub) {
+                user = { id: decoded.sub, email: decoded.email || '', admin: decoded.admin };
+              }
+            }
+          } catch {}
+        }
+        return { data: { user }, error: null };
       },
       getSession: async () => {
-        try {
-          await client.refreshAuthToken().catch(() => undefined);
-        } catch {}
         const token = getToken();
-        const user = client.user();
         return {
           data: {
-            session: token ? { access_token: token, user } : null,
+            session: token ? { access_token: token, user: null } : null,
           },
           error: null,
         };
